@@ -73,10 +73,8 @@ PAGE
 ;
 transfer    MACRO   name
 .xcref
-	IF2
-	    IFNDEF name
+	IFNDEF name
 	EXTRN   name:NEAR
-	    ENDIF
 	ENDIF
 .cref
 	JUMP    name
@@ -89,10 +87,8 @@ ENDM
 short_addr  MACRO   name
     IFDIF   <name>,<?>
 .xcref
-	IF2
-	    IFNDEF name
+	IFNDEF name
 	EXTRN   name:NEAR
-	    ENDIF
 	ENDIF
 .cref
 	DW  OFFSET DOSGROUP:name
@@ -107,10 +103,8 @@ ENDM
 ;
 long_addr   MACRO   name
 .xcref
-	IF2
-	    IFNDEF name
+	IFNDEF name
 	EXTRN   name:NEAR
-	    ENDIF
 	ENDIF
 .cref
 	DD  name
@@ -136,9 +130,6 @@ procedure   MACRO   name,distance
 	IF1
 	%OUT name... pass 1
 	ENDIF
-	IF2
-	%OUT name... pass 2
-	ENDIF
 name    PROC    distance
 	?initstack    = ?stackdepth     ;; beginning of procedure
 ENDM
@@ -149,10 +140,8 @@ ENDM
 ;
 EndProc MACRO   name, chk
 	IFDIF   <chk>,<NoCheck>       ;; check the stack size
-	IF2
 	IF ?initstack NE ?stackdepth    ;; is it different?
 	%OUT    ***** Possible stack size error in name *****
-	ENDIF
 	ENDIF
 	ENDIF
 name    ENDP

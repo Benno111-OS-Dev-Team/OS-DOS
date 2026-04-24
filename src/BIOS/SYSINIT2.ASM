@@ -56,6 +56,7 @@ DOSSIZE EQU	0A000H
 	INCLUDE devsym.INC
 	include ioctl.INC
 	include DEVMARK.inc
+	include doscntry.inc
 .list
 
 	IF	NOT IBM
@@ -77,14 +78,14 @@ ASSUME	CS:SYSINITSEG,DS:NOTHING,ES:NOTHING,SS:NOTHING
 ;	 EXTRN	 BADSIZ_POST:BYTE,BADLD_POST:BYTE
 	EXTRN	SYSSIZE:BYTE,BADCOUNTRY:BYTE
 
-	EXTRN  dosinfo:dword,entry_point:dword,
+	EXTRN  dosinfo:dword,entry_point:dword
 	EXTRN  MEMORY_SIZE:WORD,fcbs:byte,keep:byte
 	EXTRN  DEFAULT_DRIVE:BYTE,confbot:word,alloclim:word
 	EXTRN  BUFFERS:WORD,zero:byte,sepchr:byte
 	EXTRN  FILES:BYTE
 	EXTRN  count:word,chrptr:word
 	EXTRN  bufptr:byte,memlo:word,prmblk:byte,memhi:word
-	EXTRN  ldoff:word,area:word,PACKET:BYTE,UNITCOUNT:BYTE,
+	EXTRN  ldoff:word,area:word,PACKET:BYTE,UNITCOUNT:BYTE
 	EXTRN  BREAK_ADDR:DWORD,BPB_ADDR:DWORD,drivenumber:byte
 	extrn  COM_Level:byte, CMMT:byte, CMMT1:byte, CMMT2:byte
 	extrn  Cmd_Indicator:byte
@@ -345,18 +346,18 @@ Set_RecBPB:
 	mov	di,offset DeviceParameters.DP_BPB	 ; es:di -> BPB
 	mov	cx,size a_BPB
 	cld
-	repe	movsb
+	rep	movsb
 	pop	es
 ASSUME ES:NOTHING
 	test	word ptr switches,flagseclim
 	jz	see_heads
 	mov	ax,word ptr slim
-	mov	word ptr DeviceParameters.DP_BPB.BPB_SectorsPerTrack,ax
+	mov	word ptr DeviceParameters+20,ax
 see_heads:
 	test	word ptr switches,flagheads
 	jz	Set_All_Done
 	mov	ax,word ptr hlim
-	mov	word ptr DeviceParameters.DP_BPB.BPB_Heads,ax
+	mov	word ptr DeviceParameters+22,ax
 ;
 ; We need to set the media byte and the total number of sectors to reflect the
 ; number of heads. We do this by multiplying the number of heads by the number
@@ -364,17 +365,17 @@ see_heads:
 ;
 	mov	cx,ax			; cx has number of heads
 	dec	cl			; get it 0-based
-	mov	ax,DeviceParameters.DP_BPB.BPB_TotalSectors	; this is OK for two heads
+	mov	ax,DeviceParameters+15	; this is OK for two heads
 	sar	ax,1			; ax contains # of sectors/head
 	sal	ax,cl
 	jc	Set_All_Done		; We have too many sectors - overflow!!
-	mov	DeviceParameters.DP_BPB.BPB_TotalSectors,ax
+	mov	DeviceParameters+15,ax
 ; Set up correct Media Descriptor Byte
 	cmp	cl,1
 	mov	bl,0F0H
 	mov	al,2			; AL contains sectors/cluster
 	ja	Got_Correct_Mediad
-	mov	bl,byte ptr DeviceParameters.DP_BPB.BPB_MediaDescriptor
+	mov	bl,byte ptr DeviceParameters+17
 	je	Got_Correct_Mediad
 ; We have one head - OK for 48tpi medium
 	mov	al,1			; AL contains sectors/cluster
@@ -386,8 +387,8 @@ see_heads:
 Dec_Mediad:
 	dec	bl			; adjust for one head
 Got_Correct_Mediad:
-	mov	byte ptr DeviceParameters.DP_BPB.BPB_MediaDescriptor,bl
-	mov	byte ptr DeviceParameters.DP_BPB.BPB_SectorsPerCluster,al
+	mov	byte ptr DeviceParameters+17,bl
+	mov	byte ptr DeviceParameters+9,al
 	clc
 Set_All_Done:
 	RET
@@ -848,7 +849,7 @@ ROUND:
 	mov	es, si					;AN005;
 	sub	ax, si					;AN005;
 	dec	ax					;AN005;
-	mov	es:[DEVMARK_SIZE], ax			;AN005; Paragraph
+	mov	es:[3], ax			;AN005; Paragraph
 	and	cs:[SetDevMarkFlag], NOT_FOR_DEVMARK	    ;AN005;
 	pop	si					;AN005;
 	pop	es					;AN005;
