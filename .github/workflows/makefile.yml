@@ -62,4 +62,13 @@ jobs:
 
           foreach ($pattern in $patterns) {
             Get-ChildItem -Path src -Recurse -File -Filter $pattern |
-              Where-Object { $_.Full
+              Where-Object { $_.FullName -notmatch '\\dist\\' } |
+              Copy-Item -Destination dist -Force
+          }
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: os-dos-build-${{ github.run_number }}
+          path: dist
+          if-no-files-found: warn
