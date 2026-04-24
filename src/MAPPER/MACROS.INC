@@ -3,6 +3,8 @@
                 %out    macros.inc
         endif
 
+option  M510
+
 
 pushal  macro
         push    bx
