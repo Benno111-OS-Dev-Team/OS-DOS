@@ -19,7 +19,7 @@ boot.cl1: boot.skl \
 msboot.obj: msboot.asm boot.cl1
 
 msboot.bin: msboot.obj
-	link msboot;
+	link msboot.obj
 	exe2bin msboot.exe msboot.bin
 	dbof msboot.bin boot.inc 7c00 200
 	copy boot.inc $(inc)
