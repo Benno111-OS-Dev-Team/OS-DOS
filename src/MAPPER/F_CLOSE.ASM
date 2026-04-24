@@ -76,7 +76,7 @@ DosFindClose  proc   far
 
 ; Special Logic to handle DirHandle = 1
 
-        mov     si,[bp].DirHandle          ; get directory hanlde
+        mov     si,[bp+6]                  ; get directory hanlde
         cmp     si,1                       ; handle = 1??
         jne     CheckForClose              ; branch if not
 

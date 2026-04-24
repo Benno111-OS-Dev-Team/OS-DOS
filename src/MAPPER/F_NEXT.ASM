@@ -85,6 +85,38 @@ DirHandle       dw      ?
 stk     ends
 
 ;
+; Explicit stack offsets from BP
+;
+FindCountPtr_Off equ 6
+FindBufferLen_Off equ 10
+FindBufferPtr_Off equ 12
+DirHandle_Off     equ 16
+
+;
+; DTA offsets (dtastr)
+;
+DTA_ATTR_Off      equ 21
+DTA_TIME_Off      equ 22
+DTA_DATE_Off      equ 24
+DTA_SIZE_Off      equ 26
+DTA_NAME_Off      equ 30
+
+;
+; Output record offsets (FileFindBuf)
+;
+FF_CREATE_DATE_Off equ 0
+FF_CREATE_TIME_Off equ 2
+FF_ACCESS_DATE_Off equ 4
+FF_ACCESS_TIME_Off equ 6
+FF_WRITE_DATE_Off  equ 8
+FF_WRITE_TIME_Off  equ 10
+FF_FILE_SIZE_Off   equ 12
+FF_FALLOC_SIZE_Off equ 16
+FF_ATTR_Off        equ 20
+FF_STRLEN_Off      equ 22
+FF_NAME_Off        equ 23
+
+;
 DosFindNext  proc   far
 
 
@@ -98,7 +130,7 @@ DosFindNext  proc   far
 
 ; Special Logic to handle DirHandle = 1
 
-        mov     si,[bp].DirHandle
+        mov     si,[bp+DirHandle_Off]
         cmp     si,1
         jne     CheckForNext
 
@@ -136,7 +168,7 @@ HandleFound:
 
 ; Get the count of files to search for
 
-        les     di,[bp].FindCountPtr  ; load result buffer pointer
+        les     di,[bp+FindCountPtr_Off]  ; load result buffer pointer
         mov     ax,es:[di]            ; save the search
         mov     SearchCount,ax        ;                count
         mov     es:word ptr [di],0    ; set found count to zero
@@ -149,10 +181,10 @@ HandleFound:
 ;  Find first file
 
 DoSearch:
-        mov     ax,[bp].FindBufferLen ; load the buffer length
+        mov     ax,[bp+FindBufferLen_Off] ; load the buffer length
         mov     ReturnLengthToGo,ax   ; save low order buffer length
 
-        les     di,[bp].FindBufferPtr ; load result buffer pointer
+        les     di,[bp+FindBufferPtr_Off] ; load result buffer pointer
         mov     word ptr ReturnBufferSave+0,di
         mov     word ptr ReturnBufferSave+2,es
 
@@ -180,56 +212,56 @@ BufferLengthOk:
 ;       es:di -> where we are to put the resultant data
 ;       ds:si -> DTA from find (either first or next)
 
-        mov     ax,ds:[si].DTAFileDate
-        mov     es:[di].Create_Date,ax
-        mov     es:[di].Access_Date,ax
-        mov     es:[di].Write_Date,ax
+        mov     ax,word ptr ds:[si+DTA_DATE_Off]
+        mov     es:word ptr [di+FF_CREATE_DATE_Off],ax
+        mov     es:word ptr [di+FF_ACCESS_DATE_Off],ax
+        mov     es:word ptr [di+FF_WRITE_DATE_Off],ax
 
-        mov     ax,ds:[si].DTAFileTime
-        mov     es:[di].Create_Time,ax
-        mov     es:[di].Access_Time,ax
-        mov     es:[di].Write_Time,ax
+        mov     ax,word ptr ds:[si+DTA_TIME_Off]
+        mov     es:word ptr [di+FF_CREATE_TIME_Off],ax
+        mov     es:word ptr [di+FF_ACCESS_TIME_Off],ax
+        mov     es:word ptr [di+FF_WRITE_TIME_Off],ax
 
-        mov     ax,ds:word ptr [si].DTAFileSize+0
-        mov     es:word ptr [di].File_Size+0,ax
-        mov     es:word ptr [di].FAlloc_Size+0,ax
-        mov     ax,ds:word ptr [si].DTAFileSize+2
-        mov     es:word ptr [di].File_Size+2,ax
-        mov     es:word ptr [di].FAlloc_Size+2,ax
+        mov     ax,word ptr ds:[si+DTA_SIZE_Off+0]
+        mov     es:word ptr [di+FF_FILE_SIZE_Off+0],ax
+        mov     es:word ptr [di+FF_FALLOC_SIZE_Off+0],ax
+        mov     ax,word ptr ds:[si+DTA_SIZE_Off+2]
+        mov     es:word ptr [di+FF_FILE_SIZE_Off+2],ax
+        mov     es:word ptr [di+FF_FALLOC_SIZE_Off+2],ax
 
-        test    es:word ptr [di].FAlloc_Size,001ffh
+        test    es:word ptr [di+FF_FALLOC_SIZE_Off],001ffh
         jz      AllocateSizeSet
 
-        and     es:word ptr [di].FAlloc_Size,not 001ffh
-        add     es:word ptr [di].FAlloc_Size,00200h
+        and     es:word ptr [di+FF_FALLOC_SIZE_Off],not 001ffh
+        add     es:word ptr [di+FF_FALLOC_SIZE_Off],00200h
 
 AllocateSizeSet:
         xor     ax,ax
-        mov     al,ds:[si].DTAFileAttrib
-        mov     es:[di].Attributes,ax
+        mov     al,byte ptr ds:[si+DTA_ATTR_Off]
+        mov     es:word ptr [di+FF_ATTR_Off],ax
 
         mov     cx,12
         mov     bx,0
 
 MoveNameLoop:
-        mov     al,ds:[si+bx].DTAFileName
+        mov     al,byte ptr ds:[si+bx+DTA_NAME_Off]
         cmp     al,0
         je      EndOfName
 
-        mov     es:[di+bx].File_Name,al
+        mov     byte ptr es:[di+bx+FF_NAME_Off],al
         inc     bx
         loop    MoveNameLoop
 
 EndOfName:
-        mov     es:[di+bx].File_Name,0
+        mov     byte ptr es:[di+bx+FF_NAME_Off],0
         mov     ax,bx
-        mov     es:[di].String_len,al
+        mov     byte ptr es:[di+FF_STRLEN_Off],al
 
         add     di,bx
         mov     word ptr ReturnBufferSave+0,di
         mov     word ptr ReturnBufferSave+2,es
 
-        les     di,[bp].FindCountPtr
+        les     di,[bp+FindCountPtr_Off]
         inc     word ptr es:[di]
 
 ;
