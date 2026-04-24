@@ -67,7 +67,7 @@ cbDirEnt    EQU 32
 DirOff	    EQU 500h
 IBMLOADSIZE equ 3			;J.K. Size of IBMLOAD module in sectors
 ROM_DISKRD  equ 2
-include version.inc
+include ..\inc\version.inc
 
 ;
 ; Define the destination segment of the BIOS, including the initialization
