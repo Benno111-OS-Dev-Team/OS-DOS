@@ -228,10 +228,10 @@ Do_Ext_Check_ID:				;AN000;
 ;SB	BDS fields in inc\msbds.inc
 
 	mov	ax,cs:[Boot_Serial_L]
-	cmp	ax,word ptr ds:[di+VOL_SERIAL]
+	cmp	ax,word ptr ds:[di+87]
 	jnz	Ext_Changed
 	mov	ax,cs:[Boot_Serial_H]
-	cmp	ax,word ptr ds:[di+VOL_SERIAL+2]
+	cmp	ax,word ptr ds:[di+89]
 	jnz	Ext_Changed
 	xor	si,si			; don't know
 
