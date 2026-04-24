@@ -1335,42 +1335,42 @@ $P_Val02_Loop:				;AN000;
 	test	psdata_seg:$P_Flags2,$P_Signed ;AC034;
 	jne	$P_Val02_Sign		;AN000;
 
-	cmp	cx,es:[si+$P_Val_XH]	;AN000; comp cx with XH
+	cmp	cx,es:[si+3]		;AN000; comp cx with XH
 	jb	$P_Val02_Next		;AN000;
 
 	ja	$P_Val_In		;AN000;
 
-	cmp	dx,es:[si+$P_Val_XL]	;AN000; comp dx with XL
+	cmp	dx,es:[si+1]		;AN000; comp dx with XL
 	jb	$P_Val02_Next		;AN000;
 
 $P_Val_In:				;AN000;
 ;;;;;;	cmp	cx,es:$P_Val_YH]	; comp cx with YH (tm01)
-	cmp	cx,es:[si+$P_Val_YH]	;AN000; comp cx with YH (tm01)
+	cmp	cx,es:[si+7]		;AN000; comp cx with YH (tm01)
 	ja	$P_Val02_Next		;AN000;
 
 	jb	$P_Val_Found		;AN000;
 
-	cmp	dx,es:[si+$P_Val_YL]	;AN000; comp dx with YL
+	cmp	dx,es:[si+5]		;AN000; comp dx with YL
 	ja	$P_Val02_Next		;AN000;
 
 	jmp	short $P_Val_Found	;AN000;
 
 $P_Val02_Sign:				;AN000;
-	cmp	cx,es:[si+$P_Val_XH]	;AN000; comp cx with XH
+	cmp	cx,es:[si+3]		;AN000; comp cx with XH
 	jl	$P_Val02_Next		;AN000;
 
 	jg	$P_SVal_In		;AN000;
 
-	cmp	dx,es:[si+$P_Val_XL]	;AN000; comp dx with XL
+	cmp	dx,es:[si+1]		;AN000; comp dx with XL
 	jl	$P_Val02_Next		;AN000;
 
 $P_SVal_In:				;AN000;
-	cmp	cx,es:[si+$P_Val_YH]	;AN000; comp cx with YH
+	cmp	cx,es:[si+7]		;AN000; comp cx with YH
 	jg	$P_Val02_Next		;AN000;
 
 	jl	$P_Val_Found		;AN000;
 
-	cmp	dx,es:[si+$P_Val_YL]	;AN000; comp dx with YL
+	cmp	dx,es:[si+5]		;AN000; comp dx with YL
 	jg	$P_Val02_Next		;AN000;
 
 	jmp	short $P_Val_Found	;AN000;

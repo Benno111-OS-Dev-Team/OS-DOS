@@ -1593,29 +1593,29 @@ PERUNIT:
 	LES	BP,CS:[DOSINFO]
 	LES	BP,DWORD PTR ES:[BP+0]	;GET FIRST DPB
 
-SCANDPB:CMP	WORD PTR ES:[BP.DPB_NEXT_DPB],-1
+SCANDPB:CMP	WORD PTR ES:[BP+25],-1
 	JZ	FOUNDPB
-	LES	BP,ES:[BP.DPB_NEXT_DPB]
+	LES	BP,ES:[BP+25]
 	JMP	SCANDPB
 FOUNDPB:
 	MOV	AX,CS:[MEMLO]
-	MOV	WORD PTR ES:[BP.DPB_NEXT_DPB],AX
+	MOV	WORD PTR ES:[BP+25],AX
 	MOV	AX,CS:[MEMHI]
-	MOV	WORD PTR ES:[BP.DPB_NEXT_DPB+2],AX
+	MOV	WORD PTR ES:[BP+27],AX
 	LES	BP,DWORD PTR CS:[MEMLO]
 	ADD	WORD PTR CS:[MEMLO],DPBSIZ
 	or	cs:[SetDevMarkFlag], FOR_DEVMARK       ;AN004;Add DPB area for this unit
 	CALL	ROUND			;Check for alloc error
-	MOV	WORD PTR ES:[BP.DPB_NEXT_DPB],-1
-	MOV	ES:[BP.DPB_FIRST_ACCESS],-1
+	MOV	WORD PTR ES:[BP+25],-1
+	MOV	ES:[BP+24],-1
 
 	MOV	SI,[BX] 		;DS:SI POINTS TO BPB
 	INC	BX
 	INC	BX			;POINT TO NEXT GUY
-	MOV	WORD PTR ES:[BP.DPB_DRIVE],DX
+	MOV	WORD PTR ES:[BP+0],DX
 	MOV	AH,SETDPB		;HIDDEN SYSTEM CALL
 	INT	21H
-	MOV	AX,ES:[BP.DPB_SECTOR_SIZE]
+	MOV	AX,ES:[BP+2]
 	PUSH	ES
 	LES	DI,CS:[DOSINFO] 	;ES:DI POINT TO DOS INFO
 	CMP	AX,ES:[DI+16]
@@ -1624,8 +1624,8 @@ FOUNDPB:
 	PUSH	DS
 	PUSH	DX
 	LDS	DX,CS:[ENTRY_POINT]
-	MOV	WORD PTR ES:[BP.DPB_DRIVER_ADDR],DX
-	MOV	WORD PTR ES:[BP.DPB_DRIVER_ADDR+2],DS
+	MOV	WORD PTR ES:[BP+19],DX
+	MOV	WORD PTR ES:[BP+21],DS
 	POP	DX
 	POP	DS
 	INC	DX
@@ -1868,7 +1868,7 @@ TryQ_Openit:
 TRYQ_Set_for_DOS:
 	les	di, cs:SYSI_Country	;ES:DI -> country info tab in DOS
 	push	di			;save di
-	add	di, ccPath_CountrySys
+	add	di, 8
 	call	MOVE_ASCIIZ		;Set the path to COUNTRY.SYS in DOS.
 	pop	di			;ES:DI -> country info tab again.
 	mov	cx, cs:[MEMHI]
@@ -2683,9 +2683,9 @@ Set_DevMark	proc	near			;AN004;
 SDVMK_IFS:
 	mov	al, DEVMARK_IFS 	;AN004; ='I'
 SDVMK_ID:				;AN004;
-	mov	ds:[DEVMARK_ID], al	;AN004;
+	mov	ds:[0], al		;AN004;
 	inc	di			;AN008;
-	mov	ds:[DEVMARK_SEG], di	;AN008;
+	mov	ds:[1], di		;AN008;
 	xor	al,al			;AN004;
 	push	si			;AN004;
 	pop	di			;AN004; now es:si = es:di = [path]filename,0
@@ -2711,7 +2711,7 @@ SDVMK_FilePtr:				;AN004; now es:di -> start of file name
 	push	es			;AN004;
 	pop	ds			;AN004;
 	pop	es			;AN004; now, ds:si -> start of filename
-	mov	di, DEVMARK_FILENAME	;AN004;
+	mov	di, 8			;AN004;
 	push	di			;AN004;
 	mov	al, ' ' 		;AN004;
 	mov	cx, 8			;AN004;
