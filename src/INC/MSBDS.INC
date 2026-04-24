@@ -84,7 +84,7 @@ VOL_SERIAL	dd	0	  ;J.K.87 Current volume serial number from Boot record
 FILESYS_Id	db	9 dup (0) ;J.K.87 Current file system id from Boot record
 BDS_TYPE	ENDS
 
-BPBSIZE     =	TRACK - RBYTEPERSEC ; SIZE IN BYTES OF RECBPB AREA IN THE BDS
+BPBSIZE     =	31	; SIZE IN BYTES OF RECBPB AREA IN THE BDS
 
 
 ;*********************************************************************
