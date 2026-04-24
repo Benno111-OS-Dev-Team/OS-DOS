@@ -59,10 +59,8 @@ ENDM
 ;
 invoke  MACRO   name
 .xcref
-	IF2
-	    IFNDEF name
+	IFNDEF name
 	EXTRN   name:NEAR
-	    ENDIF
 	ENDIF
 .cref
 	CALL    name

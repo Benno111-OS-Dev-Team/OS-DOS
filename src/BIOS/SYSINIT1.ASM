@@ -40,6 +40,8 @@ TITLE	BIOS SYSTEM INITIALIZATION
 ;AN030; P4934 P4759 INT 2Fh handler number be changed to 1Bh	  05/20/88 J.K.
 ;==============================================================================
 
+OPTION M510
+
 TRUE	    EQU 0FFFFh
 FALSE	    EQU 0
 CR	    equ 13
@@ -76,6 +78,7 @@ DOSSIZE EQU	0A000H
 	include defems.inc		;AN010;
 	include DEVMARK.inc		;AN005;
 	include cputype.inc
+	include sysvar.inc
 
 	include version.inc
 
@@ -398,9 +401,9 @@ GOINIT:
 	jc	No_ROM_Config
 	cmp	ah, 0			; double check
 	jne	No_ROM_Config
-	mov	al, ES:[BX.bios_SD_modelbyte]
+	mov	al, ES:[BX+2]
 	mov	cs:[Sys_Model_Byte], al
-	mov	al, ES:[BX.bios_SD_scnd_modelbyte]
+	mov	al, ES:[BX+3]
 	mov	cs:[Sys_Scnd_Model_Byte], al
 	jmp	short Move_Myself
 No_ROM_Config:				; Old ROM
