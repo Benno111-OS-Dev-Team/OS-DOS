@@ -1,13 +1,14 @@
 #************************* makefile for messages **************************
 
-country    =usa-ms
+COUNTRY    =usa-ms
+country    =$(COUNTRY)
 
 #
 #######################	dependencies begin here. #########################
 #
 
-all: $(country).idx
+all: $(COUNTRY).idx
 
-$(country).idx: $(country).msg
+$(COUNTRY).idx: $(COUNTRY).msg
 	-@where buildidx >nul 2>nul
-	@if %errorlevel% neq 0 (echo buildidx not found; using checked-in $(country).idx) else (attrib -R $(country).msg & buildidx $(country).msg)
+	@if %errorlevel% neq 0 (echo buildidx not found; using checked-in $(COUNTRY).idx) else (attrib -R $(COUNTRY).msg & buildidx $(COUNTRY).msg)
