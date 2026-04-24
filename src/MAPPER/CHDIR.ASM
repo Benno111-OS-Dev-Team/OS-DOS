@@ -53,11 +53,7 @@ stk     ends
 DosChDir  proc   far
         EnterProc   DosChDir                 ; push registers
 
-        mov     dx, word ptr [bp].dnam006    ;load directory name offset
-        mov     ax, word ptr [bp].dnam006+2  ;load directory name segment
-
-        push    ax                       ; set segment in DS
-        pop     ds
+        lds     dx,dword ptr [bp+10]          ; set DS:DX to directory path name
 
         mov     ax,03b00h                ; load chdir op code
         int     21h                      ; call dos to change the directory

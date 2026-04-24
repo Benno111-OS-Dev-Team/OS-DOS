@@ -9,4 +9,5 @@ country    =usa-ms
 all: $(country).idx
 
 $(country).idx: $(country).msg
-
+	-@where buildidx >nul 2>nul
+	@if %errorlevel% neq 0 (echo buildidx not found; using checked-in $(country).idx) else (attrib -R $(country).msg & buildidx $(country).msg)

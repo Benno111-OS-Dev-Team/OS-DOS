@@ -113,12 +113,46 @@ DirHandlePtr    dd      ?       ; directory search handle
 PathNamePtr     dd      ?       ; file path name pointer
 stk     ends
 
+;
+; Explicit stack parameter offsets from BP
+;
+FindCountPtr_Off equ 10
+FindBufferLen_Off equ 14
+FindBufferPtr_Off equ 16
+FileAttrib_Off   equ 20
+DirHandlePtr_Off equ 22
+PathNamePtr_Off  equ 26
+
+;
+; DTA offsets (dtastr)
+;
+DTA_ATTR_Off     equ 21
+DTA_TIME_Off     equ 22
+DTA_DATE_Off     equ 24
+DTA_SIZE_Off     equ 26
+DTA_NAME_Off     equ 30
+
+;
+; Output record offsets (FileFindBuf)
+;
+FF_CREATE_DATE_Off equ 0
+FF_CREATE_TIME_Off equ 2
+FF_ACCESS_DATE_Off equ 4
+FF_ACCESS_TIME_Off equ 6
+FF_WRITE_DATE_Off  equ 8
+FF_WRITE_TIME_Off  equ 10
+FF_FILE_SIZE_Off   equ 12
+FF_FALLOC_SIZE_Off equ 16
+FF_ATTR_Off        equ 20
+FF_STRLEN_Off      equ 22
+FF_NAME_Off        equ 23
+
 
 DosFindFirst  proc   far
 
         EnterProc   DosFindFirst
 
-        mov     ax,seg FindSegment      ; get address to our data
+        mov     ax,FindSegment          ; get address to our data
         mov     ds,ax
         assume  ds:FindSegment
 
@@ -139,7 +173,7 @@ DosFindFirst  proc   far
 
 ; Incoming DirHandle = -1 ==> allocate a new dir handle
 
-        les     di,[bp].DirHandlePtr
+        les     di,dword ptr [bp+DirHandlePtr_Off]
         mov     ax,es:[di]
         cmp     ax,-1
         je      AllocateHandle
@@ -154,7 +188,7 @@ DosFindFirst  proc   far
 ; if it is a valid (ie - previously allocated by us) DirHandle
 
         mov     si,ax                     ; verify it is an active handle
-        test    ds:[si],OpenedHandle
+        test    word ptr ds:[si],OpenedHandle
         jnz     HandleFound               ; jump if true
 
         mov     ax,6                      ; else set error code
@@ -167,7 +201,7 @@ AllocateHandle:
         dec     cx
 
 FindHandleLoop:
-        test    ds:[si],OpenedHandle
+        test    word ptr ds:[si],OpenedHandle
         jz      HandleFound
 
         add     si,2
@@ -183,11 +217,11 @@ FindHandleLoop:
 
 HandleFound:
         mov     ax,ds:[si]              ; get the dta pointer
-        or      ds:[si],OpenedHandle    ; allocate the handle
+        or      word ptr ds:[si],OpenedHandle    ; allocate the handle
         and     ax,not OpenedHandle
         mov     CurrentDTA,ax
 
-        les     di,[bp].DirHandlePtr    ; the handle number we return is the
+        les     di,dword ptr [bp+DirHandlePtr_Off]    ; the handle number we return is the
         mov     es:[di],si              ;  offset to the entry in FindSegment
 
 ; save the callers dta so we can restore it later
@@ -207,7 +241,7 @@ HandleFound:
 
 ; Get the count of files to search for
 
-        les     di,[bp].FindCountPtr    ; load result buffer pointer
+        les     di,dword ptr [bp+FindCountPtr_Off]    ; load result buffer pointer
         mov     ax,es:[di]              ; save the search
         mov     SearchCount,ax          ;                count
         mov     es:word ptr [di],0      ; set found count to zero
@@ -220,9 +254,9 @@ HandleFound:
 ;  Find first file
 
 DoSearch:
-        lds     dx,[bp].PathNamePtr    ; load address of asciiz string
+        lds     dx,dword ptr [bp+PathNamePtr_Off]   ; load address of asciiz string
         assume  ds:nothing
-        mov     cx,[bp].FileAttribute  ; load the attribute
+        mov     cx,word ptr [bp+FileAttrib_Off]    ; load the attribute
         mov     ax,04E00h
         int     21h                    ; find the first occurance of file
         jnc     FindFirstOK            ; continue
@@ -230,14 +264,14 @@ DoSearch:
         jmp     ErrorExit
 
 FindFirstOK:
-        mov     ax,seg FindSegment
+        mov     ax,FindSegment
         mov     ds,ax
         assume  ds:FindSegment
 
-        mov     ax,[bp].FindBufferLen  ; load the buffer length
+        mov     ax,word ptr [bp+FindBufferLen_Off]    ; load the buffer length
         mov     ReturnLengthToGo,ax    ; save low order buffer length
 
-        les     di,[bp].FindBufferPtr  ; load result buffer pointer
+        les     di,dword ptr [bp+FindBufferPtr_Off]   ; load result buffer pointer
 
         mov     word ptr ReturnBufferSave+0,di
         mov     word ptr ReturnBufferSave+2,es
@@ -259,56 +293,56 @@ BufferLengthOk:
 ;       es:di -> where we are to put the resultant data
 ;       ds:si -> DTA from find (either first or next)
 
-        mov     ax,ds:[si].DTAFileDate    ; save date
-        mov     es:[di].Create_Date,ax
-        mov     es:[di].Access_Date,ax
-        mov     es:[di].Write_Date,ax
+        mov     ax,word ptr ds:[si+DTA_DATE_Off]      ; save date
+        mov     es:word ptr [di+FF_CREATE_DATE_Off],ax
+        mov     es:word ptr [di+FF_ACCESS_DATE_Off],ax
+        mov     es:word ptr [di+FF_WRITE_DATE_Off],ax
 
-        mov     ax,ds:[si].DTAFileTime    ; save time
-        mov     es:[di].Create_Time,ax
-        mov     es:[di].Access_Time,ax
-        mov     es:[di].Write_Time,ax
+        mov     ax,word ptr ds:[si+DTA_TIME_Off]      ; save time
+        mov     es:word ptr [di+FF_CREATE_TIME_Off],ax
+        mov     es:word ptr [di+FF_ACCESS_TIME_Off],ax
+        mov     es:word ptr [di+FF_WRITE_TIME_Off],ax
 
-        mov     ax,ds:word ptr [si].DTAFileSize+0    ; save file size
-        mov     es:word ptr [di].File_Size+0,ax
-        mov     es:word ptr [di].FAlloc_Size+0,ax
-        mov     ax,ds:word ptr [si].DTAFileSize+2
-        mov     es:word ptr [di].File_Size+2,ax
-        mov     es:word ptr [di].FAlloc_Size+2,ax
+        mov     ax,word ptr ds:[si+DTA_SIZE_Off]       ; save file size
+        mov     es:word ptr [di+FF_FILE_SIZE_Off],ax
+        mov     es:word ptr [di+FF_FALLOC_SIZE_Off],ax
+        mov     ax,word ptr ds:[si+DTA_SIZE_Off+2]
+        mov     es:word ptr [di+FF_FILE_SIZE_Off+2],ax
+        mov     es:word ptr [di+FF_FALLOC_SIZE_Off+2],ax
 
-        test    es:word ptr [di].FAlloc_Size,001ffh
+        test    word ptr es:[di+FF_FALLOC_SIZE_Off],001ffh
         jz      AllocateSizeSet
 
-        and     es:word ptr [di].FAlloc_Size,not 001ffh
-        add     es:word ptr [di].FAlloc_Size,00200h
+        and     word ptr es:[di+FF_FALLOC_SIZE_Off],not 001ffh
+        add     word ptr es:[di+FF_FALLOC_SIZE_Off],00200h
 
 AllocateSizeSet:
         xor     ax,ax
-        mov     al,ds:[si].DTAFileAttrib
-        mov     es:[di].Attributes,ax
+        mov     al,byte ptr ds:[si+DTA_ATTR_Off]
+        mov     es:word ptr [di+FF_ATTR_Off],ax
 
         mov     cx,12
         mov     bx,0
 
 MoveNameLoop:
-        mov     al,ds:[si+bx].DTAFileName
+        mov     al,byte ptr ds:[si+bx+DTA_NAME_Off]
         cmp     al,0
         je      EndOfName
 
-        mov     es:[di+bx].File_Name,al
+        mov     byte ptr es:[di+bx+FF_NAME_Off],al
         inc     bx
         loop    MoveNameLoop
 
 EndOfName:
-        mov     es:[di+bx].File_Name,0
+        mov     byte ptr es:[di+bx+FF_NAME_Off],0
         mov     ax,bx
-        mov     es:[di].String_len,al
+        mov     byte ptr es:[di+FF_STRLEN_Off],al
 
         add     di,bx
         mov     word ptr ReturnBufferSave+0,di
         mov     word ptr ReturnBufferSave+2,es
 
-        les     di,[bp].FindCountPtr
+        les     di,dword ptr [bp+FindCountPtr_Off]
         inc     word ptr es:[di]
 
 ;
@@ -329,7 +363,7 @@ SearchDone:
 
 ErrorExit:
         push    ax
-        mov     ax,seg FindSegment
+        mov     ax,FindSegment
         mov     ds,ax
         assume  ds:FindSegment
         cmp     SaveDTAFlag,0
