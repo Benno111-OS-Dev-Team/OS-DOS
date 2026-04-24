@@ -8,7 +8,7 @@ hinc	=..\h
 COUNTRY = usa-ms
 
 asm	=ml
-aflags	=/Cx /nologo /c /omf
+aflags	=/Cx /nologo /c
 ainc	=/I. /I$(inc) /I$(dos)
 
 .SUFFIXES:
@@ -36,8 +36,9 @@ msload.obj: msload.asm \
 	$(inc)\versiona.inc \
 	msload.inc
 
-msload.com:
-	@echo Using checked-in msload.com
+msload.com: msload.obj
+	link /NOLOGO /OUT:msload.exe msload.obj
+	exe2bin msload.exe msload.com
 
 msbio1.obj: msbio1.asm \
 	makefile \
