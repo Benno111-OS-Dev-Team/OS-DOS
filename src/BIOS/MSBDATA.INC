@@ -1,3 +1,6 @@
+IFNDEF MSBDATA_INC
+MSBDATA_INC EQU 1
+
 ;==============================================================================
 ;REVISION HISTORY:
 ;AN000 - New for DOS Version 3.4 - J.K.
@@ -719,3 +722,5 @@ FTESTBITS   DW	    fTestDISK
 	ENDIF
 
 	PATHEND 001,BIO
+
+ENDIF
