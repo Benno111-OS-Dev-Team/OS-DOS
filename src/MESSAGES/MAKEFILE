@@ -10,4 +10,4 @@ country    =$(COUNTRY)
 all: $(COUNTRY).idx
 
 $(COUNTRY).idx: $(COUNTRY).msg
-	@if exist "$(buildidx)" (attrib -R $(COUNTRY).msg & $(buildidx) $(COUNTRY).msg) else echo buildidx not found; using checked-in $(COUNTRY).idx
+	@echo Using checked-in $(COUNTRY).idx
