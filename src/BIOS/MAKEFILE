@@ -8,7 +8,7 @@ hinc	=..\h
 COUNTRY = usa-ms
 
 asm	=ml
-aflags	=/Cx /nologo /c
+aflags	=/Cx /nologo /c /Zm
 ainc	=/I. /I$(inc) /I$(dos)
 
 .SUFFIXES:
