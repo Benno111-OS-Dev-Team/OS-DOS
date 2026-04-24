@@ -14,6 +14,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Set up MSVC developer environment
+      uses: ilammy/msvc-dev-cmd@v1
+
     - name: Build
       working-directory: src
       run: nmake /f MAKEFILE
