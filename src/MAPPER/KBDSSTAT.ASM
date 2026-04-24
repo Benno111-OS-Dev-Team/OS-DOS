@@ -48,29 +48,36 @@ handle  dw      ?       ; kbd handle
 data    dd      ?       ; kbd data strructure pointer
 stk     ends
 
+Data_Off equ    6
+
+Bit_Mask_Off            equ     0
+Turn_Around_Char_Off    equ     2
+Interim_Char_Flags_Off  equ     4
+Status_Shift_State_Off  equ     6
+
 kbdsetstatus    proc    far
 
         EnterProc   KbdSetStatus            ; save registers
 
-        les     di,[bp].data            ; set up kbd data structure
+        les     di,dword ptr [bp+Data_Off]            ; set up kbd data structure
         mov     ax,seg kbddata
         mov     ds,ax
         assume  ds:kbddata
 
-        mov     ax,es:[di].Bit_Mask     ; get bit mask
+        mov     ax,es:[di+Bit_Mask_Off]     ; get bit mask
 
 CheckTurnAround:
         test    ax,040h                 ; define turnaround character ??
         jz      CheckInterimFlags       ; jump if not
 
-        mov     bx,es:[di].Turn_Around_Char  ; else, save turnaround character
+        mov     bx,es:[di+Turn_Around_Char_Off]  ; else, save turnaround character
         mov     KbdTurnAroundCharacter,bx
 
 CheckInterimFlags:
         test    ax,020h                 ; check for interim character flag ??
         jz      CheckShiftState         ; if not jump
 
-        mov     bx,es:[di].Interim_Char_Flags   ; save interim character flag
+        mov     bx,es:[di+Interim_Char_Flags_Off]   ; save interim character flag
         mov     KbdInterimCharFlags,bx
 
 CheckShiftState:
@@ -82,7 +89,7 @@ CheckShiftState:
         mov     ds,bx
         assume  ds:nothing
 
-        mov     bx,es:[di].Status_Shift_State   ; save shift state data
+        mov     bx,es:[di+Status_Shift_State_Off]   ; save shift state data
         mov     ds:018h,bl
 
         pop     ds
