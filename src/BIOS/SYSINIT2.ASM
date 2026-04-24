@@ -365,11 +365,11 @@ see_heads:
 ;
 	mov	cx,ax			; cx has number of heads
 	dec	cl			; get it 0-based
-	mov	ax,DeviceParameters+8	; this is OK for two heads
+	mov	ax,word ptr DeviceParameters+15	; this is OK for two heads
 	sar	ax,1			; ax contains # of sectors/head
 	sal	ax,cl
 	jc	Set_All_Done		; We have too many sectors - overflow!!
-	mov	word ptr DeviceParameters+8,ax
+	mov	word ptr DeviceParameters+15,ax
 ; Set up correct Media Descriptor Byte
 	cmp	cl,1
 	mov	bl,0F0H
@@ -1159,7 +1159,7 @@ GetCntryDest:
 	add	di, 5			;next data id
 	jmp	short GetCntryDest_loop
 GetCntryDest_1:
-	add	di, NEW_COUNTRY_SIZE + 3 ;next data id
+	add	di, 39			;next data id
 GetCntryDest_loop:
 	loop	GetCntryDest
 	stc
