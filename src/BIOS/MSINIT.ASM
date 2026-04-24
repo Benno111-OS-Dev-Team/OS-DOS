@@ -24,6 +24,7 @@
 ;==============================================================================
 
 	itest = 0
+	OPTION M510
 	INCLUDE MSGROUP.INC	;DEFINE CODE SEGMENT
 	INCLUDE MSDSKPR.INC
 	INCLUDE MSEQU.INC
@@ -527,9 +528,9 @@ GOTHRD:
 	jc	No_Rom_System_Conf	; just use Model_Byte
 	cmp	ah, 0			; double check
 	jne	No_Rom_System_Conf
-	mov	al, ES:[BX.bios_SD_modelbyte] ;get the model byte
+	mov	al, ES:[BX+2] ;get the model byte
 	mov	[Model_Byte], al
-	mov	al, ES:[BX.bios_SD_scnd_modelbyte] ;secondary model byte
+	mov	al, ES:[BX+3] ;secondary model byte
 	mov	[Secondary_Model_Byte], al
 	jmp	short Turn_Timer_On
 No_Rom_System_Conf:
