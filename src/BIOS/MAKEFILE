@@ -36,9 +36,8 @@ msload.obj: msload.asm \
 	$(inc)\versiona.inc \
 	msload.inc
 
-msload.com: msload.obj
-	..\tools\link.exe msload.obj,msload,,;
-	exe2bin msload.exe msload.com
+msload.com:
+	@echo Using checked-in msload.com
 
 msbio1.obj: msbio1.asm \
 	makefile \
