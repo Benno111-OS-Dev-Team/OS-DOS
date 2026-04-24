@@ -28,7 +28,7 @@ dpb	ENDS
 
 DPBSIZ	EQU	SIZE dpb		; Size of the structure in bytes
 
-DSKSIZ	=	dpb_max_cluster 	; Size of disk (temp used during init only)
+DSKSIZ	=	13			; Size of disk (temp used during init only)
 ;									   ;
 ;	     C	A  V  E  A  T	  P  R	O  G  R  A  M  M  E  R		   ;
 ;----+----+----+----+----+----+----+----+----+----+----+----+----+----+----;
