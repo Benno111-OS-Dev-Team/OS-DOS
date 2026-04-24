@@ -352,12 +352,12 @@ ASSUME ES:NOTHING
 	test	word ptr switches,flagseclim
 	jz	see_heads
 	mov	ax,word ptr slim
-	mov	word ptr DeviceParameters+20,ax
+	mov	word ptr DeviceParameters+13,ax
 see_heads:
 	test	word ptr switches,flagheads
 	jz	Set_All_Done
 	mov	ax,word ptr hlim
-	mov	word ptr DeviceParameters+22,ax
+	mov	word ptr DeviceParameters+15,ax
 ;
 ; We need to set the media byte and the total number of sectors to reflect the
 ; number of heads. We do this by multiplying the number of heads by the number
@@ -365,17 +365,17 @@ see_heads:
 ;
 	mov	cx,ax			; cx has number of heads
 	dec	cl			; get it 0-based
-	mov	ax,DeviceParameters+15	; this is OK for two heads
+	mov	ax,DeviceParameters+8	; this is OK for two heads
 	sar	ax,1			; ax contains # of sectors/head
 	sal	ax,cl
 	jc	Set_All_Done		; We have too many sectors - overflow!!
-	mov	DeviceParameters+15,ax
+	mov	word ptr DeviceParameters+8,ax
 ; Set up correct Media Descriptor Byte
 	cmp	cl,1
 	mov	bl,0F0H
 	mov	al,2			; AL contains sectors/cluster
 	ja	Got_Correct_Mediad
-	mov	bl,byte ptr DeviceParameters+17
+	mov	bl,byte ptr DeviceParameters+10
 	je	Got_Correct_Mediad
 ; We have one head - OK for 48tpi medium
 	mov	al,1			; AL contains sectors/cluster
@@ -387,8 +387,8 @@ see_heads:
 Dec_Mediad:
 	dec	bl			; adjust for one head
 Got_Correct_Mediad:
-	mov	byte ptr DeviceParameters+17,bl
-	mov	byte ptr DeviceParameters+9,al
+	mov	byte ptr DeviceParameters+10,bl
+	mov	byte ptr DeviceParameters+2,al
 	clc
 Set_All_Done:
 	RET
@@ -1104,8 +1104,8 @@ SetDOSCntry_data:
 	ja	SetDOSData_fail
 	cmp	al, SetCountryInfo	;is the data for SetCountryInfo table?
 	jne	SetDOSCntry_Mov 	;no, don't worry
-	push	word ptr es:[di+ccMono_Ptr-ccCountryInfoLen]	;AN009;Cannot destroy ccMono_ptr address. Save them.
-	push	word ptr es:[di+ccMono_Ptr-ccCountryInfoLen+2]	;AN009;At this time DI -> ccCountryInfoLen
+	push	word ptr es:[di+26]	;AN009;Cannot destroy ccMono_ptr address. Save them.
+	push	word ptr es:[di+28]	;AN009;At this time DI -> ccCountryInfoLen
 	push	di			;save DI
 
 	push	ax
@@ -1118,8 +1118,8 @@ SetDOSCntry_Mov:
 	cmp	al, SetCountryInfo	;was the ccMono_ptr saved?
 	jne	SetDOSCntry_data_next
 	pop	di			;restore DI
-	pop	word ptr es:[di+ccMono_Ptr-ccCountryInfoLen+2]	 ;AN009;restore
-	pop	word ptr es:[di+ccMono_Ptr-ccCountryInfoLen]	 ;AN009;
+	pop	word ptr es:[di+28]	 ;AN009;restore
+	pop	word ptr es:[di+26]	 ;AN009;
 
 SetDOSCntry_data_next:
 	pop	si			;restore control buffer pointer
@@ -1147,7 +1147,7 @@ GetCountryDestination	proc	near
 ;	carry set if no matching data id found in DOS.
 
 	push	cx
-	add	di, ccNumber_of_entries ;skip the reserved area, syscodepage etc.
+	add	di, 76			;skip the reserved area, syscodepage etc.
 	mov	cx, word ptr es:[di]	;get the number of entries
 	inc	di
 	inc	di			;SI -> the first start entry id
