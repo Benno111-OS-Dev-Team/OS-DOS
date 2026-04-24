@@ -1195,7 +1195,7 @@ ENDIF					;AN037;
 					;AN000; skip length field
 ;(changed ;AN035;) add	   bx,word	;AN000; skip length field
 	sub	al,$P_ASCII80		;AN000; make char to index
-	xlat	es:[bx] 		;AN000; perform case map
+	xlat	byte ptr es:[bx]	;AN000; perform case map
 
 IFDEF BASESW				;AN037; If BASESW has been defined, and
   IFE BASESW				;AN037; If ES is psdata base

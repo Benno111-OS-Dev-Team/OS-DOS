@@ -50,7 +50,7 @@ FALSE	    EQU 0
 LF	equ	10
 CR	equ	13
 TAB	equ	 9
-SEMICOLON equ	';'
+SEMICOLON equ	3Bh
 
 IBMVER	   EQU	   TRUE
 IBM	   EQU	   IBMVER
