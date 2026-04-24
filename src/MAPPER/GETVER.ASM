@@ -25,12 +25,12 @@ dosxxx	segment byte public 'dos'
 stk	    struc
 old_bp	    dw	     ?
 Return	    dd	     ?
-Data	    dd	     ?	     ; return data area pointer
+dataptr    dd       ?         ; return data area pointer
 stk	    ends
 
 dosgetversion	proc	far
 	EnterProc	dosgetversion
-	lds	si,[bp].Data	      ; set pointer
+	lds	si,[bp].dataptr	      ; set pointer
 
 	mov	ah,30h		      ; get DOS version
 	int	21h
