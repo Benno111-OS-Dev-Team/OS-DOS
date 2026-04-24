@@ -19,7 +19,7 @@ concurrency:
 jobs:
   build:
     name: Build DOS layer
-    runs-on: windows-2019   # more stable MASM support than latest
+           runs-on: windows-2022
     timeout-minutes: 60
 
     steps:
