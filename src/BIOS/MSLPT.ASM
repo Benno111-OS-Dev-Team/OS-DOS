@@ -75,7 +75,7 @@ Prn$Out:
 
 	mov	al,es:[di]	; assume AX disposible since enter
 	xor	ah,ah		; via int 21h
-	call	PrnOp		; print to printer
+	call	PRNOP		; print to printer
 	jz	Prn$Con		; no error - continue
 	test	ah,TIMEOUTSTATUS
 	jz	Prn$Con		; NOT time out - continue
@@ -83,7 +83,7 @@ Prn$Out:
 ;SB34LPT000****************************************************************
 	dec	bx			;Retry until count is exhausted.
 	jnz	Prn$Out 		;Retry it.
-	jmp short Pmessg		;Return with error.
+	jmp	Err$Cnt		;Return with error.
    ;
    ; next character
    ;
@@ -125,7 +125,7 @@ PRN$STAT PROC	NEAR
 	ASSUME	DS:CODE 		; SET BY PRINTER DEVICE DRIVER ENTRY
 
 	CALL	PRNSTAT 		;DEVICE IN DX
-	JNZ	PMESSG			; OTHER ERRORS WERE FOUND
+	JNZ	Err$Cnt			; OTHER ERRORS WERE FOUND
 ;J.K. The next three lines are commented out, since it is a dead code.
 ;	 MOV	 AL,9			 ; AGAIN, ASSUME OUT OF PAPER...
 ;	 TEST	 AH,NOPAPERSTATUS
@@ -141,9 +141,7 @@ PRN$STAT ENDP
 PRNSTAT PROC	NEAR
 ;SB33037**********************************************************************
 	mov	AH, 2			; set command for get status  ;SB ;3.30*
-PRNOP:								      ;SB ;3.30*
-	call	GETDX			; determine which printer     ;SB ;3.30*
-	int	17h			; call ROM-BIOS printer routine ;SB;3.30*
+	call	PRNOP			; call ROM-BIOS printer routine ;SB;3.30*
 
 ;SB33037**********************************************************************
 
@@ -177,6 +175,12 @@ PRNOP2:
 	RET
 PRNSTAT ENDP
 
+PRNOP PROC	NEAR
+	call	GETDX			; determine which printer
+	int	17h			; call ROM-BIOS printer routine
+	ret
+PRNOP ENDP
+
 ; OUTPUT UNTIL BUSY.  THIS ENTRY POINT IS USED EXCLUSIVELY BY THE PRINT
 ; SPOOLERS.  UNDER NO CURCUMSTANCES SHOULD THE DEVICE DRIVER BLOCK WAITING FOR
 ; THE DEVICE TO BECOME READY.
@@ -208,17 +212,17 @@ PRN$GETSTAT:
 	TEST	AH,10000000B		; READY YET?
 	LOOPZ	PRN$GETSTAT		; NO, GO FOR MORE
 	POP	CX			; GET ORIGINAL COUNT
-	JZ	PRN$BERR		; STILL NOT READY => DONE
+	JZ	PRN$BPERR		; STILL NOT READY => DONE
 	LODSB
 	XOR	AH,AH
 	CALL	PRNOP
-	JNZ	PRN$BERR		; ERROR
+	JNZ	PRN$BPERR		; ERROR
 	LOOP	PRN$TILBLOOP		; GO FOR MORE
 PRN$B:
 	POP	DS
 	LDS	BX,CS:[PTRSAV]
 	ASSUME	DS:NOTHING
-	SUB	WORD PTR [BX].COUNT,CX	;# OF SUCCESSFUL I/O'S
+	SUB	WORD PTR [BX+COUNT],CX	;# OF SUCCESSFUL I/O'S
 	JMP	EXIT
 PRN$TILBUSY ENDP
 
@@ -230,7 +234,7 @@ PRN$BERR:
 	LDS	BX,CS:[PTRSAV]
 	ASSUME	DS:NOTHING
 
-	SUB	WORD PTR [BX].COUNT,CX	;# OF SUCCESSFUL I/O'S
+	SUB	WORD PTR [BX+COUNT],CX	;# OF SUCCESSFUL I/O'S
 	JMP	ERR$EXIT
 PRN$BPERR ENDP
 ;
@@ -244,14 +248,14 @@ PRN$GENIOCTL PROC NEAR
 	ASSUME	DS:CODE 		; SET BY PRINTER DEVICE DRIVER ENTRY
 
 	LES	DI,[PTRSAV]
-	CMP	ES:[DI].MAJORFUNCTION,IOC_PC
+	CMP	BYTE PTR ES:[DI+MAJORFUNCTION],IOC_PC
 	JE	PRNFUNC_OK
 PRNFUNCERR:
 	JMP	CMDERR
 
 PRNFUNC_OK:
-	MOV	AL,ES:[DI].MINORFUNCTION
-	LES	DI,ES:[DI].GENERICIOCTL_PACKET
+	MOV	AL,BYTE PTR ES:[DI+MINORFUNCTION]
+	LES	DI,DWORD PTR ES:[DI+GENERICIOCTL_PACKET]
 	XOR	BX,BX
 	MOV	BL,[PRINTDEV]		; GET INDEX INTO RETRY COUNTS
 	SHL	BX,1
@@ -260,10 +264,10 @@ PRNFUNC_OK:
 	JZ	PRNGETCOUNT
 	CMP	AL,SET_RETRY_COUNT
 	JNZ	PRNFUNCERR
-	MOV	CX,ES:[DI].RC_COUNT
+	MOV	CX,WORD PTR ES:[DI+RC_COUNT]
 PRNGETCOUNT:
 	MOV	WAIT_COUNT[BX],CX	; PLACE "NEW" RETRY COUNT
-	MOV	ES:[DI].RC_COUNT,CX	; RETURN CURRENT RETRY COUNT
+	MOV	WORD PTR ES:[DI+RC_COUNT],CX	; RETURN CURRENT RETRY COUNT
 	JMP	EXIT
 PRN$GENIOCTL ENDP
 CODE	ENDS

@@ -105,18 +105,8 @@ DEV_OTHER		EQU	7
 MAX_DEV_TYPE		EQU	7	; MAXIMUM DEVICE TYPE THAT WE
 					; CURRENTLY SUPPORT.
 
-;J.K. Bug in MASM 3.  A_BPB will be defined in PASS1 and, in PASS2 the
-;compiler does not include BPB.INC and it will be treated as undefined.
-IF1
-	BPBINPASS1 = 0
-	IFNDEF A_BPB
-	    INCLUDE BPB.INC
-	    BPBINPASS1 = 1
-	ENDIF
-ELSE
-	IF BPBINPASS1
-	    INCLUDE BPB.INC
-	ENDIF
+IFNDEF A_BPB
+	INCLUDE BPB.INC
 ENDIF
 
 A_SECTORTABLE	    STRUC

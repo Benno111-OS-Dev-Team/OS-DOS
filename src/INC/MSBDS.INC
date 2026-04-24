@@ -10,6 +10,10 @@
 ;AN001; D113 Disable I/O access to unformatted media		    9/03/87 J.K.
 ;==============================================================================
 
+IFNDEF A_BPB
+	INCLUDE BPB.INC
+ENDIF
+
 ; VALUES FOR VARIOUS FLAGS IN BDS.FLAGS.
 
 FNON_REMOVABLE	    EQU     01H 	;FOR NON-REMOVABLE MEDIA
