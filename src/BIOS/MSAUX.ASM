@@ -98,7 +98,7 @@ FLAG_REC_SIG	 EQU	80H	;RECEIVE LINE SIGNAL DETECT
 	PUBLIC AUX$READ
 AUX$READ PROC NEAR
 	ASSUME	DS:CODE 	; SET BY AUX DEVICE DRIVER ENTRY ROUTINE
-	jcxz	EXIT		; if no characters, get out
+	jcxz	AUX$READ_DONE	; if no characters, get out
 	call	GETBX		; put address of AUXBUF in BX
 	xor	AX,AX		; clear AX register
 	xchg	AL,[BX] 	; Get character , if any, from
@@ -111,6 +111,8 @@ AUX1:				;
 AUX2:				;
 	stosb			; store character
 	loop	AUX1		; if more character, go around again
+; no more characters, fall through to the shared exit
+AUX$READ_DONE:
 	Jump	EXIT		; all done, successful exit
 AUX$READ ENDP
 
@@ -236,7 +238,7 @@ AUX$FLSH ENDP
 	PUBLIC	AUX$WRIT
 AUX$WRIT PROC	NEAR
 	ASSUME	DS:CODE 	; SET BY AUX DEVICE DRIVER ENTRY ROUTINE
-	jcxz	EXIT		; if CX is zero, no characters
+	jcxz	AUX$WRIT_DONE	; if CX is zero, no characters
 				;   to be written, jump to exit
 AUX$LOOP:
 	mov	AL,ES:[DI]	; get character to be written
@@ -254,6 +256,8 @@ AUX$LOOP:
 				; if CX is non-zero, still more
 AWOK:
 	loop	AUX$LOOP	; more characrter to print
+; no more characters, fall through to the shared exit
+AUX$WRIT_DONE:
 	Jump	Exit		; all done, successful return
 AUX$WRIT ENDP
 
