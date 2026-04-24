@@ -30,7 +30,7 @@ stk	    ends
 
 dosgetversion	proc	far
 	EnterProc	dosgetversion
-	lds	si,[bp].dataptr	      ; set pointer
+	lds	si,dword ptr [bp+6]      ; set pointer
 
 	mov	ah,30h		      ; get DOS version
 	int	21h
