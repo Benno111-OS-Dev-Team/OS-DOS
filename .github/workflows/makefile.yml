@@ -19,34 +19,62 @@ concurrency:
 jobs:
   build:
     name: Build DOS layer
-    runs-on: windows-latest
+    runs-on: windows-2019   # more stable MASM support than latest
     timeout-minutes: 60
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up MSVC (x86)
+      - name: Setup MSVC (x86)
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x86
 
-      - name: Verify tools
+      - name: Verify toolchain
         shell: cmd
         run: |
-          where nmake
-          where ml
-          where cl
-          where link
+          echo === TOOL CHECK ===
+          where nmake || exit /b 1
+          where ml || exit /b 1
+          where link || exit /b 1
+          where cl || exit /b 1
+
+      - name: Setup environment
+        shell: cmd
+        run: |
+          echo === ENV SETUP ===
+          set INIT=%CD%\src\TOOLS
+          set COUNTRY=USA
+          set PATH=%CD%\src\TOOLS;%PATH%
+          echo INIT=%INIT%
+          echo PATH=%PATH%
+
+      - name: Clean previous builds
+        working-directory: src
+        shell: cmd
+        run: |
+          if exist *.obj del /s /q *.obj
+          if exist *.exe del /s /q *.exe
+          if exist *.com del /s /q *.com
 
       - name: Build OS-DOS
         working-directory: src
         shell: cmd
-        env:
-          INIT: ${{ github.workspace }}\src\TOOLS
-          COUNTRY: USA
         run: |
-          nmake /f MAKEFILE
+          echo === BUILD START ===
+          nmake /f MAKEFILE || exit /b 1
+
+      - name: Verify outputs
+        shell: pwsh
+        run: |
+          Write-Host "=== OUTPUT CHECK ==="
+          $outputs = Get-ChildItem -Path src -Recurse -Include *.com, *.exe, *.sys -File
+          if ($outputs.Count -eq 0) {
+            Write-Error "❌ No build outputs found!"
+            exit 1
+          }
+          $outputs | ForEach-Object { Write-Host $_.FullName }
 
       - name: Collect outputs
         shell: pwsh
@@ -54,21 +82,12 @@ jobs:
           $ErrorActionPreference = 'Stop'
           New-Item -ItemType Directory -Force -Path dist | Out-Null
 
-          $patterns = @(
-            '*.com','*.exe','*.sys','*.bin',
-            '*.obj','*.lib','*.map',
-            '*.lst','*.cod','*.idx','*.msg','*.ctl','*.cl1'
-          )
-
-          foreach ($pattern in $patterns) {
-            Get-ChildItem -Path src -Recurse -File -Filter $pattern |
-              Where-Object { $_.FullName -notmatch '\\dist\\' } |
-              Copy-Item -Destination dist -Force
-          }
+          Get-ChildItem -Path src -Recurse -Include *.com, *.exe, *.sys, *.bin -File |
+            Copy-Item -Destination dist -Force
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: os-dos-build-${{ github.run_number }}
           path: dist
-          if-no-files-found: warn
+          if-no-files-found: error
