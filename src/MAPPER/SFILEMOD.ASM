@@ -39,7 +39,7 @@ Path	dd	?	; path name pointer  pointer
 str	ends
 
 dossetfilemode proc  far
-	    Enter    dossetfilemode	   ; push registers
+	    EnterProc    dossetfilemode	   ; push registers
 
 	    lds      dx,[bp].path	   ; set pointer to path
 	    mov      cx,[bp].attrib

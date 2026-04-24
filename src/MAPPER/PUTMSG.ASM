@@ -44,7 +44,7 @@ str	ends
 
 dosputmessage proc   far
 
-	Enter	dosputmessage		      ; save registers
+	EnterProc	dosputmessage		      ; save registers
 
 	mov	bx,[bp].Handle		      ; get handle
 	mov	cx,[bp].MessageLength	      ; get message length

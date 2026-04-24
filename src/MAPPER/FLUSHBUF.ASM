@@ -31,7 +31,7 @@ handle	dw	?	   ; kbd handle
 str	ends
 
 kbdflushbuffer	proc   far
-	Enter	KbdFlushBuffer	  ; push registers
+	EnterProc	KbdFlushBuffer	  ; push registers
 	mov	ah,0bh		  ; Check for ^C
 	int	021h
 

@@ -61,7 +61,7 @@ Handle	    dw	     ?		; file handle
 str	    ends
 
 dosQfileinfo  proc     far
-	Enter	dosQfileinfo		   ; save registers
+	EnterProc	dosQfileinfo		   ; save registers
 
 	mov	bx,[bp].handle		   ;fill registers for function call
 

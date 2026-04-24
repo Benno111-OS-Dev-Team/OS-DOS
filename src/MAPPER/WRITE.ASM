@@ -40,7 +40,7 @@ str         ends
 
 doswrite    proc     far
 
-            Enter    doswrite            ; push registers
+            EnterProc    doswrite            ; push registers
 
             mov      bx,[bp].handle      ; get handle
             lds      dx,[bp].buffer      ; set write buffer

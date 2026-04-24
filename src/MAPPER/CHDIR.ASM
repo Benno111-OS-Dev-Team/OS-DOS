@@ -51,7 +51,7 @@ dnam006 dd      ?            ;address of directory path name
 str     ends
 
 DosChDir  proc   far
-        Enter   DosChDir                 ; push registers
+        EnterProc   DosChDir                 ; push registers
 
         mov     dx, word ptr [bp].dnam006    ;load directory name offset
         mov     ax, word ptr [bp].dnam006+2  ;load directory name segment

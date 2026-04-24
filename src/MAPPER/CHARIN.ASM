@@ -49,7 +49,7 @@ str	ends
 
 kbdcharin proc	 far
 
-	Enter	KbdCharIn		; save registers
+	EnterProc	KbdCharIn		; save registers
 	lds	si,[bp].data		; set up return data area
 loopx:
 	mov	ax,savedkbdinput

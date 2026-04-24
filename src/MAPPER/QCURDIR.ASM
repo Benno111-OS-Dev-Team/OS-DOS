@@ -43,7 +43,7 @@ str         ends
 
 dosqcurdir  proc     far
 
-        Enter   Dosqcurdir               ; push registers
+        EnterProc   Dosqcurdir               ; push registers
 
         mov     ax,seg buffer            ; set temporary buffer  to receive
         mov     ds,ax                    ; dircetory path information

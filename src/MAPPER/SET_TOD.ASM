@@ -35,7 +35,7 @@ Data	    dd	     ?	       ; TOD data pointer
 str	    ends
 
 dossetdatetime	proc far
-	    Enter    dossetdatetime	   ; push registers
+	    EnterProc    dossetdatetime	   ; push registers
 
 	    lds      si,[bp].data	   ; set TOD data pointer and load
 					   ;   info into registers

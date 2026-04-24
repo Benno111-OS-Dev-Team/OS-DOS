@@ -67,7 +67,7 @@ Asyncindic dw	?	; ignored,  PC-DOS always waits!
 str	ends
 
 dosexecpgm proc   far				; push registers
-	Enter	dosexecpgm
+	EnterProc	dosexecpgm
 
 	mov	ax,seg buffer			; setup buffer segment
 	mov	ds,ax				;   and copy info into

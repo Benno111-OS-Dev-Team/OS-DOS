@@ -88,7 +88,7 @@ str     ends
 DosFindNext  proc   far
 
 
-        Enter   DosFindNext
+        EnterProc   DosFindNext
 
         mov     ax,seg FindSegment      ; get address to our data
         mov     ds,ax

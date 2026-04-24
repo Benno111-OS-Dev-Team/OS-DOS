@@ -50,7 +50,7 @@ str     ends
 
 kbdsetstatus    proc    far
 
-        Enter   KbdSetStatus            ; save registers
+        EnterProc   KbdSetStatus            ; save registers
 
         les     di,[bp].data            ; set up kbd data structure
         mov     ax,seg kbddata

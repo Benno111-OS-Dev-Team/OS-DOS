@@ -42,7 +42,7 @@ Selector dw      ?         ; selector of the segment to be freed
 str     ends
 
 dosfreeseg proc   far
-        Enter   dosfreeseg              ; push registers
+        EnterProc   dosfreeseg              ; push registers
 
         mov     es,[bp].selector        ; get selector in es
 

@@ -78,7 +78,7 @@ Doscntry       ends
 
 dosgetctryinfo  proc far
 
-        Enter   Dosgetcntryinfo
+        EnterProc   Dosgetcntryinfo
 
         lds     si,[bp].CountryCodePtr
         mov     ax,ds:[si]

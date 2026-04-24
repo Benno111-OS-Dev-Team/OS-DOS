@@ -34,7 +34,7 @@ verify      dd       ?     ; return data area pointer
 str         ends
 
 dosqverify  proc    far
-            Enter   dosqverify             ; save registers
+            EnterProc   dosqverify             ; save registers
 
             mov      ah,54h
             int      21h                   ; get verify flag setting

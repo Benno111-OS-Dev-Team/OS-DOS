@@ -43,7 +43,7 @@ SegmentSize	dw	?	; number of bytes requested
 str	ends
 
 dosallocseg proc   far
-	Enter	dosallocseg		 ; push registers
+	EnterProc	dosallocseg		 ; push registers
 
 	mov	bx,[bp].SegmentSize	 ; Get segment size
 

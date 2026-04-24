@@ -87,7 +87,7 @@ str	ends
 
 ;
 DosOpen  proc	far
-	Enter	DosOpen 	       ; save registers
+	EnterProc	DosOpen 	       ; save registers
 	sub	sp,2		       ; allocate space on the stack
 SaveArea	equ	-2
 

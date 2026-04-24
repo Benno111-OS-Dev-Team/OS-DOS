@@ -116,7 +116,7 @@ str     ends
 
 DosFindFirst  proc   far
 
-        Enter   DosFindFirst
+        EnterProc   DosFindFirst
 
         mov     ax,seg FindSegment      ; get address to our data
         mov     ds,ax

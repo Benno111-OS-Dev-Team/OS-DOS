@@ -39,7 +39,7 @@ Handle      dw       ?       ; handle
 str         ends
 
 dosread     proc     far
-            Enter    Dosread           ; save registers
+            EnterProc    Dosread           ; save registers
 
             mov      bx,[bp].handle    ; fill registers for
             lds      dx,[bp].buffer    ; function call

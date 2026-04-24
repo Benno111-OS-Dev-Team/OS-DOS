@@ -63,7 +63,7 @@ VLabel		db	"???????????"           ;Match any vol name found
 
 
 DosSetFsInfo proc   far
-	Enter	DosSetfsinfo	; push registers
+	EnterProc	DosSetfsinfo	; push registers
 	mov	ax,[bp].sdrive	; Get drive number
 	mov	FCBDrive,al	; Place it in the extended FCB
 ;--------------------------

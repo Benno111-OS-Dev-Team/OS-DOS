@@ -48,7 +48,7 @@ str     ends
 
 dosqhandtype proc   far
 
-        Enter   dosqhandtype            ; push registers
+        EnterProc   dosqhandtype            ; push registers
 
         mov     bx,[bp].Handle          ; get file handle
         mov     ax,4400h

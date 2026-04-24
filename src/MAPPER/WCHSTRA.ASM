@@ -48,7 +48,7 @@ addr    dd      ?       ; string to be written (pointer)
 str     ends
 
 viowrtcharstratt proc   far
-        Enter   viowrtcharstratt         ; push registers
+        EnterProc   viowrtcharstratt         ; push registers
 
         sub     bh,bh
         sub     ax,ax                    ; Start with clean error condition

@@ -54,7 +54,7 @@ NextCriticalErrorHandlerSegment dw      dosxxx
 
 dossetsighandler  proc  far
 
-        Enter    dossetsighandler       ; push registers
+        EnterProc    dossetsighandler       ; push registers
 
         mov      ax,[bp].action         ; get action code
         cmp      ax,2                   ; action code 2 ??

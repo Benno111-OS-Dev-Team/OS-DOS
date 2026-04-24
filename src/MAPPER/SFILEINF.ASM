@@ -50,7 +50,7 @@ Handle	    dw	     ?		; file handle
 str	    ends
 
 dossetfileinfo	proc	 far
-	Enter	dossetfileinfo	      ; push registers
+	EnterProc	dossetfileinfo	      ; push registers
 
 	mov	bx,[bp].Handle	      ; fill registers for function call
 	lds	si,[bp].BufferPtr     ; date/time pointer

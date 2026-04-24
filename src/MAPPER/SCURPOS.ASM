@@ -41,7 +41,7 @@ row     dw      ?           ; row value
 str     ends
 
 viosetcurpos proc   far
-        Enter   viosetcurpos            ; push registers
+        EnterProc   viosetcurpos            ; push registers
 
         mov     bh,0
         mov     ax,[bp].row             ; get column number

@@ -26,7 +26,7 @@ modeaddr    dw	     ?
 str	    ends
 
 dosgetmachinemode proc	far
-	Enter	DosGetMachMode	      ; push registers
+	EnterProc	DosGetMachMode	      ; push registers
 
 	sub	ax,ax		      ; set good return code
 

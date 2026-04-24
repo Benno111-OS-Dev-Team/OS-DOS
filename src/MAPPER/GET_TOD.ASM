@@ -34,7 +34,7 @@ str	    ends
 
 dosgetdatetime	proc far
 
-	    Enter    dosgetdatetime	   ; push registers
+	    EnterProc    dosgetdatetime	   ; push registers
 
 	    lds      si,[bp].data	   ; set return data area
 

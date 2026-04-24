@@ -39,7 +39,7 @@ Path	    dd	     ?	     ; file path name pointer
 str	    ends
 
 dosqfilemode proc    far
-	    Enter    dosqfilemode	 ; push registers
+	    EnterProc    dosqfilemode	 ; push registers
 
 	    lds      dx,[bp].path	 ; set path name
 

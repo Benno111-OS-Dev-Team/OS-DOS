@@ -34,7 +34,7 @@ str	ends
 
 DosGetDBCSEv	proc	far
 
-	Enter  DosGetDBCSEv		    ;AN000; push registers
+	EnterProc  DosGetDBCSEv		    ;AN000; push registers
 
 ; Get the country, so we can then get the country case map stuff
 

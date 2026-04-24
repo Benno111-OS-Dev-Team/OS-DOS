@@ -45,7 +45,7 @@ str	ends
 
 
 DosClose  proc	 far
-	Enter	DosClose	       ; push registers
+	EnterProc	DosClose	       ; push registers
 
 ; Only files are closed.  Devices are not closed, since OPEN creates
 ; a dummy device handle without actually openning the device.

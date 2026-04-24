@@ -32,7 +32,7 @@ Ccode       dd       ?        ; country code
 str         ends
 
 dossetctrycode  proc far
-            Enter    dossetctrycode        ; push registers
+            EnterProc    dossetctrycode        ; push registers
 
             lds      si,[bp].ccode
             mov      ax,word ptr [si]      ; get country code

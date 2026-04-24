@@ -49,7 +49,7 @@ asc012	dd	?	; file name path pointer
 str	ends
 
 DosDelete  proc   far
-	Enter	DosDelete		    ; push registers
+	EnterProc	DosDelete		    ; push registers
 
 	lds	dx,dword ptr [bp].asc012    ; file path name
 

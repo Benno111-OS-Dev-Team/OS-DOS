@@ -34,7 +34,7 @@ str         ends
 
 dosmkdir    proc     far
 
-            Enter    DosMkdir            ; push registers
+            EnterProc    DosMkdir            ; push registers
             lds      dx,[bp].asciiz      ; set pointer to directory name
 
             mov      ah,39h              ; load opcode

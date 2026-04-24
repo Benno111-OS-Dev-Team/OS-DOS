@@ -190,7 +190,7 @@ str	    ends
 
 dosgetmessage  proc	far
 
-	Enter	Dosgetmessage		; push registers
+	EnterProc	Dosgetmessage		; push registers
 	mov	ax,messages		; setup message buffer
 	mov	ds,ax
 	assume	ds:messages

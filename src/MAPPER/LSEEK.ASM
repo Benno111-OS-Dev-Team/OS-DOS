@@ -40,7 +40,7 @@ handle	    dw	     ?	     ; file handle
 str	    ends
 
 doschgfileptr  proc  far
-	    Enter    doschgfileptr	 ; push registers
+	    EnterProc    doschgfileptr	 ; push registers
 
 	    push     es
 	    les      dx,[bp].dstnce

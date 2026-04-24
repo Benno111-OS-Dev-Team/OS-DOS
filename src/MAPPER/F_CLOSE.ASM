@@ -62,7 +62,7 @@ dosxxx  segment byte public 'dos'
         assume  cs:dosxxx,ds:nothing,es:nothing,ss:nothing
 
 DosFindClose  proc   far
-        Enter   DosFindClose               ; push registers
+        EnterProc   DosFindClose               ; push registers
 
         mov     ax,seg FindSegment         ; get address to our data
         mov     ds,ax

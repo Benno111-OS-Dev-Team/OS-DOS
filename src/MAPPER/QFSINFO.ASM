@@ -64,7 +64,7 @@ DRNUM40 dw	?	; driver number
 str	ends
 
 DosQFsInfo proc   far
-	Enter	Dosqfsinfo	   ; push registers
+	EnterProc	Dosqfsinfo	   ; push registers
 
 	mov	dx,[bp].drnum40    ; load drive number
 	mov	ah,036h

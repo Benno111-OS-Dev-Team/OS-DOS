@@ -29,7 +29,7 @@ Data	    dd	     ?	     ; return data area pointer
 str	    ends
 
 dosgetversion	proc	far
-	Enter	dosgetversion
+	EnterProc	dosgetversion
 	lds	si,[bp].data	      ; set pointer
 
 	mov	ah,30h		      ; get DOS version

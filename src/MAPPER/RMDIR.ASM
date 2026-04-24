@@ -34,7 +34,7 @@ str         ends
 
 dosrmdir    proc     far
 
-            Enter    dosrmdir            ; push registers
+            EnterProc    dosrmdir            ; push registers
 
             lds      dx,[bp].asciiz      ; set pointer to directory name
 

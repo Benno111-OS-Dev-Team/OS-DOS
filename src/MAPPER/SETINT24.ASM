@@ -32,7 +32,7 @@ str	    ends						;AN000;
 
 
 set_int24_vector   proc  far					;AN000;
-	Enter	set_int24_vector				;AN000;
+	EnterProc	set_int24_vector				;AN000;
 
 	mov	ax,seg databuff 				;AN000;
 	mov	ds,ax						;AN000;

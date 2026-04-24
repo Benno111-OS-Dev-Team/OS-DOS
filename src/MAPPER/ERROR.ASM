@@ -42,7 +42,7 @@ str	    ends		;	       1 = System handle error
 
 
 DosError   proc  far
-	Enter	 doserror		; Push registers
+	EnterProc	 doserror		; Push registers
 
 	mov	 ax,seg databuff	;-->RW
 	mov	 ds,ax			;-->RW

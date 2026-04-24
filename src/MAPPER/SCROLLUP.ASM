@@ -51,7 +51,7 @@ toprow   dw      ?        ; top row
 str     ends
 
 vioscrollup proc   far
-        Enter   VioScrollUp             ; save registers
+        EnterProc   VioScrollUp             ; save registers
 
         mov     bx,[bp].lines           ; get number of blank lines
         cmp     bl,25                   ; check for validity

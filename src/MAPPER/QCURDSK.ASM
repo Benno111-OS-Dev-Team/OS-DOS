@@ -57,7 +57,7 @@ defdrive	db	?	; Save area for default drive -->RW
 
 dosqcurdisk proc     far
 
-	    Enter    Dosqcurdisk	 ; push registers
+	    EnterProc    Dosqcurdisk	 ; push registers
 
 	    mov      ah,19h		 ; get current default drive
 	    int      21h

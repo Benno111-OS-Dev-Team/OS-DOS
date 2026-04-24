@@ -35,7 +35,7 @@ str         ends
 
 dosexit     proc     far
 
-            Enter    DosExit             ; push registers
+            EnterProc    DosExit             ; push registers
 
             mov      ax,[bp].action      ; set resule code area
             cmp      ax,1                ; check for valid action code

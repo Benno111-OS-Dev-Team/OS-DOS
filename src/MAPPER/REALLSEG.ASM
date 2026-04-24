@@ -45,7 +45,7 @@ SegmentSize     dw      ?       ; new segment size in bytes
 str     ends
 
 dosreallocseg proc   far
-        Enter   dosreallocseg           ; save registers
+        EnterProc   dosreallocseg           ; save registers
 
         mov     bx,[bp].SegmentSize     ; Get new segment size
         cmp     bx,0                    ; check for 0

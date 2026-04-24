@@ -55,7 +55,7 @@ actioncode  dw    ?           ; action code
 str     ends
 
 doscwait proc   far
-        Enter   doscwait                 ; push registers
+        EnterProc   doscwait                 ; push registers
 
         mov     ax,seg buffer
         mov     ds,ax                    ; set temporary buffer

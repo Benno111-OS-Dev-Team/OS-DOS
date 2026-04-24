@@ -44,7 +44,7 @@ str	ends
 
 kbdgetstatus	proc	far
 
-	Enter	KbdGetStatus		; push registers
+	EnterProc	KbdGetStatus		; push registers
 
 	les	di,[bp].data		; setup area where status is
 					; returned

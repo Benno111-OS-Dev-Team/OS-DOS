@@ -39,7 +39,7 @@ data	    dd	     ?	      ; returned information
 str	    ends
 
 dosdevconfig  proc far
-	    Enter    dosdevconfig	   ; push registers
+	    EnterProc    dosdevconfig	   ; push registers
 
 	    mov      ax,[bp].rsrvd	   ; reserved parm must
 	    cmp      ax,0		   ; be zero

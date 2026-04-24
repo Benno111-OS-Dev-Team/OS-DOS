@@ -34,7 +34,7 @@ Drive       dw       ?       ; drive number
 str         ends
 
 dosselectdisk  proc  far
-        Enter   Dosselectdisk         ; push registers
+        EnterProc   Dosselectdisk         ; push registers
 
         mov     dx,[bp].drive         ; load drive number
         dec     dx                    ; adjust for cp/dos incompatibility

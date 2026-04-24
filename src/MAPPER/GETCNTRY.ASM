@@ -78,7 +78,7 @@ Doscntry       ends
 
 dosgetctryinfo  proc far
 
-        Enter   Dosgetcntryinfo       ; save registers
+        EnterProc   Dosgetcntryinfo       ; save registers
 
         lds     si,[bp].CountryCodePtr
         mov     ax,ds:[si]            ; get country code pointer

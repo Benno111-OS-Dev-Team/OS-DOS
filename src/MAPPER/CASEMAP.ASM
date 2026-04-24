@@ -37,7 +37,7 @@ str     ends
 
 DosCaseMap      proc    far
 
-        Enter  DosCaseMap               ; save registers
+        EnterProc  DosCaseMap               ; save registers
 
 ; Get the country, so we can then get the country case map stuff
 

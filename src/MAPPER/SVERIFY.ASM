@@ -35,7 +35,7 @@ verify      dw       ?      ; new verify settings value
 str         ends
 
 dossetverify proc    far
-            Enter    dossetverify          ; push registers
+            EnterProc    dossetverify          ; push registers
 
             mov      ax,[bp].verify        ; check request
             cmp      al,1                  ; for validity

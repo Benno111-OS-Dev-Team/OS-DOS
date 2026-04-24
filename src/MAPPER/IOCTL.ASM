@@ -42,7 +42,7 @@ Data        dd       ?       ; data area
 str         ends
 
 dosdevioctl     proc  far
-        Enter   dosdevioctl           ; push registers
+        EnterProc   dosdevioctl           ; push registers
 
         mov     bx,[bp].handle        ; get handle
 
