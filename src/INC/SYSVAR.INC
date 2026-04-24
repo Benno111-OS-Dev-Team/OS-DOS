@@ -1,6 +1,9 @@
 ;	SCCSID = @(#)sysvar.asm 1.1 85/04/10
 include		version.inc
 
+IFNDEF SYSVAR_INC
+SYSVAR_INC EQU 1
+
 SysInitVars STRUC
 SYSI_DPB	    DD	    ?		; DPB chain
 SYSI_SFT	    DD	    ?		; SFT chain
@@ -71,6 +74,8 @@ Buffinfo    ENDS
 
 
 
+
+ENDIF
 
 
 
