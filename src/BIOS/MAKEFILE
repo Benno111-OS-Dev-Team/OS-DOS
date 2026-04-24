@@ -29,16 +29,8 @@ all: $(dest).sys
 msbio.cl1: msbio.skl \
 	$(msg)\$(COUNTRY).msg
 
-msload.obj: msload.asm \
-	makefile \
-	msbio.cl1 \
-	$(inc)\bootform.inc \
-	$(inc)\versiona.inc \
-	msload.inc
-
-msload.com: msload.obj
-	link /NOLOGO /OUT:msload.exe msload.obj
-	exe2bin msload.exe msload.com
+msload.com:
+	@echo Using checked-in msload.com
 
 msbio1.obj: msbio1.asm \
 	makefile \
@@ -167,11 +159,7 @@ msbio2.obj: msbio2.asm \
 
 mshard.obj:  mshard.asm $(inc)\postequ.inc $(inc)\dseg.inc
 
-$(dest).sys: msbio.cl1 msbio1.obj mscon.obj  msaux.obj \
-	mslpt.obj msclock.obj msdisk.obj msbio2.obj \
-	msinit.obj mshard.obj sysinit1.obj sysconf.obj \
-	sysinit2.obj sysimes.obj \
-	msload.com \
+$(dest).sys: msbio.cl1 msload.com \
 	makefile
 	link @msbio.lnk
 	exe2bin msbio.exe msbio.bin <locscr
