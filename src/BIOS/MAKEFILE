@@ -160,6 +160,9 @@ msbio2.obj: msbio2.asm \
 mshard.obj:  mshard.asm $(inc)\postequ.inc $(inc)\dseg.inc
 
 $(dest).sys: msbio.cl1 msload.com \
+	msbio1.obj mscon.obj msaux.obj mslpt.obj msclock.obj msdisk.obj \
+	msbio2.obj mshard.obj msinit.obj sysinit1.obj sysconf.obj sysinit2.obj \
+	sysimes.obj \
 	makefile
 	link @msbio.lnk
 	exe2bin msbio.exe msbio.bin <locscr
