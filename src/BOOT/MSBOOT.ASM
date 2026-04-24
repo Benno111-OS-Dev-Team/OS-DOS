@@ -176,7 +176,7 @@ START:
 if	$ le BIOS$_L
 	%OUT Don't destroy unexcuted code yet!!!
 endif
-	repz	movsb			;AN000;
+	rep	movsb			;AN000;
 	push	es			;AN000;
 	pop	ds			;AN000; DS = ES = code = 0.
 	assume	ds:code 		;AN000;
@@ -408,7 +408,9 @@ DISKOK:
 	MOV	DL,PhyDrv
 	MOV	bx,[BIOS$_L]		;AN000; J.K.I1.Get bios sector in bx
 	mov	ax,[BIOS$_H]		;AN000; J.K.I1.
-	JMP	FAR PTR BIOS		;CRANK UP THE DOS
+	DB	0EAh			;CRANK UP THE DOS
+	DW	0
+	DW	BIOSEG
 
 WRITE:	LODSB				;GET NEXT CHARACTER
 	OR	AL,AL			;clear the high bit
@@ -504,12 +506,6 @@ DOS	DB	"IBMDOS  COM"
 BIO	DB	"IO      SYS"
 DOS	DB	"MSDOS   SYS"
 	ENDIF
-
-Free	EQU (cbSec - 4) - ($-$start)		;AC000;
-;Free	 EQU (cbSec - 5) - ($-$start)
-if Free LT 0
-    %out FATAL PROBLEM:boot sector is too large
-endif
 
 	org	origin + (cbSec - 2)		;AN004;
 ;	 org	 origin + (cbSec - 5)
