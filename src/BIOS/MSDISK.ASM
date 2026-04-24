@@ -26,6 +26,7 @@
 
 ;for testing, set itest to 1.  So as MSBIO1.ASM.
 	itest=0
+	OPTION M510
 	EXTRN NUMERR:ABS		;MSDATA
 
 	INCLUDE MSGROUP.INC	;DEFINE CODE SEGMENT

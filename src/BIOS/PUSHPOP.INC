@@ -1,4 +1,4 @@
-	IF1								  ;3.30
+?stackdepth = 0
 
 SaveReg MACRO	reglist 		;; push those registers
 IRP reg,<reglist>
@@ -8,7 +8,6 @@ ENDM
 ENDM
 .xcref	SaveReg
 
-
 RestoreReg  MACRO   reglist		;; pop those registers
 IRP reg,<reglist>
 	?stackdepth = ?stackdepth - 1
@@ -16,5 +15,3 @@ IRP reg,<reglist>
 ENDM
 ENDM
 .xcref	RestoreReg
-
-	ENDIF								  ;3.30
