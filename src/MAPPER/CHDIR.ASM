@@ -47,13 +47,13 @@ stk     struc
 old_bp  dw      ?
 return  dd      ?
 dtrm006 dd      0h           ;reserved  (must be zero)
-DirName dd      ?            ;address of directory path name
+dnam006 dd      ?            ;address of directory path name
 stk     ends
 
 DosChDir  proc   far
         EnterProc   DosChDir                 ; push registers
 
-        lds     dx,[bp].DirName             ; set DS:DX to directory path name
+        lds     dx,dword ptr [bp+10]          ; set DS:DX to directory path name
 
         mov     ax,03b00h                ; load chdir op code
         int     21h                      ; call dos to change the directory
