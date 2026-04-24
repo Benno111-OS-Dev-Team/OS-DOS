@@ -14,9 +14,6 @@
 ;		this program is IBM_DISK_IO.
 ;
 
-
-	.286		;Use 80286 non-protected mode
-
 BIOSEG		= 040h		;Segment for ROM BIOS Data
 ROMSEG		= 0F000h	;Segment of ROM
 
