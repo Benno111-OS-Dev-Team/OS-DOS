@@ -54,6 +54,10 @@ waitoption  dw    ?           ; wait option
 actioncode  dw    ?           ; action code
 stk     ends
 
+ResultCode_Off  equ  12
+Qprocessid_Off  equ  6
+Aprocessid_Off  equ  8
+
 doscwait proc   far
         EnterProc   doscwait                 ; push registers
 
@@ -69,12 +73,12 @@ doscwait proc   far
 
 WeHaveExeced:
         mov     ax,DosExecPgmReturnCode
-        lds     si,[bp].ResultCode
+        lds     si,dword ptr [bp+ResultCode_Off]
         assume  ds:nothing
         mov     ds:[si],ax               ; return termination code
 
-        mov     ax,[bp].Qprocessid       ; return child process id
-        lds     si,[bp].Aprocessid
+        mov     ax,[bp+Qprocessid_Off]   ; return child process id
+        lds     si,dword ptr [bp+Aprocessid_Off]
         mov     ds:[si],ax
 
         xor     ax,ax                    ; set good return code

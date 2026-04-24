@@ -187,6 +187,14 @@ VariablesCount	 dw	 ?	; number of variables
 VariableTablePtr dd	 ?	; table of variables to insert
 stk	    ends
 
+ReturnLengthPtr_Off  equ  6
+MessageFileName_Off  equ  10
+MessageNumber_Off    equ  14
+MessageBufferLen_Off equ  16
+MessageBufferPtr_Off equ  18
+VariablesCount_Off   equ  22
+VariableTablePtr_Off equ  24
+
 
 dosgetmessage  proc	far
 
@@ -196,7 +204,7 @@ dosgetmessage  proc	far
 	assume	ds:messages
 	mov	ErrorMessageFlag,0	; reset error message flag
 
-	mov	bx,[bp].MessageNumber		 ; get message number
+	mov	bx,[bp+MessageNumber_Off]	 ; get message number
 	mov	si,offset messages:MessageIndex
 
 SearchForMessageLoop:			; search for message in table
@@ -218,16 +226,16 @@ FoundMessage:
 
 ; Here, ds:[si] -> message text bytes
 
-	les	di,[bp].VariableTablePtr	; get variable address
+	les	di,dword ptr [bp+VariableTablePtr_Off]	; get variable address
 	mov	word ptr NextVarPointer+0,di	; save it
 	mov	word ptr NextVarPointer+2,es
 
-	mov	di,[bp].VariablesCount		; get variable count
+	mov	di,[bp+VariablesCount_Off]	; get variable count
 	mov	VarsToGo,di			; save it
 
-	les	di,[bp].MessageBufferPtr	; get return message buffer
+	les	di,dword ptr [bp+MessageBufferPtr_Off]	; get return message buffer
 						;     address
-	mov	ax,[bp].MessageBufferLen	; get return message buffer
+	mov	ax,[bp+MessageBufferLen_Off]	; get return message buffer
 	mov	MessageToGo,ax			;   length
 
 	cmp	ax,0				; length = 0 ??
@@ -405,7 +413,7 @@ GetMessageDone:
 	push	ds
 	push	si
 	mov	ax,MessageLength
-	lds	si,[bp].ReturnLengthPtr
+	lds	si,dword ptr [bp+ReturnLengthPtr_Off]
 	assume	ds:nothing
 	mov	ds:[si],ax
 	pop	si
@@ -425,11 +433,11 @@ KeepGoingBackwards:
 	jmp	KeepGoingBackwards
 
 PutItHere:
-	mov	ax,[bp].MessageNumber
+	mov	ax,[bp+MessageNumber_Off]
 	mov	dx,0
 
 	call	convdec
-	lds	si,[bp].ReturnLengthPtr
+	lds	si,dword ptr [bp+ReturnLengthPtr_Off]
 	assume	ds:nothing
 	add	ax,3			; for cr, lf, nul
 	add	ds:[si],ax
@@ -452,9 +460,9 @@ NotErrorMessage:
 	mov	ah,9			   ; load op code
 	int	21h			   ; display message
 
-	lds	si,[bp].ReturnLengthPtr
+	lds	si,dword ptr [bp+ReturnLengthPtr_Off]
 	mov	cx,ds:[si]
-	lds	dx,[bp].MessageBufferPtr
+	lds	dx,dword ptr [bp+MessageBufferPtr_Off]
 
 	mov	bx,1
 	mov	ah,40h

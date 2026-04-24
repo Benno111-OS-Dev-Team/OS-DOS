@@ -66,6 +66,10 @@ Traceindic dw	?	; ignored,  what is a trace process?
 Asyncindic dw	?	; ignored,  PC-DOS always waits!
 stk	ends
 
+PgmPointer_Off  equ  6
+EnvPointer_Off  equ  14
+ArgPointer_Off  equ  18
+
 dosexecpgm proc   far				; push registers
 	EnterProc	dosexecpgm
 
@@ -73,10 +77,10 @@ dosexecpgm proc   far				; push registers
 	mov	ds,ax				;   and copy info into
 	assume	ds:buffer			;      data buffer
 
-	mov	ax,word ptr [bp+2].EnvPointer	; seg portion only for pc-dos
+	mov	ax,word ptr [bp+EnvPointer_Off+2]	; seg portion only for pc-dos
 	mov	EnvironmentSegment,ax		; copy environment string
 
-	les	di,[bp].ArgPointer
+	les	di,dword ptr [bp+ArgPointer_Off]
 	mov	word ptr ArgumentPointer+0,di	; copy argument string
 	mov	word ptr ArgumentPointer+2,es
 
@@ -91,7 +95,7 @@ dosexecpgm proc   far				; push registers
 	mov	es,bx
 	mov	bx,offset buffer:DosExecParameterBlock
 
-	lds	dx,[bp].PgmPointer	   ; setup program name
+	lds	dx,dword ptr [bp+PgmPointer_Off]	   ; setup program name
 	mov	ax,4b00h
 	int	21h			   ; exec program  and
 	jc	ErrorExit		   ;   check for error

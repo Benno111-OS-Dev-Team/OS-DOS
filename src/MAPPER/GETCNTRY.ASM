@@ -41,6 +41,11 @@ CountryCodePtr  dd      ?
 BufferLength    dw      ?
 stk         ends
 
+ReturnLength_Off   equ    6
+BufferPtr_Off      equ    10
+CountryCodePtr_Off equ    14
+BufferLength_Off   equ    18
+
 
 cntry       struc                       ;country info. sturctrue
 ctry_code       dw      ?
@@ -80,7 +85,7 @@ dosgetctryinfo  proc far
 
         EnterProc   Dosgetcntryinfo       ; save registers
 
-        lds     si,[bp].CountryCodePtr
+        lds     si,dword ptr [bp+CountryCodePtr_Off]
         mov     ax,ds:[si]            ; get country code pointer
 
         cmp     ax,256                ; 16 bit country code
@@ -100,7 +105,7 @@ getinfo:
         jc      ErrorExit
 
         mov     si,offset buffer:CountryInfo     ;pointer to DOS cntry infor
-        les     di,[bp].BufferPtr                ;pointer to return data area
+        les     di,dword ptr [bp+BufferPtr_Off]                ;pointer to return data area
 
         mov     ax,[si].ddformat                 ;copy date format
         mov     es:[di].dformat,ax
@@ -111,11 +116,11 @@ getinfo:
         mov     al,[si].dtformat                 ;copy time format
         mov     es:[di].tformat,al
 
-        mov     cx,[bp].BufferLength  ;was buffer larger than pc-dos gave us?
+        mov     cx,[bp+BufferLength_Off]  ;was buffer larger than pc-dos gave us?
         sub     cx,34
         jc      NoFillNecessary       ; no fill necessary
 
-        les     di,[bp].BufferPtr     ; else fill the remaining area
+        les     di,dword ptr [bp+BufferPtr_Off]     ; else fill the remaining area
         add     di,34                 ;   with zeros
         mov     al,0
         rep     stosb

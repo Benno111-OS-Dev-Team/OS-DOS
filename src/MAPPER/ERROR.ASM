@@ -40,6 +40,8 @@ Return	    dd	     ?
 Flag	    dw	     ?		; error flag;  0 = APP handle error
 stk	    ends		;	       1 = System handle error
 
+Flag_Off    equ     6
+
 
 DosError   proc  far
 	EnterProc	 doserror		; Push registers
@@ -48,7 +50,7 @@ DosError   proc  far
 	mov	 ds,ax			;-->RW
 	assume	 ds:databuff		;-->RW
 
-	mov	 ax,[bp].flag		; get error flag
+	mov	 ax,[bp+Flag_Off]	; get error flag
 	cmp	 ax,AppIsHandling	; check who should handle errors
 	je	 apperrorhandle 	; branch if application handles error
 	cmp	 ax,SystemIsHandling	; system handle error ??

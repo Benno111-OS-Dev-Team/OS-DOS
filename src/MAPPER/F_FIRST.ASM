@@ -152,7 +152,7 @@ DosFindFirst  proc   far
 
         EnterProc   DosFindFirst
 
-        mov     ax,FindSegment          ; get address to our data
+        mov     ax,seg FindSegment      ; get address to our data
         mov     ds,ax
         assume  ds:FindSegment
 
@@ -264,7 +264,7 @@ DoSearch:
         jmp     ErrorExit
 
 FindFirstOK:
-        mov     ax,FindSegment
+        mov     ax,seg FindSegment
         mov     ds,ax
         assume  ds:FindSegment
 
@@ -363,7 +363,7 @@ SearchDone:
 
 ErrorExit:
         push    ax
-        mov     ax,FindSegment
+        mov     ax,seg FindSegment
         mov     ds,ax
         assume  ds:FindSegment
         cmp     SaveDTAFlag,0
