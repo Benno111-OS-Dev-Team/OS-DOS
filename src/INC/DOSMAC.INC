@@ -7,7 +7,7 @@
 TRUE    EQU 0FFFFh
 FALSE   EQU 0
 
-OPTION NOKEYWORD:<INVOKE>
+OPTION NOKEYWORD:<INVOKE,ENTER,LEAVE>
 
 SUBTTL BREAK a listing into pages and give new subtitles
 PAGE
@@ -427,7 +427,8 @@ endif
 
 Break   <DOSAssume - validate assumes>
 
-AsmVar  Debug,$temp
+AsmVar  Debug
+AsmVar  $temp
 
 IF debug
 DOSAssume   Macro   reg,reglist,message
