@@ -37,7 +37,7 @@ msload.obj: msload.asm \
 	msload.inc
 
 msload.com: msload.obj
-	link /NOLOGO /OUT:msload.exe msload.obj
+	..\tools\link.exe msload.obj,msload,,;
 	exe2bin msload.exe msload.com
 
 msbio1.obj: msbio1.asm \
