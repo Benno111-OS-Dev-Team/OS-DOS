@@ -171,6 +171,7 @@ EOI	=	20H
 	extrn	Start_Sec_H:word	;AN000; Starting sector high word for
 					;disk I/O request. IBMDISK.ASM
 
+	MSBDATA_MODULE EQU 1
 	INCLUDE MSBDATA.INC
 
 	IF	iTEST
