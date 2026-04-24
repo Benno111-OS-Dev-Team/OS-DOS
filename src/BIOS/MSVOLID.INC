@@ -120,27 +120,27 @@ read_volume_id:
 
 	pop	DI			; Restore Current BDS
 	pop	DS
-	mov	al,byte ptr ds:[di].cFAT    ; # of fats
-	mov	cx,word ptr ds:[di].csecfat ; sectors / fat
+	mov	al,byte ptr ds:[di+11]    ; # of fats
+	mov	cx,word ptr ds:[di+17] ; sectors / fat
 	mul	cl			    ; size taken by fats
-	add	ax,word ptr ds:[di].ressec  ; add on reserved sectors
+	add	ax,word ptr ds:[di+9]  ; add on reserved sectors
 					; AX is now sector # (0 based)
 	mov	cs:[root_sec],ax	; set initial value
-	mov	ax,[di].cDir		; # root dir entries
+	mov	ax,word ptr [di+12]		; # root dir entries
 	mov	cl,4			; 16 entries/sector
 	shr	ax,cl			; divide by 16
 	mov	cx,ax			; cx is # of sectors to scan
 next_sec:
 	push	cx			; save outer loop counter
 	mov	ax,cs:[root_sec]	; get sector #
-	mov	cx,word ptr ds:[di].seclim    ; sectors / track
+	mov	cx,word ptr ds:[di+19]    ; sectors / track
 	xor	DX,DX
 	div	cx
 			; set up registers for call to read_sector
 	inc	DX		; dx= sectors into track, ax= track count from 0
 	mov	cl,dl		; sector to read
 	xor	DX,DX
-	div	word ptr ds:[di].hdlim ; # heads on this disc
+	div	word ptr ds:[di+21] ; # heads on this disc
 	mov	dh,dl		; Head number
 	mov	ch,al		; Track #
 	call	read_sector	; get first sector of the root directory,
@@ -266,7 +266,7 @@ FAT_CHECK:
 	push	AX
 	xor	SI, SI			 ; say FAT ID's are same.
 	mov	AL, cs:MedByt
-	cmp	AL, byte ptr [DI].Mediad ; compare it with the BDS medbyte
+	cmp	AL, byte ptr [DI+16] ; compare it with the BDS medbyte
 	jz	OKRET1			 ; carry clear
 	dec	SI
 OkRet1: clc
@@ -290,7 +290,7 @@ init_vid_loop:
 	push	cs
 	pop	ds
 	mov	si,offset tmp_vid   ; source
-	add	di,volid
+	add	di,75
 	mov	cx,vid_size
 	pop	ax
 	ret
