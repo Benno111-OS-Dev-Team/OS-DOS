@@ -8,7 +8,8 @@ inc	=..\inc
 hinc	=..\h
 shell	=..\shell
 cas	=..\shell\cassfar
-make	=nmake
+COUNTRY = usa-ms
+make	=nmake COUNTRY=$(COUNTRY)
 here	=..\..\select
 
 #

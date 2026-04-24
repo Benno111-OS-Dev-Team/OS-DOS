@@ -1,6 +1,7 @@
 #************************** CMD Root level Makefile ***********************
 
-make	=nmake
+COUNTRY = usa-ms
+make	=nmake COUNTRY=$(COUNTRY)
 
 all:
 	cd command

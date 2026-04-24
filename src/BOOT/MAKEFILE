@@ -4,6 +4,7 @@ msg	=..\messages
 dos	=..\dos
 inc	=..\inc
 hinc	=..\h
+COUNTRY = usa-ms
 
 #
 #################### dependencies begin here ############################

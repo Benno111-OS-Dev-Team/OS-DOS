@@ -5,6 +5,7 @@ inc	=..\inc
 hinc	=..\hinc
 make	=nmake -i
 dos	=.
+COUNTRY = usa-ms
 
 #
 ###################### Dependencies begin here ##########################
