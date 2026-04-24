@@ -343,7 +343,7 @@ Got_80:
 	mov	si,offset BPBTable
 	mov	si,word ptr [si+bx]	; get address of BPB
 Set_RecBPB:
-	mov	di,offset DeviceParameters.DP_BPB	 ; es:di -> BPB
+	mov	di,offset DeviceParameters+7	 ; es:di -> BPB
 	mov	cx,size a_BPB
 	cld
 	rep	movsb
@@ -379,7 +379,7 @@ see_heads:
 	je	Got_Correct_Mediad
 ; We have one head - OK for 48tpi medium
 	mov	al,1			; AL contains sectors/cluster
-	mov	ch,DeviceParameters.DP_DeviceType
+	mov	ch,byte ptr DeviceParameters+1
 	cmp	ch,DEV_5INCH
 	jz	Dec_Mediad
 	mov	bl,0F0H
