@@ -152,7 +152,7 @@ DosFindFirst  proc   far
 
         EnterProc   DosFindFirst
 
-        mov     ax,seg FindSegment      ; get address to our data
+        mov     ax,FindSegment          ; get address to our data
         mov     ds,ax
         assume  ds:FindSegment
 
@@ -165,7 +165,7 @@ DosFindFirst  proc   far
 ;       2) the high order bit of the DTA pointer is used to indicate that
 ;           the handle is allocated
 
-        mov     si,offset FindHandles
+        mov     si,offset FindSegment:FindHandles
         mov     cx,MaxFinds
 
 ; DS:[SI] -> Find DTA Pointer Table
@@ -264,7 +264,7 @@ DoSearch:
         jmp     ErrorExit
 
 FindFirstOK:
-        mov     ax,seg FindSegment
+        mov     ax,FindSegment
         mov     ds,ax
         assume  ds:FindSegment
 
@@ -363,7 +363,7 @@ SearchDone:
 
 ErrorExit:
         push    ax
-        mov     ax,seg FindSegment
+        mov     ax,FindSegment
         mov     ds,ax
         assume  ds:FindSegment
         cmp     SaveDTAFlag,0
