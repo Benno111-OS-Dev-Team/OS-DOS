@@ -7,6 +7,8 @@
 TRUE    EQU 0FFFFh
 FALSE   EQU 0
 
+OPTION NOKEYWORD:<INVOKE>
+
 SUBTTL BREAK a listing into pages and give new subtitles
 PAGE
 BREAK   MACRO   subtitle
