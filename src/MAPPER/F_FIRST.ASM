@@ -113,6 +113,40 @@ DirHandlePtr    dd      ?       ; directory search handle
 PathNamePtr     dd      ?       ; file path name pointer
 stk     ends
 
+;
+; Explicit stack parameter offsets from BP
+;
+FindCountPtr_Off equ 10
+FindBufferLen_Off equ 14
+FindBufferPtr_Off equ 16
+FileAttrib_Off   equ 20
+DirHandlePtr_Off equ 22
+PathNamePtr_Off  equ 26
+
+;
+; DTA offsets (dtastr)
+;
+DTA_ATTR_Off     equ 21
+DTA_TIME_Off     equ 22
+DTA_DATE_Off     equ 24
+DTA_SIZE_Off     equ 26
+DTA_NAME_Off     equ 30
+
+;
+; Output record offsets (FileFindBuf)
+;
+FF_CREATE_DATE_Off equ 0
+FF_CREATE_TIME_Off equ 2
+FF_ACCESS_DATE_Off equ 4
+FF_ACCESS_TIME_Off equ 6
+FF_WRITE_DATE_Off  equ 8
+FF_WRITE_TIME_Off  equ 10
+FF_FILE_SIZE_Off   equ 12
+FF_FALLOC_SIZE_Off equ 16
+FF_ATTR_Off        equ 20
+FF_STRLEN_Off      equ 22
+FF_NAME_Off        equ 23
+
 
 DosFindFirst  proc   far
 
@@ -139,7 +173,7 @@ DosFindFirst  proc   far
 
 ; Incoming DirHandle = -1 ==> allocate a new dir handle
 
-        les     di,dword ptr [bp+22]
+        les     di,dword ptr [bp+DirHandlePtr_Off]
         mov     ax,es:[di]
         cmp     ax,-1
         je      AllocateHandle
@@ -187,7 +221,7 @@ HandleFound:
         and     ax,not OpenedHandle
         mov     CurrentDTA,ax
 
-        les     di,dword ptr [bp+22]    ; the handle number we return is the
+        les     di,dword ptr [bp+DirHandlePtr_Off]    ; the handle number we return is the
         mov     es:[di],si              ;  offset to the entry in FindSegment
 
 ; save the callers dta so we can restore it later
@@ -207,7 +241,7 @@ HandleFound:
 
 ; Get the count of files to search for
 
-        les     di,dword ptr [bp+10]    ; load result buffer pointer
+        les     di,dword ptr [bp+FindCountPtr_Off]    ; load result buffer pointer
         mov     ax,es:[di]              ; save the search
         mov     SearchCount,ax          ;                count
         mov     es:word ptr [di],0      ; set found count to zero
@@ -220,9 +254,9 @@ HandleFound:
 ;  Find first file
 
 DoSearch:
-        lds     dx,dword ptr [bp+26]   ; load address of asciiz string
+        lds     dx,dword ptr [bp+PathNamePtr_Off]   ; load address of asciiz string
         assume  ds:nothing
-        mov     cx,word ptr [bp+20]    ; load the attribute
+        mov     cx,word ptr [bp+FileAttrib_Off]    ; load the attribute
         mov     ax,04E00h
         int     21h                    ; find the first occurance of file
         jnc     FindFirstOK            ; continue
@@ -234,10 +268,10 @@ FindFirstOK:
         mov     ds,ax
         assume  ds:FindSegment
 
-        mov     ax,word ptr [bp+14]    ; load the buffer length
+        mov     ax,word ptr [bp+FindBufferLen_Off]    ; load the buffer length
         mov     ReturnLengthToGo,ax    ; save low order buffer length
 
-        les     di,dword ptr [bp+16]   ; load result buffer pointer
+        les     di,dword ptr [bp+FindBufferPtr_Off]   ; load result buffer pointer
 
         mov     word ptr ReturnBufferSave+0,di
         mov     word ptr ReturnBufferSave+2,es
@@ -259,56 +293,56 @@ BufferLengthOk:
 ;       es:di -> where we are to put the resultant data
 ;       ds:si -> DTA from find (either first or next)
 
-        mov     ax,word ptr ds:[si+24]      ; save date
-        mov     es:word ptr [di+0],ax
-        mov     es:word ptr [di+4],ax
-        mov     es:word ptr [di+8],ax
+        mov     ax,word ptr ds:[si+DTA_DATE_Off]      ; save date
+        mov     es:word ptr [di+FF_CREATE_DATE_Off],ax
+        mov     es:word ptr [di+FF_ACCESS_DATE_Off],ax
+        mov     es:word ptr [di+FF_WRITE_DATE_Off],ax
 
-        mov     ax,word ptr ds:[si+22]      ; save time
-        mov     es:word ptr [di+2],ax
-        mov     es:word ptr [di+6],ax
-        mov     es:word ptr [di+10],ax
+        mov     ax,word ptr ds:[si+DTA_TIME_Off]      ; save time
+        mov     es:word ptr [di+FF_CREATE_TIME_Off],ax
+        mov     es:word ptr [di+FF_ACCESS_TIME_Off],ax
+        mov     es:word ptr [di+FF_WRITE_TIME_Off],ax
 
-        mov     ax,word ptr ds:[si+26]       ; save file size
-        mov     es:word ptr [di+12],ax
-        mov     es:word ptr [di+16],ax
-        mov     ax,word ptr ds:[si+28]
-        mov     es:word ptr [di+14],ax
-        mov     es:word ptr [di+18],ax
+        mov     ax,word ptr ds:[si+DTA_SIZE_Off]       ; save file size
+        mov     es:word ptr [di+FF_FILE_SIZE_Off],ax
+        mov     es:word ptr [di+FF_FALLOC_SIZE_Off],ax
+        mov     ax,word ptr ds:[si+DTA_SIZE_Off+2]
+        mov     es:word ptr [di+FF_FILE_SIZE_Off+2],ax
+        mov     es:word ptr [di+FF_FALLOC_SIZE_Off+2],ax
 
-        test    word ptr es:[di+16],001ffh
+        test    word ptr es:[di+FF_FALLOC_SIZE_Off],001ffh
         jz      AllocateSizeSet
 
-        and     word ptr es:[di+16],not 001ffh
-        add     word ptr es:[di+16],00200h
+        and     word ptr es:[di+FF_FALLOC_SIZE_Off],not 001ffh
+        add     word ptr es:[di+FF_FALLOC_SIZE_Off],00200h
 
 AllocateSizeSet:
         xor     ax,ax
-        mov     al,byte ptr ds:[si+21]
-        mov     es:word ptr [di+20],ax
+        mov     al,byte ptr ds:[si+DTA_ATTR_Off]
+        mov     es:word ptr [di+FF_ATTR_Off],ax
 
         mov     cx,12
         mov     bx,0
 
 MoveNameLoop:
-        mov     al,byte ptr ds:[si+bx+30]
+        mov     al,byte ptr ds:[si+bx+DTA_NAME_Off]
         cmp     al,0
         je      EndOfName
 
-        mov     byte ptr es:[di+bx+23],al
+        mov     byte ptr es:[di+bx+FF_NAME_Off],al
         inc     bx
         loop    MoveNameLoop
 
 EndOfName:
-        mov     byte ptr es:[di+bx+23],0
+        mov     byte ptr es:[di+bx+FF_NAME_Off],0
         mov     ax,bx
-        mov     byte ptr es:[di+22],al
+        mov     byte ptr es:[di+FF_STRLEN_Off],al
 
         add     di,bx
         mov     word ptr ReturnBufferSave+0,di
         mov     word ptr ReturnBufferSave+2,es
 
-        les     di,dword ptr [bp+10]
+        les     di,dword ptr [bp+FindCountPtr_Off]
         inc     word ptr es:[di]
 
 ;
