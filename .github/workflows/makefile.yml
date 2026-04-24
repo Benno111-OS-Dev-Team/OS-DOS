@@ -16,7 +16,11 @@ jobs:
 
     - name: Set up MSVC developer environment
       uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x86
 
     - name: Build
       working-directory: src
+      env:
+        INIT: ${{ github.workspace }}\src\TOOLS
       run: nmake /f MAKEFILE
