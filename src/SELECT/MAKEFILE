@@ -9,7 +9,7 @@ hinc	=..\h
 shell	=..\shell
 cas	=..\shell\cassfar
 COUNTRY = usa-ms
-make	=nmake COUNTRY=$(COUNTRY)
+make	=$(NMAKE) COUNTRY=$(COUNTRY)
 here	=..\..\select
 
 #

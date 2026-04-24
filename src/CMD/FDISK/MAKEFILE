@@ -94,7 +94,7 @@ reboot.obj : reboot.asm \
 
 $(map)\mapper.lib:
 	cd $(map)
-	nmake
+	$(NMAKE)
 	cd $(here)
 
 # Do the link of FDISK
@@ -108,7 +108,7 @@ fdisk.exe : fdisk.obj reboot.obj bootrec.obj fdboot.obj \
 	    $(map)\mapper.lib makefile fdisk.lnk fdisk.ctl _parse.obj \
             $(inc)\comsubs.lib
 	cd $(inc)
-	nmake
+	$(NMAKE)
 	cd $(here)
         link @fdisk.lnk
 

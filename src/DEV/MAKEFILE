@@ -1,7 +1,7 @@
 #************************** DEV root level Makefile ***********************
 
 COUNTRY = usa-ms
-make	=nmake COUNTRY=$(COUNTRY)
+make	=$(NMAKE) COUNTRY=$(COUNTRY)
 
 all:
 	cd country

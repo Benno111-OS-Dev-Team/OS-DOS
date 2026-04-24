@@ -3,7 +3,7 @@
 msg	=..\messages
 inc	=..\inc
 hinc	=..\hinc
-make	=nmake -i
+make	=$(NMAKE) -i
 dos	=.
 COUNTRY = usa-ms
 

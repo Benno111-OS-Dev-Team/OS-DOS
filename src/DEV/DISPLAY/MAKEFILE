@@ -4,7 +4,7 @@ inc	=..\..\inc
 msg	=..\..\messages
 dos	=..\..\dos
 hinc	=..\..\h
-make	=nmake
+make	=$(NMAKE)
 
 #
 ######################## Dependencies Begin Here ##########################

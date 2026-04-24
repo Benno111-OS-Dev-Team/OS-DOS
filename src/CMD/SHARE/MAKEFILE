@@ -5,7 +5,7 @@ dos	=..\..\dos
 inc	=..\..\inc
 hinc	=..\..\h
 here	=..\cmd\share	  # This is the path from INC or MAP dir's to here.
-make	=nmake -i
+make	=$(NMAKE) -i
 
 #
 #######################	dependencies begin here. #########################

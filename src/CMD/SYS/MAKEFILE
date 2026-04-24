@@ -15,7 +15,7 @@ all: sys.com
 
 $(inc)\boot.inc: $(boot)\msboot.asm $(msg)\$(COUNTRY).msg
         cd $(boot)
-        nmake
+        $(NMAKE)
         cd $(here)
 
 sys.ctl: sys.skl $(msg)\$(COUNTRY).msg

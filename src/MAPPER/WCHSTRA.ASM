@@ -44,19 +44,26 @@ attr    dd      ?       ; attribute pointer
 column  dw      ?       ; column number
 row     dw      ?       ; starting position for output
 lngth   dw      ?       ; length of the string
-addr    dd      ?       ; string to be written (pointer)
+string_ptr dd   ?       ; string to be written (pointer)
 stk     ends
+
+Handle_Off      equ     6
+Attr_Off        equ     8
+Column_Off      equ     12
+Row_Off         equ     14
+Length_Off      equ     16
+StringPtr_Off   equ     18
 
 viowrtcharstratt proc   far
         EnterProc   viowrtcharstratt         ; push registers
 
         sub     bh,bh
         sub     ax,ax                    ; Start with clean error condition
-        mov     dx,[bp].column           ; get column number
+        mov     dx,[bp+Column_Off]       ; get column number
         cmp     dl,80                    ; check for upper boundry
         jg      error                    ; branch if illegal number
 
-        mov     ax,[bp].row              ; get row number
+        mov     ax,[bp+Row_Off]          ; get row number
         cmp     al,25                    ; check for upper boundry
         jg      error                    ; branch if illegal number
         mov     dh,al
@@ -66,10 +73,10 @@ viowrtcharstratt proc   far
         int     10h                      ; Set start cursor position
 
         popal
-        lds     si,[bp].attr             ; Set up attribute in BL
+        lds     si,dword ptr [bp+Attr_Off] ; Set up attribute in BL
         mov     bl,byte ptr ds:[si]
-        lds     si,[bp].addr             ; DS:SI is pointer to string
-        mov     di,[bp].lngth
+        lds     si,dword ptr [bp+StringPtr_Off] ; DS:SI is pointer to string
+        mov     di,[bp+Length_Off]
                                          ;  ****************************
 ;       cmp     bl,15                    ;  ** assume good attribute! **
 ;       jg      error                    ;  ****************************

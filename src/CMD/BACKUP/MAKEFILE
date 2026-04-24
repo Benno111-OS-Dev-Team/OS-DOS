@@ -16,7 +16,7 @@ all: backup.com
 
 $(map)\mapper.lib:
 	cd $(map)
-	nmake
+	$(NMAKE)
 	cd $(here)
 
 _parse.obj:	_parse.asm			\

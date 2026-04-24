@@ -5,7 +5,7 @@ dos	=..\..\dos
 inc	=..\..\inc
 hinc	=..\..\h
 here	=..\cmd\ifsfunc
-make	=nmake -i
+make	=$(NMAKE) -i
 
 #
 #######################	dependencies begin here. #########################

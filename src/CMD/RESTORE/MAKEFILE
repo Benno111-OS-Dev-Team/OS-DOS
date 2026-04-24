@@ -17,7 +17,7 @@ all: not_file restore.com
 #-------BUILD MAPPER ----------------
 not_file : makefile		 #Always perform these steps!
 	cd $(map)
-	nmake
+	$(NMAKE)
 	cd $(here)
 
 

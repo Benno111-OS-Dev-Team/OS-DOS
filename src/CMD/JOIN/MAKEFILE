@@ -6,7 +6,7 @@ inc	=..\..\inc
 hinc	=..\..\h
 map	=..\..\mapper
 here	=..\cmd\join	  # This is the path from INC or MAP dir's to here.
-make	=nmake -i
+make	=$(NMAKE) -i
 
 #
 #######################	dependencies begin here. #########################

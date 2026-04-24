@@ -44,6 +44,7 @@ jobs:
         shell: cmd
         run: |
           echo === ENV SETUP ===
+          for /f "delims=" %%I in ('where nmake ^| findstr /i "\\VC\\Tools\\MSVC\\"') do echo NMAKE="%%I">>"%GITHUB_ENV%"
           echo INIT=%CD%\src\TOOLS>>"%GITHUB_ENV%"
           echo COUNTRY=usa-ms>>"%GITHUB_ENV%"
           echo INIT will be persisted for later steps
@@ -62,7 +63,8 @@ jobs:
         shell: cmd
         run: |
           echo === BUILD START ===
-          nmake /f MAKEFILE || exit /b 1
+          set "PATH=%PATH%;%CD%\TOOLS"
+          "%NMAKE%" /f MAKEFILE || exit /b 1
 
       - name: Verify outputs
         shell: pwsh
