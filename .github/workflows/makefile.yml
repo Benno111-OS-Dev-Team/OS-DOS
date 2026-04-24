@@ -46,9 +46,8 @@ jobs:
           echo === ENV SETUP ===
           echo INIT=%CD%\src\TOOLS>>"%GITHUB_ENV%"
           echo COUNTRY=usa-ms>>"%GITHUB_ENV%"
-          echo %CD%\src\TOOLS>>"%GITHUB_PATH%"
           echo INIT will be persisted for later steps
-          echo PATH will include src\TOOLS for later steps
+          echo PATH will keep the Visual Studio tools first
 
       - name: Clean previous builds
         working-directory: src
