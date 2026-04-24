@@ -51,8 +51,8 @@ cseg		segment public para 'code'
 		assume	cs:cseg,ds:nothing,es:nothing,ss:nothing
 
 include MSload.inc
-include Bootform.inc		;AN000; Extended bpb, boot record defintion.
-include versiona.inc		;AN001; Version number for SYS.COM
+include ..\inc\bootform.inc		;AN000; Extended bpb, boot record defintion.
+include ..\inc\versiona.inc		;AN001; Version number for SYS.COM
 
 sec9	equ	522h		;;** 8/3/87 DCL
 
