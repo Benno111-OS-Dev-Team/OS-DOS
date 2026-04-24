@@ -37,18 +37,18 @@ dosxxx  segment byte public 'dos'
         .list
 
 
-str     struc
+stk     struc
 old_bp          dw    ?
 return          dd    ?
 AttributePtr    dd    ?      ; Device descriptor word returned if device
 HandleTypePtr   dd    ?      ; handle type; 0 = file handle, 1 = device handle
 Handle          dw    ?      ; file handle
-str     ends
+stk     ends
 
 
 dosqhandtype proc   far
 
-        Enter   dosqhandtype            ; push registers
+        EnterProc   dosqhandtype            ; push registers
 
         mov     bx,[bp].Handle          ; get file handle
         mov     ax,4400h
@@ -67,7 +67,7 @@ dosqhandtype proc   far
 
 ItIsAFile:
         Mexit                           ; pop registers
-        ret     size str - 6            ; return
+        ret     size stk - 6            ; return
 
 dosqhandtype  endp
 

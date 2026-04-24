@@ -101,7 +101,7 @@ dosxxx  segment byte public 'dos'
         .list
 
 
-str     struc
+stk     struc
 old_bp          dw      ?
 return          dd      ?
 ReservedZero    dd      0       ; reserved
@@ -111,12 +111,12 @@ FindBufferPtr   dd      ?       ; result buffer pointer
 FileAttribute   dw      ?       ; search attribute
 DirHandlePtr    dd      ?       ; directory search handle
 PathNamePtr     dd      ?       ; file path name pointer
-str     ends
+stk     ends
 
 
 DosFindFirst  proc   far
 
-        Enter   DosFindFirst
+        EnterProc   DosFindFirst
 
         mov     ax,seg FindSegment      ; get address to our data
         mov     ds,ax
@@ -345,7 +345,7 @@ DoNotRestore:
         pop     ax
 
         mexit                              ; pop registers
-        ret     size str - 6               ; return
+        ret     size stk - 6               ; return
 
 DosFindFirst endp
 

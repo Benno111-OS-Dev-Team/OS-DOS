@@ -25,16 +25,16 @@ dosxxx  segment byte public 'dos'
             .sall
             include  macros.inc
 
-str         struc
+stk         struc
 old_bp      dw       ?
 return      dd       ?
 rsrvd       dd       ?
 Asciiz      dd       ?       ; new directory name pointer
-str         ends
+stk         ends
 
 dosmkdir    proc     far
 
-            Enter    DosMkdir            ; push registers
+            EnterProc    DosMkdir            ; push registers
             lds      dx,[bp].asciiz      ; set pointer to directory name
 
             mov      ah,39h              ; load opcode
@@ -44,7 +44,7 @@ dosmkdir    proc     far
             sub      ax,ax               ; else, set good return code
 
 exit:       mexit                        ; pop registers
-            ret      size str - 6        ; return
+            ret      size stk - 6        ; return
 
 dosmkdir    endp
 

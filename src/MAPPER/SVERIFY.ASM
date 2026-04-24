@@ -28,14 +28,14 @@ dosxxx  segment byte public 'dos'
 
 error_code  equ      0002h
 
-str         struc
+stk         struc
 old_bp      dw       ?
 return      dd       ?
 verify      dw       ?      ; new verify settings value
-str         ends
+stk         ends
 
 dossetverify proc    far
-            Enter    dossetverify          ; push registers
+            EnterProc    dossetverify          ; push registers
 
             mov      ax,[bp].verify        ; check request
             cmp      al,1                  ; for validity
@@ -50,7 +50,7 @@ dossetverify proc    far
 error:      mov      ax,error_code         ; set error return code
 
 exit:       Mexit                          ; pop registers
-            ret      size str - 6          ; return
+            ret      size stk - 6          ; return
 
 dossetverify endp
 

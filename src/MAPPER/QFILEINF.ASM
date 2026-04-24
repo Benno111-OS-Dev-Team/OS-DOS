@@ -51,17 +51,17 @@ Attributes	dw	?	; attributes
 FileInfo	ends
 
 
-str	    struc
+stk	    struc
 old_bp	    dw	     ?
 return	    dd	     ?
 BufferSize  dw	     ?		; file data buffer size
 BufferPtr   dd	     ?		; file data buffer
 Level	    dw	     ?		; file data info level
 Handle	    dw	     ?		; file handle
-str	    ends
+stk	    ends
 
 dosQfileinfo  proc     far
-	Enter	dosQfileinfo		   ; save registers
+	EnterProc	dosQfileinfo		   ; save registers
 
 	mov	bx,[bp].handle		   ;fill registers for function call
 
@@ -137,7 +137,7 @@ HaveSpace:
 
 ErrorExit:
 	mexit				       ; restore registers
-	ret	 size  str - 6		       ; return
+	ret	 size  stk - 6		       ; return
 
 dosqfileinfo endp
 

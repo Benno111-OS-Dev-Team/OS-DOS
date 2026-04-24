@@ -34,7 +34,7 @@ dosxxx	segment byte public 'dos'
 	include error.inc
 	.list
 
-str	struc
+stk	struc
 old_bp	dw	?
 return	dd	?
 sbufsize dw	?	; info buffer size
@@ -42,7 +42,7 @@ sbuffoff dw	?	; info buffer offset
 sbuffseg dw	?	; info buffer segment
 slevel	dw	?	; info level
 sdrive	dw	?	; drive number
-str	ends
+stk	ends
 
 
 ;-----------------------------------------------
@@ -63,7 +63,7 @@ VLabel		db	"???????????"           ;Match any vol name found
 
 
 DosSetFsInfo proc   far
-	Enter	DosSetfsinfo	; push registers
+	EnterProc	DosSetfsinfo	; push registers
 	mov	ax,[bp].sdrive	; Get drive number
 	mov	FCBDrive,al	; Place it in the extended FCB
 ;--------------------------
@@ -96,7 +96,7 @@ deleted:
 	sub	ax,ax		   ; set good return code
 retrn:
 	mexit			   ; pop registers
-	ret	size str - 6	   ; return
+	ret	size stk - 6	   ; return
 
 DosSetFsInfo  endp
 

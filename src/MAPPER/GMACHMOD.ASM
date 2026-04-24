@@ -21,17 +21,17 @@ dosxxx	segment byte public 'dos'
 	    include  macros.inc
 	    .list
 
-str	    struc
+stk	    struc
 modeaddr    dw	     ?
-str	    ends
+stk	    ends
 
 dosgetmachinemode proc	far
-	Enter	DosGetMachMode	      ; push registers
+	EnterProc	DosGetMachMode	      ; push registers
 
 	sub	ax,ax		      ; set good return code
 
 	mexit			      ; pop registers
-	ret	size str - 6	      ; return garbage (Not supported in PCDOS)
+	ret	size stk - 6	      ; return garbage (Not supported in PCDOS)
 
 dosgetmachinemode endp
 

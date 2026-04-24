@@ -75,20 +75,20 @@ dosxxx  segment byte public 'dos'
         .list
 ;
 
-str     struc
+stk     struc
 old_bp          dw      ?
 return          dd      ?
 FindCountPtr    dd      ?
 FindBufferLen   dw      ?
 FindBufferPtr   dd      ?       ;Changed to DW to match the DOSCALL.h  PyL 6/1 Rsltbuf21       dd    ?
 DirHandle       dw      ?
-str     ends
+stk     ends
 
 ;
 DosFindNext  proc   far
 
 
-        Enter   DosFindNext
+        EnterProc   DosFindNext
 
         mov     ax,seg FindSegment      ; get address to our data
         mov     ds,ax
@@ -262,7 +262,7 @@ DoNotRestore:
 
         mexit
 
-        ret     size str - 6
+        ret     size stk - 6
 
 DosFindNext endp
 

@@ -35,14 +35,14 @@ dosxxx  segment byte public 'dos'
 invalid_selector equ 0006h
 
 
-str     struc
+stk     struc
 Old_bp   dw      ?
 Return   dd      ?
 Selector dw      ?         ; selector of the segment to be freed
-str     ends
+stk     ends
 
 dosfreeseg proc   far
-        Enter   dosfreeseg              ; push registers
+        EnterProc   dosfreeseg              ; push registers
 
         mov     es,[bp].selector        ; get selector in es
 
@@ -56,7 +56,7 @@ dosfreeseg proc   far
 error:  mov     ax,invalid_selector     ; put in error code
 
 exit:   Mexit                           ; pop registers
-        ret     size str - 6            ; return
+        ret     size stk - 6            ; return
 
 dosfreeseg endp
 

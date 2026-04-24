@@ -37,15 +37,15 @@ dosxxx	segment byte public 'dos'
 	include macros.inc
 	.list
 
-str	struc
+stk	struc
 old_bp	   dw	  ?
 return	   dd	  ?
 FileHandle dw	  ?	     ; file or device handle
-str	ends
+stk	ends
 
 
 DosClose  proc	 far
-	Enter	DosClose	       ; push registers
+	EnterProc	DosClose	       ; push registers
 
 ; Only files are closed.  Devices are not closed, since OPEN creates
 ; a dummy device handle without actually openning the device.
@@ -65,7 +65,7 @@ GoodExit:
 
 ErrorExit:
 	mexit			       ; pop registers
-	ret	size str - 6	       ; return
+	ret	size stk - 6	       ; return
 
 DosClose  endp
 

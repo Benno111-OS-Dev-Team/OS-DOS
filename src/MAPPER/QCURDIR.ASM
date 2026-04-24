@@ -32,18 +32,18 @@ dosxxx  segment byte public 'dos'
             .sall
             include  macros.inc
 
-str         struc
+stk         struc
 old_bp      dw       ?
 return      dd       ?
 BufferLengthPtr dd      ?    ; directory path buffer length pointer
 BufferPtr       dd      ?    ; directory path buffer pointer
 Drive           dw      ?    ; driver number
-str         ends
+stk         ends
 
 
 dosqcurdir  proc     far
 
-        Enter   Dosqcurdir               ; push registers
+        EnterProc   Dosqcurdir               ; push registers
 
         mov     ax,seg buffer            ; set temporary buffer  to receive
         mov     ds,ax                    ; dircetory path information
@@ -94,7 +94,7 @@ HaveThePathLength:
 
 ErrorExit:
         mexit                            ; pop registers
-        ret      size str - 6            ; return
+        ret      size stk - 6            ; return
 
 dosqcurdir  endp
 

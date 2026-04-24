@@ -26,15 +26,15 @@ dosxxx	segment byte public 'dos'
 	    .sall
 	    include  macros.inc
 
-str	    struc
+stk	    struc
 old_bp	    dw	     ?
 return	    dd	     ?
 data	    dd	     ?	     ; date and time info return pointer
-str	    ends
+stk	    ends
 
 dosgetdatetime	proc far
 
-	    Enter    dosgetdatetime	   ; push registers
+	    EnterProc    dosgetdatetime	   ; push registers
 
 	    lds      si,[bp].data	   ; set return data area
 
@@ -58,7 +58,7 @@ dosgetdatetime	proc far
 exit:	    sub      ax,ax		   ; set good return code
 
 	    Mexit			   ; pop registers
-	    ret      size str - 6	   ; return
+	    ret      size stk - 6	   ; return
 
 dosgetdatetime endp
 

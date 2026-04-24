@@ -28,7 +28,7 @@ popal   macro
         pop     bx
         endm
 ;
-Enter   macro   Routine
+EnterProc macro   Routine
 
         push    bp
         mov     bp,sp

@@ -41,16 +41,16 @@ kbdxxx  segment byte public 'kbd'
 ;
         public kbdsetstatus
 
-str     struc
+stk     struc
 old_bp  dw      ?
 return  dd      ?
 handle  dw      ?       ; kbd handle
 data    dd      ?       ; kbd data strructure pointer
-str     ends
+stk     ends
 
 kbdsetstatus    proc    far
 
-        Enter   KbdSetStatus            ; save registers
+        EnterProc   KbdSetStatus            ; save registers
 
         les     di,[bp].data            ; set up kbd data structure
         mov     ax,seg kbddata
@@ -119,7 +119,7 @@ CheckEchoOn:
 EverythingSet:
         Mexit                               ; pop registers
 
-        ret     size str - 6                ; return
+        ret     size stk - 6                ; return
 
 KbdSetStatus    endp
 

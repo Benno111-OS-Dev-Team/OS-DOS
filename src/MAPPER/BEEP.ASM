@@ -27,15 +27,15 @@ dosxxx  segment byte public 'dos'
 
 inv_parm equ    0002h         ;invalid parameter return code
 
-str     struc
+stk     struc
 old_bp  dw      ?
 return  dd      ?
 duratn  dw      ?       ; duration
 frqncy  dw      ?       ; frequency
-str     ends
+stk     ends
 
 dosbeep proc    far
-        Enter   DosBeep
+        EnterProc   DosBeep
 
         mov     al,10110110b      ; Set 8253 chip channel 2
         out     43h,al            ; to proper mode for tone
@@ -88,7 +88,7 @@ del2:   dec     bx                ; a millisecond
 error:  mov     ax,inv_parm
 
 exit:   MExit                     ; pop registers
-        ret     size str - 6      ; return
+        ret     size stk - 6      ; return
 
 dosbeep endp
 

@@ -72,7 +72,7 @@ ACT_FileExisted 	equ	1
 ACT_FileCreated 	equ	2
 
 
-str	struc
+stk	struc
 old_bp		dw     ?
 return		dd     ?
 resrv34 	dd     ?     ; reserved
@@ -83,11 +83,11 @@ FileSize	dd     ?     ; file allocation size
 acttak34	dd     ?     ; action taken
 FileHandlePtr	dd     ?     ; New file handler
 FileNamePtr	dd     ?     ; file name pointer
-str	ends
+stk	ends
 
 ;
 DosOpen  proc	far
-	Enter	DosOpen 	       ; save registers
+	EnterProc	DosOpen 	       ; save registers
 	sub	sp,2		       ; allocate space on the stack
 SaveArea	equ	-2
 
@@ -280,7 +280,7 @@ erret34:;
 ErrorExit:
 	add	sp,2		   ; deallocate space
 	mexit			   ; restore registers
-	ret	size str - 6	   ; return
+	ret	size stk - 6	   ; return
 
 DosOpen  endp
 

@@ -44,7 +44,7 @@ dosxxx  segment byte public 'dos'
         include macros.inc
         .list
 ;
-str     struc
+stk     struc
 old_bp      dw    ?
 return      dd    ?
 Qprocessid  dw    ?           ; Child process ID
@@ -52,10 +52,10 @@ Aprocessid  dd    ?           ; process id pointer
 resultcode  dd    ?           ; result code pointer
 waitoption  dw    ?           ; wait option
 actioncode  dw    ?           ; action code
-str     ends
+stk     ends
 
 doscwait proc   far
-        Enter   doscwait                 ; push registers
+        EnterProc   doscwait                 ; push registers
 
         mov     ax,seg buffer
         mov     ds,ax                    ; set temporary buffer
@@ -81,7 +81,7 @@ WeHaveExeced:
 
 ErrorExit:
         Mexit                            ; pop registers
-        ret     size str - 6             ; return
+        ret     size stk - 6             ; return
 
 doscwait endp
 

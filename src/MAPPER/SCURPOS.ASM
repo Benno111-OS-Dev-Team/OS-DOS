@@ -32,16 +32,16 @@ vioxxx  segment byte public 'vio'
 
 error_bvs_parameter equ    0002h
 
-str     struc
+stk     struc
 old_bp  dw      ?
 return  dd      ?
 handle  dw      ?           ; vio handle
 column  dw      ?           ; column value
 row     dw      ?           ; row value
-str     ends
+stk     ends
 
 viosetcurpos proc   far
-        Enter   viosetcurpos            ; push registers
+        EnterProc   viosetcurpos            ; push registers
 
         mov     bh,0
         mov     ax,[bp].row             ; get column number
@@ -65,7 +65,7 @@ viosetcurpos proc   far
 
 error:  mov     ax,error_bvs_parameter  ; set error return code
 exit:   Mexit                           ; pop registers
-        ret     size str - 6            ; return
+        ret     size stk - 6            ; return
 
 viosetcurpos endp
 vioxxx  ends

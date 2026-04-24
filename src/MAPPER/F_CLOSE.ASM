@@ -51,18 +51,18 @@ FindSegment     ends
         include macros.inc
         .list
 
-str     struc
+stk     struc
 old_bp    dw      ?
 return    dd      ?
 DirHandle dw      ?           ; dirctory search handle
-str     ends
+stk     ends
 
 
 dosxxx  segment byte public 'dos'
         assume  cs:dosxxx,ds:nothing,es:nothing,ss:nothing
 
 DosFindClose  proc   far
-        Enter   DosFindClose               ; push registers
+        EnterProc   DosFindClose               ; push registers
 
         mov     ax,seg FindSegment         ; get address to our data
         mov     ds,ax
@@ -95,7 +95,7 @@ OkToClose:
 
 ErrorExit:
         mexit                              ; pop registers
-        ret     size str - 6               ; return
+        ret     size stk - 6               ; return
 
 DosFindClose endp
 

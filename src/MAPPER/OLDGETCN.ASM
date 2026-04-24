@@ -32,14 +32,14 @@ dosxxx  segment byte public 'dos'
             include  macros.inc
 
 ;
-str         struc
+stk         struc
 old_bp          dw      ?
 return          dd      ?
 ReturnLength    dd      ?
 BufferPtr       dd      ?
 CountryCodePtr  dd      ?
 BufferLength    dw      ?
-str         ends
+stk         ends
 ;
 
 cntry       struc                       ;country info. sturctrue
@@ -78,7 +78,7 @@ Doscntry       ends
 
 dosgetctryinfo  proc far
 
-        Enter   Dosgetcntryinfo
+        EnterProc   Dosgetcntryinfo
 
         lds     si,[bp].CountryCodePtr
         mov     ax,ds:[si]
@@ -123,7 +123,7 @@ NoFillNecessary:
 ErrorExit:
         Mexit
 
-        ret     size str - 6
+        ret     size stk - 6
 ;
 dosgetctryinfo endp
 

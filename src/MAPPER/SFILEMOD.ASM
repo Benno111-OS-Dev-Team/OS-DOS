@@ -30,16 +30,16 @@ dosxxx	segment byte public 'dos'
 	    .list
 
 
-str	struc
+stk	struc
 old_bp	dw	?
 return	dd	?
 Rsrvd	dd	?	; reserved
 Attrib	dw	?	; file attribute
 Path	dd	?	; path name pointer  pointer
-str	ends
+stk	ends
 
 dossetfilemode proc  far
-	    Enter    dossetfilemode	   ; push registers
+	    EnterProc    dossetfilemode	   ; push registers
 
 	    lds      dx,[bp].path	   ; set pointer to path
 	    mov      cx,[bp].attrib
@@ -52,7 +52,7 @@ dossetfilemode proc  far
 	    jmp      short exit 	   ; return
 
 exit:	    mexit			   ; pop registers
-	    ret      size  str - 6	   ; return
+	    ret      size  stk - 6	   ; return
 
 dossetfilemode endp
 

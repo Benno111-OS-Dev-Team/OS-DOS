@@ -38,7 +38,7 @@ vioxxx  segment byte public 'vio'
 
 error_bvs_parameter equ 0002h
 
-str     struc
+stk     struc
 old_bp   dw      ?
 return   dd      ?
 handle   dw      ?        ; vio handle
@@ -48,10 +48,10 @@ rightcol dw      ?        ; right column
 botrow   dw      ?        ; bottom row
 leftcol  dw      ?        ; left column
 toprow   dw      ?        ; top row
-str     ends
+stk     ends
 
 vioscrollup proc   far
-        Enter   VioScrollUp             ; save registers
+        EnterProc   VioScrollUp             ; save registers
 
         mov     bx,[bp].lines           ; get number of blank lines
         cmp     bl,25                   ; check for validity
@@ -96,7 +96,7 @@ ar02:   mov     ah,06h                  ; set scroll up function code
 error:  mov     ax,error_bvs_parameter  ; set error code
 
 exit:   Mexit                           ; pop registers
-        ret     size str - 6            ; return
+        ret     size stk - 6            ; return
 
 vioscrollup endp
 vioxxx  ends
