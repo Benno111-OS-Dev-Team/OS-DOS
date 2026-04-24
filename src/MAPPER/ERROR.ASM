@@ -34,11 +34,11 @@ dosxxx	segment byte public 'dos'
 	    include  macros.inc
 	    .list
 
-str	    struc
+stk	    struc
 old_bp	    dw	     ?
 Return	    dd	     ?
 Flag	    dw	     ?		; error flag;  0 = APP handle error
-str	    ends		;	       1 = System handle error
+stk	    ends		;	       1 = System handle error
 
 
 DosError   proc  far
@@ -98,7 +98,7 @@ setapp: mov	 errorstate,AppIsHandling ; indicate app handles error
 	xor	 ax,ax		       ; set good error return
 
 exit:	mexit			       ; pop all registers
-	ret	 size str - 6	       ; return
+	ret	 size stk - 6	       ; return
 
 DosError    endp
 

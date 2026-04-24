@@ -29,14 +29,14 @@ dosxxx  segment byte public 'dos'
             include  macros.inc
             .list
 
-str         struc
+stk         struc
 old_bp      dw       ?
 return      dd       ?
 Written     dd       ?       ; number of bytes actually read
 Bufflng     dw       ?       ; number of bytes to be read
 Buffer      dd       ?       ; read buffer
 Handle      dw       ?       ; handle
-str         ends
+stk         ends
 
 dosread     proc     far
             EnterProc    Dosread           ; save registers
@@ -54,7 +54,7 @@ dosread     proc     far
             sub      ax,ax             ; set good return code
 
 exit:       mexit                      ; pop registers
-            ret      size str - 6      ; rturn
+            ret      size stk - 6      ; rturn
 
 dosread     endp
 

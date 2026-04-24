@@ -43,12 +43,12 @@ dosxxx	segment byte public 'dos'
 	    include  macros.inc
 	    .list
 
-str	    struc
+stk	    struc
 old_bp	    dw	     ?
 return	    dd	     ?
 Drvmap	    dd	     ?	     ; drive map pointer
 Drvnbr	    dd	     ?	     ; drive number
-str	    ends
+stk	    ends
 
 
 defdrive	db	?	; Save area for default drive -->RW
@@ -139,7 +139,7 @@ rotate:     rcr      map[di],1		 ; shift bit in
 					 ; Set good return code -->RW
 	    xor      ax,ax
 exit:	    mexit			 ; pop registers
-	    ret      size str - 6	 ; return
+	    ret      size stk - 6	 ; return
 
 dosqcurdisk endp
 

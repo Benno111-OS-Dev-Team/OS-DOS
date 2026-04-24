@@ -27,11 +27,11 @@ dosxxx  segment byte public 'dos'
             include  macros.inc
             .list
 
-str         struc
+stk         struc
 old_bp      dw       ?
 return      dd       ?
 verify      dd       ?     ; return data area pointer
-str         ends
+stk         ends
 
 dosqverify  proc    far
             EnterProc   dosqverify             ; save registers
@@ -45,7 +45,7 @@ dosqverify  proc    far
             sub      ax,ax                 ; set good return code
 
 exit:       Mexit                          ; pop registers
-            ret      size str - 6          ; return
+            ret      size stk - 6          ; return
 
 dosqverify  endp
 

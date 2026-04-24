@@ -24,13 +24,13 @@ dosxxx	segment byte public 'dos'
 	.sall
 	include macros.inc
 
-str	struc
+stk	struc
 old_bp	dw	?
 return	dd	?
 DataAreaPtr	dd	?      ; Data buffer pointer
 CountryCodePtr	dd	?      ; Country code pointer
 DataAreaLength	dw	?      ; Length of data area
-str	ends
+stk	ends
 
 DosGetDBCSEv	proc	far
 
@@ -62,7 +62,7 @@ loopx:
 Exit:
 	Mexit				    ;AN000;pop registers
 
-	ret	size str - 6		    ;AN000; return
+	ret	size stk - 6		    ;AN000; return
 
 DosGetDBCSEv	endp
 

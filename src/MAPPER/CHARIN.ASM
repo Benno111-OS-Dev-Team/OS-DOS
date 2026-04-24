@@ -38,13 +38,13 @@ kbdxxx	segment byte public 'kbd'
 
 error_kbd_parameter equ 0002h
 
-str	struc
+stk	struc
 old_bp	dw	?
 return	dd	?
 handle	dw	?	 ; keyboard handle
 iowait	dw	?	 ; indicate if wait for io
 data	dd	?	 ; data buffer pointer
-str	ends
+stk	ends
 
 
 kbdcharin proc	 far
@@ -103,7 +103,7 @@ shift:	mov	ah,02h			; Start of shift check block
 	sub	ax,ax			; set good return code
 	Mexit				; pop registers
 
-	ret	size str - 6		; return
+	ret	size stk - 6		; return
 
 kbdcharin endp
 

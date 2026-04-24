@@ -27,13 +27,13 @@ dosxxx  segment byte public 'dos'
         .sall
         include macros.inc
 
-str     struc
+stk     struc
 old_bp  dw      ?
 return  dd      ?
 StringPtr       dd      ?       ; binary string pointer
 CountryCodePtr  dd      ?       ; country code pointer
 StringLength    dw      ?       ; lenght of the string
-str     ends
+stk     ends
 
 DosCaseMap      proc    far
 
@@ -64,7 +64,7 @@ ThisCharDone:
         loop    MapLoop                 ; loop until string is complete
 
         MExit                           ; pop registers
-        ret     size str - 6            ; return
+        ret     size stk - 6            ; return
 ;
 DosCaseMap      endp
 

@@ -51,11 +51,11 @@ FindSegment     ends
         include macros.inc
         .list
 
-str     struc
+stk     struc
 old_bp    dw      ?
 return    dd      ?
 DirHandle dw      ?           ; dirctory search handle
-str     ends
+stk     ends
 
 
 dosxxx  segment byte public 'dos'
@@ -95,7 +95,7 @@ OkToClose:
 
 ErrorExit:
         mexit                              ; pop registers
-        ret     size str - 6               ; return
+        ret     size stk - 6               ; return
 
 DosFindClose endp
 

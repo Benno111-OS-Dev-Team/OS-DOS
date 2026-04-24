@@ -54,14 +54,14 @@ dosxxx	segment byte public 'dos'
 	include error.inc
 	.list
 
-str	struc
+stk	struc
 old_bp	dw	?
 return	dd	?
 FSIBS40 dw	?	; info buffer size
 FSIB40	dd	?	; info buffer
 ILL40	dw	?	; info level
 DRNUM40 dw	?	; driver number
-str	ends
+stk	ends
 
 DosQFsInfo proc   far
 	EnterProc	Dosqfsinfo	   ; push registers
@@ -127,7 +127,7 @@ bufok40:;
 
 erret40:;
 	mexit			   ; pop registers
-	ret	size str - 6	   ; return
+	ret	size stk - 6	   ; return
 
 DosQFsInfo  endp
 

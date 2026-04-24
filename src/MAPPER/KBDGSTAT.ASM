@@ -35,12 +35,12 @@ kbdxxx	segment byte public 'kbd'
 
 	public kbdgetstatus
 
-str	struc
+stk	struc
 old_bp	dw	?
 return	dd	?
 handle	dw	?      ; kbd handle
 data	dd	?      ; data area pointer
-str	ends
+stk	ends
 
 kbdgetstatus	proc	far
 
@@ -69,7 +69,7 @@ kbdgetstatus	proc	far
 						 ; area
 	Mexit					 ; restore registers
 
-	ret	size str - 6			 ; return
+	ret	size stk - 6			 ; return
 
 kbdgetstatus	endp
 kbdxxx	ends

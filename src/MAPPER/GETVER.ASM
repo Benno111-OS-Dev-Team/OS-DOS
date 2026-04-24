@@ -22,11 +22,11 @@ dosxxx	segment byte public 'dos'
 	    .sall
 	    include  macros.inc
 
-str	    struc
+stk	    struc
 old_bp	    dw	     ?
 Return	    dd	     ?
 Data	    dd	     ?	     ; return data area pointer
-str	    ends
+stk	    ends
 
 dosgetversion	proc	far
 	EnterProc	dosgetversion
@@ -40,7 +40,7 @@ dosgetversion	proc	far
 
 exit:	mexit			      ; pop registers
 	sub	ax,ax
-	ret	size str - 6
+	ret	size stk - 6
 ;
 dosgetversion endp
 

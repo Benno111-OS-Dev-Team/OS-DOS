@@ -27,11 +27,11 @@ dosxxx  segment byte public 'dos'
             include  macros.inc
             .list
 
-str         struc
+stk         struc
 old_bp      dw       ?
 Return      dd       ?
 Drive       dw       ?       ; drive number
-str         ends
+stk         ends
 
 dosselectdisk  proc  far
         EnterProc   Dosselectdisk         ; push registers
@@ -45,7 +45,7 @@ dosselectdisk  proc  far
         sub     ax,ax                 ; set good return code
 
         mexit                         ; pop registers
-        ret     size str - 6          ; return
+        ret     size stk - 6          ; return
 
 dosselectdisk endp
 

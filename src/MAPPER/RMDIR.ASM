@@ -25,12 +25,12 @@ dosxxx  segment byte public 'dos'
             .sall
             include  macros.inc
 
-str         struc
+stk         struc
 old_bp      dw       ?
 return      dd       ?
 rsrvd       dd       ?       ; reserved
 asciiz      dd       ?       ; directory name pointer
-str         ends
+stk         ends
 
 dosrmdir    proc     far
 
@@ -44,7 +44,7 @@ dosrmdir    proc     far
 
             sub      ax,ax               ; set good return code
 exit:       Mexit                        ; pop registers
-            ret      size str - 6        ; return
+            ret      size stk - 6        ; return
 
 dosrmdir    endp
 

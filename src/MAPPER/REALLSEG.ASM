@@ -37,12 +37,12 @@ dosxxx  segment byte public 'dos'
         include macros.inc
         .list
 
-str     struc
+stk     struc
 old_bp  dw      ?
 return  dd      ?
 Selector        dw      ?       ; segment selector
 SegmentSize     dw      ?       ; new segment size in bytes
-str     ends
+stk     ends
 
 dosreallocseg proc   far
         EnterProc   dosreallocseg           ; save registers
@@ -72,7 +72,7 @@ HaveSize:
 ErrorExit:
         Mexit                           ; restore registers
 
-        ret     size str - 6            ; return
+        ret     size stk - 6            ; return
 
 dosreallocseg  endp
 

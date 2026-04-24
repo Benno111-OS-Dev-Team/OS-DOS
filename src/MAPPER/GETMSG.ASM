@@ -175,7 +175,7 @@ dosxxx	segment byte public 'dos'
 	    include  macros.inc
 	    .list
 
-str	    struc
+stk	    struc
 old_bp	    dw	     ?
 return	    dd	     ?
 ReturnLengthPtr  dd	 ?	; length of returned message
@@ -185,7 +185,7 @@ MessageBufferLen dw	 ?	; length of the message buffer
 MessageBufferPtr dd	 ?	; buffer address to return message
 VariablesCount	 dw	 ?	; number of variables
 VariableTablePtr dd	 ?	; table of variables to insert
-str	    ends
+stk	    ends
 
 
 dosgetmessage  proc	far
@@ -464,7 +464,7 @@ SkipToHere:
 	xor	ax,ax			   ; set good return code
 
 	mexit				   ; pop registers
-	ret	 size str - 6		   ; return
+	ret	 size stk - 6		   ; return
 
 dosgetmessage  endp
 

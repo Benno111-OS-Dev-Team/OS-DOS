@@ -26,12 +26,12 @@ dosxxx  segment byte public 'dos'
             .sall
             include  macros.inc
 
-str         struc
+stk         struc
 old_bp      dw       ?
 return      dd       ?
 Result      dw       ?       ; result code
 Action      dw       ?       ; action code
-str         ends
+stk         ends
 
 dosexit     proc     far
 
@@ -49,7 +49,7 @@ dosexit     proc     far
             xor      ax,ax               ; set good return code
 
 exit:       mexit                        ; pop registers
-            ret      size str - 6        ; return
+            ret      size stk - 6        ; return
 
 dosexit     endp
 

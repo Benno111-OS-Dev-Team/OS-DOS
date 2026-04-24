@@ -31,7 +31,7 @@ dosxxx  segment byte public 'dos'
             include  macros.inc
             .list
 
-str         struc
+stk         struc
 Old_bp      dw       ?
 Return      dd       ?
 Handle      dw       ?       ; handle
@@ -39,7 +39,7 @@ Category    dw       ?       ; device category
 Function    dw       ?       ; device function
 Parmlist    dd       ?       ; command arguments
 Data        dd       ?       ; data area
-str         ends
+stk         ends
 
 dosdevioctl     proc  far
         EnterProc   dosdevioctl           ; push registers
@@ -84,7 +84,7 @@ continue:
         xor     ax,ax                 ; set no error coe
 
 exit:   mexit                         ; pop registers
-        ret     size str - 6          ; return
+        ret     size stk - 6          ; return
 
 dosdevioctl  endp
 

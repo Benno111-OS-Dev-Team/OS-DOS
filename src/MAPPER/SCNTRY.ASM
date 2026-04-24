@@ -25,11 +25,11 @@ dosxxx  segment
             .sall
             include  macros.inc
 
-str         struc
+stk         struc
 Old_bp      dw       ?
 Return      dd       ?
 Ccode       dd       ?        ; country code
-str         ends
+stk         ends
 
 dossetctrycode  proc far
             EnterProc    dossetctrycode        ; push registers
@@ -50,7 +50,7 @@ okay:       mov      dx,0ffffh             ; Set DX
 
             sub      ax,ax                 ; set good return
 exit:       mexit                          ; pop registers
-            ret      size  str - 6         ; return
+            ret      size  stk - 6         ; return
 
 dossetctrycode endp
 dosxxx      ends

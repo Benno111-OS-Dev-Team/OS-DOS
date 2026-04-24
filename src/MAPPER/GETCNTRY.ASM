@@ -32,14 +32,14 @@ dosxxx  segment byte public 'dos'
             include  macros.inc
 
 
-str         struc
+stk         struc
 old_bp          dw      ?
 return          dd      ?
 ReturnLength    dd      ?
 BufferPtr       dd      ?
 CountryCodePtr  dd      ?
 BufferLength    dw      ?
-str         ends
+stk         ends
 
 
 cntry       struc                       ;country info. sturctrue
@@ -126,7 +126,7 @@ NoFillNecessary:
 ErrorExit:
         Mexit                         ; pop registers
 
-        ret     size str - 6          ; return
+        ret     size stk - 6          ; return
 
 dosgetctryinfo endp
 

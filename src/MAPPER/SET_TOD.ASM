@@ -28,11 +28,11 @@ dosxxx	segment byte public 'dos'
 
 error_ts_datetime equ 0002h
 
-str	    struc
+stk	    struc
 old_bp	    dw	     ?
 return	    dd	     ?
 Data	    dd	     ?	       ; TOD data pointer
-str	    ends
+stk	    ends
 
 dossetdatetime	proc far
 	    EnterProc    dossetdatetime	   ; push registers
@@ -67,7 +67,7 @@ error:	    mov      ax,error_ts_datetime  ; set error code
 
 exit:	    sub      ax,ax		   ; set good return code
 exit1:	    Mexit			   ; pop registers
-	    ret      size str - 6	   ; return
+	    ret      size stk - 6	   ; return
 
 dossetdatetime endp
 

@@ -24,11 +24,11 @@ savedkbdinput	label	word
 		db	0	; Not zero means char is here
 
 
-str	struc
+stk	struc
 old_bp	dw	?
 return	dd	?
 handle	dw	?	   ; kbd handle
-str	ends
+stk	ends
 
 kbdflushbuffer	proc   far
 	EnterProc	KbdFlushBuffer	  ; push registers
@@ -48,7 +48,7 @@ nochar:
 
 done:	sub	ax,ax		  ; set good return code
 	Mexit			  ; pop registers
-	ret	size str - 6	  ; return
+	ret	size stk - 6	  ; return
 
 kbdflushbuffer endp
 

@@ -43,12 +43,12 @@ dosxxx  segment byte public 'dos'
         include macros.inc
         .list
 
-str     struc
+stk     struc
 old_bp  dw      ?
 return  dd      ?
 dtrm006 dd      0h           ;reserved  (must be zero)
 dnam006 dd      ?            ;address of directory path name
-str     ends
+stk     ends
 
 DosChDir  proc   far
         EnterProc   DosChDir                 ; push registers
@@ -65,7 +65,7 @@ DosChDir  proc   far
 
         xor     ax,ax                    ; else, good return code
 exit:   mexit                            ; pop registers
-        ret     size str - 6             ; return
+        ret     size stk - 6             ; return
 
 DosChDir  endp
 

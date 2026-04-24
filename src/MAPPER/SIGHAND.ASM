@@ -31,7 +31,7 @@ dosxxx  segment byte public 'dos'
             include  macros.inc
             .list
 
-str         struc
+stk         struc
 old_bp      dw       ?
 return      dd       ?
 Signumber   dw       ?          ; signal number
@@ -39,7 +39,7 @@ Action      dw       ?          ; action code
 Prevaction  dd       ?          ; previous action code
 Prevadrs    dd       ?          ; previous vector address
 Routineadrs dd       ?          ; interrupt handler address
-str         ends
+stk         ends
 
 ; While we hate to do this, we have to.  The following data areas are
 ; expected to be in the CODE segment.
@@ -93,7 +93,7 @@ cntrlc: mov      ax,03523h
         sub      ax,ax                 ; set good return code
 
 exit:   mexit                          ; pop registers
-        ret      size str - 6          ; return
+        ret      size stk - 6          ; return
 
 dossetsighandler  endp
 

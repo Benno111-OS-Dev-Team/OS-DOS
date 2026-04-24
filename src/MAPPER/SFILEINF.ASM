@@ -40,14 +40,14 @@ dosxxx	segment byte public 'dos'
 
 
 
-str	    struc
+stk	    struc
 old_bp	    dw	     ?
 return	    dd	     ?
 BufferSize  dw	     ?		; file info buufer size
 BufferPtr   dd	     ?		; file info buffer
 Level	    dw	     ?		; file info level
 Handle	    dw	     ?		; file handle
-str	    ends
+stk	    ends
 
 dossetfileinfo	proc	 far
 	EnterProc	dossetfileinfo	      ; push registers
@@ -80,7 +80,7 @@ dossetfileinfo	proc	 far
 
 ErrorExit:
 	mexit			       ; pop registers
-	ret	size  str - 6	       ; return
+	ret	size  stk - 6	       ; return
 
 dossetfileinfo endp
 

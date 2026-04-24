@@ -34,13 +34,13 @@ dosxxx	segment byte public 'dos'
 	include macros.inc
 	.list
 
-str	struc
+stk	struc
 old_bp	dw	?
 return	dd	?
 MessagePtr	dd	?	; message pointer
 MessageLength	dw	?	; message length
 Handle		dw	?	; file handle
-str	ends
+stk	ends
 
 dosputmessage proc   far
 
@@ -58,7 +58,7 @@ dosputmessage proc   far
 
 ErrorExit:
 	Mexit				      ; pop registers
-	ret	size str - 6		      ; return
+	ret	size stk - 6		      ; return
 
 dosputmessage  endp
 

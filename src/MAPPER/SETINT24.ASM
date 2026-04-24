@@ -24,11 +24,11 @@ dosxxx	segment byte public 'dos'                               ;AN000;
 	    include  macros.inc 				;AN000;
 	    .list						;AN000;
 
-str	    struc						;AN000;
+stk	    struc						;AN000;
 old_bp	    dw	     ?						;AN000;
 Return	    dd	     ?						;AN000;
 Flag	    dw	     ?						;AN000;
-str	    ends						;AN000;
+stk	    ends						;AN000;
 
 
 set_int24_vector   proc  far					;AN000;
@@ -55,7 +55,7 @@ set_int24_vector   proc  far					;AN000;
 	xor	ax,ax		       ;Set good error return	;AN000;
 
 exit:	mexit			       ; pop all registers	;AN000;
-	ret	size str - 6	       ; return 		;AN000;
+	ret	size stk - 6	       ; return 		;AN000;
 
 set_int24_vector    endp					;AN000;
 

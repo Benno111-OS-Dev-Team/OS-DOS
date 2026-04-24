@@ -41,12 +41,12 @@ dosxxx	segment byte public 'dos'
 	include macros.inc
 	.list
 
-str	struc
+stk	struc
 old_bp	dw	?
 return	dd	?
 dtrm12	dd	?	; reserved, always 0
 asc012	dd	?	; file name path pointer
-str	ends
+stk	ends
 
 DosDelete  proc   far
 	EnterProc	DosDelete		    ; push registers
@@ -61,7 +61,7 @@ DosDelete  proc   far
 
 err012:
 	mexit				    ; pop registers
-	ret	size str - 6		    ; return
+	ret	size stk - 6		    ; return
 
 DosDelete  endp
 

@@ -30,13 +30,13 @@ dosxxx	segment byte public 'dos'
 
 error_code  equ      0002h
 
-str	    struc
+stk	    struc
 old_bp	    dw	     ?
 return	    dd	     ?
 rsrvd	    dd	     ?
 Attrib	    dd	     ?	     ; current attribute pointer
 Path	    dd	     ?	     ; file path name pointer
-str	    ends
+stk	    ends
 
 dosqfilemode proc    far
 	    EnterProc    dosqfilemode	 ; push registers
@@ -55,7 +55,7 @@ dosqfilemode proc    far
 error:	    mov      ax,error_code	 ; set error code
 
 exit:	    mexit			 ; pop registers
-	    ret      size str - 6	 ; return
+	    ret      size stk - 6	 ; return
 
 dosqfilemode endp
 

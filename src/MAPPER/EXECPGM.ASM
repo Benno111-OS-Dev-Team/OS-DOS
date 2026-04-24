@@ -55,7 +55,7 @@ dosxxx	segment byte public 'dos'
 inv_parm equ 0002
 not_suf_mem equ 0004
 
-str	struc
+stk	struc
 old_bp	dw	?
 return	dd	?
 Pgmpointer dd	?	; address of program file name
@@ -64,7 +64,7 @@ EnvPointer dd	?	; address of environment string
 ArgPointer dd	?	; address of argument string
 Traceindic dw	?	; ignored,  what is a trace process?
 Asyncindic dw	?	; ignored,  PC-DOS always waits!
-str	ends
+stk	ends
 
 dosexecpgm proc   far				; push registers
 	EnterProc	dosexecpgm
@@ -108,7 +108,7 @@ dosexecpgm proc   far				; push registers
 
 ErrorExit:
 	Mexit				   ; pop registers
-	ret	size str - 6		   ; return
+	ret	size stk - 6		   ; return
 
 dosexecpgm  endp
 

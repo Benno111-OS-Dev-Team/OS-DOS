@@ -34,13 +34,13 @@ dosxxx	segment byte public 'dos'
 	include macros.inc
 	.list
 ;
-str	struc
+stk	struc
 old_bp	 dw	 ?
 return	 dd	 ?
 ShareIndicator	dw	?	; whether segment will be shared
 SelectorPtr	dd	?	; selector allocated
 SegmentSize	dw	?	; number of bytes requested
-str	ends
+stk	ends
 
 dosallocseg proc   far
 	EnterProc	dosallocseg		 ; push registers
@@ -78,7 +78,7 @@ AllocDone:
 	sub	ax,ax			 ; set good return code
 ErrorExit:
 	mexit				 ; pop registers
-	ret	size str - 6		 ; return
+	ret	size stk - 6		 ; return
 
 dosallocseg endp
 

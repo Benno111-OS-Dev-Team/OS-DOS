@@ -36,7 +36,7 @@ vioxxx  segment byte public 'vio'
 full_scr_err equ 0001h
 error_bvs_parameter     equ 0002h
 
-str     struc
+stk     struc
 old_bp  dw      ?
 return  dd      ?
 handle  dw      ?       ; vio handle
@@ -45,7 +45,7 @@ column  dw      ?       ; column number
 row     dw      ?       ; starting position for output
 lngth   dw      ?       ; length of the string
 addr    dd      ?       ; string to be written (pointer)
-str     ends
+stk     ends
 
 viowrtcharstratt proc   far
         EnterProc   viowrtcharstratt         ; push registers
@@ -108,7 +108,7 @@ around: mov     ah,02h
 error:  mov     ax,error_bvs_parameter
 
 exit:   Mexit                            ; return
-        ret     size str - 6
+        ret     size stk - 6
 ;
 viowrtcharstratt endp
 vioxxx  ends
