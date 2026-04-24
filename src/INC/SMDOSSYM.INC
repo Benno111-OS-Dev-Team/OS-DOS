@@ -12,10 +12,6 @@ ENDIF
 include dosmac.INC
 INCLUDE VERSIONA.INC		;DEFINE THE MAJOR AND MINOR VERSION NUMBERS
 
-IF2
-    %OUT    DOSSYM in Pass 2
-ENDIF
-
 BREAK <Control character definitions>
 
 c_DEL	    EQU     7Fh 		;    ASCII rubout or delete previous char
