@@ -44,11 +44,11 @@ jobs:
         shell: cmd
         run: |
           echo === ENV SETUP ===
-          set INIT=%CD%\src\TOOLS
-          set COUNTRY=USA
-          set PATH=%CD%\src\TOOLS;%PATH%
-          echo INIT=%INIT%
-          echo PATH=%PATH%
+          echo INIT=%CD%\src\TOOLS>>"%GITHUB_ENV%"
+          echo COUNTRY=usa-ms>>"%GITHUB_ENV%"
+          echo %CD%\src\TOOLS>>"%GITHUB_PATH%"
+          echo INIT will be persisted for later steps
+          echo PATH will include src\TOOLS for later steps
 
       - name: Clean previous builds
         working-directory: src

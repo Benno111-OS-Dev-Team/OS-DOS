@@ -5,6 +5,19 @@ dos	=..\dos
 inc	=..\inc
 hinc	=..\h
 
+asm	=ml
+aflags	=/Cx /nologo /c /omf
+ainc	=/I. /I$(inc) /I$(dos)
+
+.SUFFIXES:
+.SUFFIXES: .asm .obj .lst
+
+.asm.obj:
+	$(asm) $(aflags) $(ainc) /Fo$*.obj $*.asm
+
+.asm.lst:
+	$(asm) /Fl$*.lst $(aflags) $(ainc) $*.asm
+
 #
 #######################	dependencies begin here. #########################
 #
