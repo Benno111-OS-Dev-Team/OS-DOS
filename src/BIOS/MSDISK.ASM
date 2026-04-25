@@ -94,7 +94,7 @@
 	EXTRN FHAVE96:BYTE		;MSDATA
 	EXTRN NEW_ROM:BYTE		;MSDATA
 	EXTRN FORMT_EOT:BYTE,HDNUM:BYTE,TRKNUM:WORD,GAP_PATCH:BYTE ;MSDATA
-	EXTRN NEXT2F_13:WORD		;MSDATA
+	EXTRN NEXT2F_13:DWORD		;MSDATA
 	extrn Save_head_sttl:byte	;msbdata
 	extrn Secrete_Code:word 	;msbdata J.K. 11/7/86 Secrete code for DOS 3.3 MSBIO
 	extrn Ext_Boot_Sig:byte 	;AN000; msbdata
