@@ -1,5 +1,5 @@
-IFNDEF MSBDATA_INC
-MSBDATA_INC EQU 1
+IFNDEF __MSBDATA_INC__
+__MSBDATA_INC__ EQU 1
 
 ;==============================================================================
 ;REVISION HISTORY:
