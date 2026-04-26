@@ -5,20 +5,6 @@ msg	=..\messages
 dos	=..\dos
 inc	=..\inc
 hinc	=..\h
-COUNTRY = usa-ms
-
-asm	=ml
-aflags	=/Cx /nologo /c /Zm
-ainc	=/I. /I$(inc) /I$(dos)
-
-.SUFFIXES:
-.SUFFIXES: .asm .obj .lst
-
-.asm.obj:
-	$(asm) $(aflags) $(ainc) /Fo$*.obj $*.asm
-
-.asm.lst:
-	$(asm) /Fl$*.lst $(aflags) $(ainc) $*.asm
 
 #
 #######################	dependencies begin here. #########################
@@ -29,8 +15,16 @@ all: $(dest).sys
 msbio.cl1: msbio.skl \
 	$(msg)\$(COUNTRY).msg
 
-msload.com:
-	@echo Using checked-in msload.com
+msload.obj: msload.asm \
+	makefile \
+	msbio.cl1 \
+	$(inc)\bootform.inc \
+	$(inc)\versiona.inc \
+	msload.inc
+
+msload.com: msload.obj
+	link msload.obj,msload,,;
+	exe2bin msload.exe msload.com
 
 msbio1.obj: msbio1.asm \
 	makefile \
@@ -159,10 +153,11 @@ msbio2.obj: msbio2.asm \
 
 mshard.obj:  mshard.asm $(inc)\postequ.inc $(inc)\dseg.inc
 
-$(dest).sys: msbio.cl1 msload.com \
-	msbio1.obj mscon.obj msaux.obj mslpt.obj msclock.obj msdisk.obj \
-	msbio2.obj mshard.obj msinit.obj sysinit1.obj sysconf.obj sysinit2.obj \
-	sysimes.obj \
+$(dest).sys: msbio.cl1 msbio1.obj mscon.obj  msaux.obj \
+	mslpt.obj msclock.obj msdisk.obj msbio2.obj \
+	msinit.obj mshard.obj sysinit1.obj sysconf.obj \
+	sysinit2.obj sysimes.obj \
+	msload.com \
 	makefile
 	link @msbio.lnk
 	exe2bin msbio.exe msbio.bin <locscr

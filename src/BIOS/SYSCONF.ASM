@@ -50,7 +50,7 @@ FALSE	    EQU 0
 LF	equ	10
 CR	equ	13
 TAB	equ	 9
-SEMICOLON equ	3Bh
+SEMICOLON equ	';'
 
 IBMVER	   EQU	   TRUE
 IBM	   EQU	   IBMVER
@@ -971,14 +971,14 @@ $$IF4:
 	    cmp    ax, $P_RC_EOL	;AN000; End of Line?
 ;	$LEAVE	   E			;AN000;  then jmp to $Endloop for semantic check.
 	JE $$EN4
-	    cmp    word ptr Result_Val+2, offset Switch_X ;AN000;AN025;
+	    cmp    Result_Val.$P_SYNONYM_PTR, offset Switch_X ;AN000;AN025;
 ;	    $IF    E					      ;AN000;
 	    JNE $$IF8
 		mov	P_Buffer_Slash_X, 1		      ;AN000;AN025; set the flag
 ;	    $ELSE					      ;AN000;
 	    JMP SHORT $$EN8
 $$IF8:
-		mov	ax, word ptr Result_Val+4 ;AN000;
+		mov	ax, word ptr Result_Val.$P_PICKED_VAL ;AN000;
 		cmp	cx, 1				      ;AN000;
 ;		$IF	E				      ;AN000;
 		JNE $$IF10
@@ -1092,7 +1092,7 @@ $$IF19:
 	    cmp    ax, $P_RC_EOL	;AN000; End of Line?
 ;	$LEAVE	   E			;AN000;  then end the $ENDLOOP
 	JE $$EN19
-	    cmp    byte ptr Result_Val+1, 1	 ;AN000;
+	    cmp    Result_Val.$P_ITEM_TAG, 1	 ;AN000;
 ;	    $IF    E				 ;AN000;
 	    JNE $$IF23
 	       mov    P_Ctrl_Break, 1		 ;AN000; Turn it on
@@ -1164,7 +1164,7 @@ $$IF28:
 	    cmp    ax, $P_RC_EOL	;AN002; End of Line?
 ;	$LEAVE	   E			;AN002;  then end the $ENDLOOP
 	JE $$EN28
-	    cmp    byte ptr Result_Val+1, 1	 ;AN002;
+	    cmp    Result_Val.$P_ITEM_TAG, 1	 ;AN002;
 ;	    $IF    E				 ;AN002;
 	    JNE $$IF32
 	       mov    P_Mtrk, 1 		 ;AN002; Turn it on temporarily.
@@ -1247,7 +1247,7 @@ $$IF40:
 	    cmp    ax, $P_RC_EOL	;AN002; End of Line?
 ;	$LEAVE	   E			;AN002;  then end the $ENDLOOP
 	JE $$EN40
-	    cmp    byte ptr Result_Val+1, 1	 ;AN002;
+	    cmp    Result_Val.$P_ITEM_TAG, 1	 ;AN002;
 ;	    $IF    E				 ;AN002;
 	    JNE $$IF44
 	       mov    P_CPSW, 1 		 ;AN002; Turn it on temporarily.
@@ -1299,8 +1299,8 @@ GOTDJ:
 	MOV	WORD PTR [BPB_ADDR+2],ES
 
 ;J.K. In case it is for IFS=, then set the parameter pointer.
-	mov	word ptr [ifs_rh+22], SI   ;AN000; for IFS
-	mov	word ptr [ifs_rh+24], ES ;AN000;
+	mov	word ptr [ifs_rh.IFSR_PARMS@], SI   ;AN000; for IFS
+	mov	word ptr [ifs_rh.IFSR_PARMS@+2], ES ;AN000;
 
 	CALL	ROUND
 ;J.K. Set up the DEVMARK entries here for MEM command.
@@ -1431,10 +1431,10 @@ GOODLD:
 	mov	bx, word ptr cs:[ENTRY_POINT+2] ;AN000;
 	mov	ds, bx				;AN000; DS:0 will be the header
 	les	di, cs:[DosInfo]		;AN000;
-	mov	bx, word ptr es:[di+55]	 ;AN000;
-	mov	word ptr ds:[16], bx		 ;AN000;
-	mov	bx, word ptr es:[di+57] ;AN000;
-	mov	word ptr ds:[18], bx	 ;AN000;
+	mov	bx, word ptr es:[di.SYSI_IFS_DOSCALL@]	 ;AN000;
+	mov	word ptr ds:[IFS_DOSCALL@], bx		 ;AN000;
+	mov	bx, word ptr es:[di.SYSI_IFS_DOSCALL@]+2 ;AN000;
+	mov	word ptr ds:[IFS_DOSCALL@]+2, bx	 ;AN000;
 	pop	ds				;AN000;
 	pop	di				;AN000;
 	pop	es				;AN000;
@@ -1453,17 +1453,17 @@ Got:	MOV	BYTE PTR ES:[SI],' '	;   *p = ' ';
 
 	test	cs:[IFS_Flag], IS_IFS	;AN000;
 	jz	Got_Device_Com		;AN000;
-	mov	bx, 20			;AN000; offset from the start of IFSHEADER
+	mov	bx, IFS_CALL@		;AN000; offset from the start of IFSHEADER
 	call	CallIFS 		;AN000;
 	jmp	short End_Init_Call
 Got_Device_Com:
 	push	ds			;AN017;
 	push	si			;AN017;
 	lds	si, cs:[ENTRY_POINT]	;AN017; Peeks the header attribute
-	test	word ptr ds:[si+4], DEVTYP  ;AN017;Block device driver?
+	test	word ptr ds:[si.SDEVATT], DEVTYP  ;AN017;Block device driver?
 	jnz	Got_Device_Com_Cont		  ;AN017;No.
 	lds	si, cs:[DOSINFO]	;AN017; DS:SI -> SYS_VAR
-	cmp	byte ptr ds:[si+32], 26	;AN017; No more than 26 drive number
+	cmp	ds:[si.SYSI_NUMIO], 26	;AN017; No more than 26 drive number
 	jb	Got_Device_Com_Cont	;AN017;
 	pop	si			;AN017;
 	pop	ds			;AN017;
@@ -1473,9 +1473,9 @@ Got_Device_Com:
 Got_Device_Com_Cont:			;AN017;
 	pop	si			;AN017;
 	pop	ds			;AN017;
-	MOV	BX,6
+	MOV	BX,SDEVSTRAT
 	invoke	CALLDEV 		;   CallDev (SDevStrat);
-	MOV	BX,8
+	MOV	BX,SDEVINT
 	invoke	CALLDEV 		;   CallDev (SDevInt);
 End_Init_Call:
 	RestoreReg  <SI,DS>
@@ -1486,12 +1486,12 @@ End_Init_Call:
 
 	test	[IFS_Flag], IS_IFS	;AN000;
 	jz	Was_Device_Com		;AN000;
-	cmp	byte ptr [ifs_rh+3], 0 ;AN000; Was a success ?
+	cmp	[ifs_rh.IFSR_RETCODE], 0 ;AN000; Was a success ?
 	jne	Erase_Dev_do		;AN000;
 	pop	si			;AN000; restore es:si to clean up the
 	pop	es			;AN000; stack for Set_Break call.
 	mov	ax, word ptr [Entry_Point+2]	   ;AN000; Get the loaded segment
-	add	ax, word ptr [ifs_rh+26] ;AN000;
+	add	ax, word ptr [ifs_rh.IFSR_RESSIZE] ;AN000;
 	mov	word ptr [Break_addr], 0	   ;AN000;
 	mov	word ptr [Break_addr+2], ax	   ;AN000;
 	or	cs:[SetDevMarkFlag], FOR_DEVMARK       ;AN004;
@@ -1501,11 +1501,11 @@ End_Init_Call:
 	jc	Erase_Dev_do		;AN000;
 Link_IFS:				;AN000;
 	les	di, cs:[dosinfo]	;AN000;
-	mov	cx, word ptr es:[di+59]	;AN000; save old pointer
-	mov	dx, word ptr es:[di+61] ;AN000;
+	mov	cx, word ptr es:[di.SYSI_IFS]	;AN000; save old pointer
+	mov	dx, word ptr es:[di.SYSI_IFS+2] ;AN000;
 	lds	si, cs:[Entry_Point]		;AN000;
-	mov	word ptr es:[di+59],si	;AN000;
-	mov	word ptr es:[di+61], ds ;AN000;
+	mov	word ptr es:[di.SYSI_IFS],si	;AN000;
+	mov	word ptr es:[di.SYSI_IFS+2], ds ;AN000;
 	mov	word ptr ds:[si], cx		;AN000; We don't permit multiple IFSs.
 	mov	word ptr ds:[si+2], dx		;AN000;
 	pop	si			;AN000; Restore es:si for the next command.
@@ -1540,7 +1540,7 @@ Was_Device_Com: 			;AN000;
 BREAKOK:
 	LDS	DX,[ENTRY_POINT]	;SET DS:DX TO HEADER
 	MOV	SI,DX
-	ADD	SI,4			;DS:SI POINTS TO ATTRIBUTES
+	ADD	SI,SDEVATT		;DS:SI POINTS TO ATTRIBUTES
 	LES	DI,CS:[DOSINFO] 	;ES:DI POINT TO DOS INFO
 	MOV	AX,DS:[SI]		;GET ATTRIBUTES
 	TEST	AX,DEVTYP		;TEST IF BLOCK DEV
@@ -1550,13 +1550,13 @@ BREAKOK:
 	jc	Erase_Dev_do		;device driver's Init routien failed.
 	TEST	AX,ISCIN		;IS IT A CONSOLE IN?
 	JZ	TRYCLK
-	MOV	WORD PTR ES:[DI+12],DX
-	MOV	WORD PTR ES:[DI+14],DS
+	MOV	WORD PTR ES:[DI.SYSI_CON],DX
+	MOV	WORD PTR ES:[DI.SYSI_CON+2],DS
 
 TRYCLK: TEST	AX,ISCLOCK		;IS IT A CLOCK DEVICE?
 	JZ	GOLINK
-	MOV	WORD PTR ES:[DI+8],DX
-	MOV	WORD PTR ES:[DI+10],DS
+	MOV	WORD PTR ES:[DI+SYSI_CLOCK],DX
+	MOV	WORD PTR ES:[DI+SYSI_CLOCK+2],DS
 GOLINK: JMP	LINKIT
 
 ISBLOCK:
@@ -1571,7 +1571,7 @@ PERDRV:
 	CBW				; WARNING NO DEVICE > 127 UNITS
 	MOV	CX,AX
 	MOV	DH,AH
-	MOV	DL,ES:[DI+32]		;GET NUMBER OF DEVICES
+	MOV	DL,ES:[DI.SYSI_NUMIO]	;GET NUMBER OF DEVICES
 	MOV	AH,DL
 	ADD	AH,AL			; Check for too many devices
 	CMP	AH,26			; 'A' - 'Z' is 26 devices
@@ -1586,46 +1586,46 @@ BadNumBlock:				;AN017;
 OK_BLOCK:
 	or	cs:[SetDevMarkFlag],FOR_DEVMARK ;AN004;
 	invoke	SET_BREAK		; Alloc the device
-	ADD	ES:[DI+32],AL	;UPDATE THE AMOUNT
+	ADD	ES:[DI.SYSI_NUMIO],AL	;UPDATE THE AMOUNT
 	ADD	CS:DriveNumber,AL	; remember amount for next device
 	LDS	BX,CS:[BPB_ADDR]	;POINT TO BPB ARRAY
 PERUNIT:
 	LES	BP,CS:[DOSINFO]
-	LES	BP,DWORD PTR ES:[BP+0]	;GET FIRST DPB
+	LES	BP,DWORD PTR ES:[BP.SYSI_DPB]	;GET FIRST DPB
 
-SCANDPB:CMP	WORD PTR ES:[BP+25],-1
+SCANDPB:CMP	WORD PTR ES:[BP.DPB_NEXT_DPB],-1
 	JZ	FOUNDPB
-	LES	BP,ES:[BP+25]
+	LES	BP,ES:[BP.DPB_NEXT_DPB]
 	JMP	SCANDPB
 FOUNDPB:
 	MOV	AX,CS:[MEMLO]
-	MOV	WORD PTR ES:[BP+25],AX
+	MOV	WORD PTR ES:[BP.DPB_NEXT_DPB],AX
 	MOV	AX,CS:[MEMHI]
-	MOV	WORD PTR ES:[BP+27],AX
+	MOV	WORD PTR ES:[BP.DPB_NEXT_DPB+2],AX
 	LES	BP,DWORD PTR CS:[MEMLO]
 	ADD	WORD PTR CS:[MEMLO],DPBSIZ
 	or	cs:[SetDevMarkFlag], FOR_DEVMARK       ;AN004;Add DPB area for this unit
 	CALL	ROUND			;Check for alloc error
-	MOV	WORD PTR ES:[BP+25],-1
-	MOV	ES:[BP+24],-1
+	MOV	WORD PTR ES:[BP.DPB_NEXT_DPB],-1
+	MOV	ES:[BP.DPB_FIRST_ACCESS],-1
 
 	MOV	SI,[BX] 		;DS:SI POINTS TO BPB
 	INC	BX
 	INC	BX			;POINT TO NEXT GUY
-	MOV	WORD PTR ES:[BP+0],DX
+	MOV	WORD PTR ES:[BP.DPB_DRIVE],DX
 	MOV	AH,SETDPB		;HIDDEN SYSTEM CALL
 	INT	21H
-	MOV	AX,ES:[BP+2]
+	MOV	AX,ES:[BP.DPB_SECTOR_SIZE]
 	PUSH	ES
 	LES	DI,CS:[DOSINFO] 	;ES:DI POINT TO DOS INFO
-	CMP	AX,ES:[DI+16]
+	CMP	AX,ES:[DI.SYSI_MAXSEC]
 	POP	ES
 	ja	Bad_BPB_Size_Sector
 	PUSH	DS
 	PUSH	DX
 	LDS	DX,CS:[ENTRY_POINT]
-	MOV	WORD PTR ES:[BP+19],DX
-	MOV	WORD PTR ES:[BP+21],DS
+	MOV	WORD PTR ES:[BP.DPB_DRIVER_ADDR],DX
+	MOV	WORD PTR ES:[BP.DPB_DRIVER_ADDR+2],DS
 	POP	DX
 	POP	DS
 	INC	DX
@@ -1637,12 +1637,12 @@ FOUNDPB:
 
 LINKIT:
 	LES	DI,CS:[DOSINFO] 	;ES:DI = DOS TABLE
-	MOV	CX,WORD PTR ES:[DI+34]	;DX:CX = HEAD OF LIST
-	MOV	DX,WORD PTR ES:[DI+36]
+	MOV	CX,WORD PTR ES:[DI.SYSI_DEV]	;DX:CX = HEAD OF LIST
+	MOV	DX,WORD PTR ES:[DI.SYSI_DEV+2]
 
 	LDS	SI,CS:[ENTRY_POINT]	;DS:SI = DEVICE LOCATION
-	MOV	WORD PTR ES:[DI+34],SI	;SET HEAD OF LIST IN DOS
-	MOV	WORD PTR ES:[DI+36],DS
+	MOV	WORD PTR ES:[DI.SYSI_DEV],SI	;SET HEAD OF LIST IN DOS
+	MOV	WORD PTR ES:[DI.SYSI_DEV+2],DS
 	MOV	AX,DS:[SI]		;GET POINTER TO NEXT DEVICE
 	MOV	WORD PTR CS:[ENTRY_POINT],AX	;AND SAVE IT
 
@@ -1791,10 +1791,10 @@ $$IF49:
 	    cmp    ax, $P_RC_EOL	;AN000; End of Line?
 ;	$LEAVE	   E			;AN000;  then end the $SEARCH LOOP
 	JE $$EN49
-	    cmp    byte ptr Result_Val+0, $P_NUMBER		;AN000; Numeric?
+	    cmp    Result_Val.$P_TYPE, $P_NUMBER		;AN000; Numeric?
 ;	    $IF    E						;AN000;
 	    JNE $$IF53
-		   mov	  ax, word ptr Result_Val+4 ;AN000;
+		   mov	  ax, word ptr Result_Val.$P_PICKED_VAL ;AN000;
 		   cmp	    cx, 1				;AN000;
 ;		   $IF	 E					;AN000;
 		   JNE $$IF54
@@ -1868,7 +1868,7 @@ TryQ_Openit:
 TRYQ_Set_for_DOS:
 	les	di, cs:SYSI_Country	;ES:DI -> country info tab in DOS
 	push	di			;save di
-	add	di, 8
+	add	di, ccPath_CountrySys
 	call	MOVE_ASCIIZ		;Set the path to COUNTRY.SYS in DOS.
 	pop	di			;ES:DI -> country info tab again.
 	mov	cx, cs:[MEMHI]
@@ -1994,7 +1994,7 @@ $$IF64:
 	    cmp    ax, $P_RC_EOL	;AN000; End of Line?
 ;	$LEAVE	   E			;AN000;  then end the $ENDLOOP
 	JE $$EN64
-	    mov    al, byte ptr Result_Val+4 ;AN000;
+	    mov    al, byte ptr Result_Val.$P_PICKED_VAL ;AN000;
 	    mov    P_Files, al		;AN000; Save it temporarily
 ;	$ENDLOOP			;AN000;
 	JMP SHORT $$DO64
@@ -2203,7 +2203,7 @@ $$IF76:
 	    cmp    ax, $P_RC_EOL	;AN000; End of Line?
 ;	$LEAVE	   E			;AN000;  then end the $ENDLOOP
 	JE $$EN76
-	    mov    ax, word ptr Result_Val+4   ;AN000;
+	    mov    ax, word ptr Result_Val.$P_PICKED_VAL   ;AN000;
 	    cmp    cx, 1				   ;AN000;
 ;	    $IF    E					   ;AN000;
 	    JNE $$IF80
@@ -2397,7 +2397,7 @@ $$IF95:
 	    cmp    ax, $P_RC_EOL	;AN000; End of Line?
 ;	$LEAVE	   E			;AN000;  then end the $ENDLOOP
 	JE $$EN95
-	    mov    al, byte ptr Result_Val+4  ;AN000;
+	    mov    al, byte ptr Result_Val.$P_PICKED_VAL  ;AN000;
 	    cmp    cx, 1		;AN000; The first positional?
 ;	    $IF    E			;AN000;
 	    JNE $$IF99
@@ -2500,7 +2500,7 @@ $$IF107:
 	    cmp    ax, $P_RC_EOL	;AN019; End of Line?
 ;	$LEAVE	   E			;AN019;  then jmp to $Endloop for semantic check.
 	JE $$EN107
-	    cmp    word ptr Result_Val+2, offset Swit_K   ;AN019;
+	    cmp    Result_Val.$P_SYNONYM_PTR, offset Swit_K   ;AN019;
 ;	    $IF    E					      ;AN019;
 	    JNE $$IF111
 		mov	P_Swit_K, 1			      ;AN019; set the flag
@@ -2683,9 +2683,9 @@ Set_DevMark	proc	near			;AN004;
 SDVMK_IFS:
 	mov	al, DEVMARK_IFS 	;AN004; ='I'
 SDVMK_ID:				;AN004;
-	mov	ds:[0], al		;AN004;
+	mov	ds:[DEVMARK_ID], al	;AN004;
 	inc	di			;AN008;
-	mov	ds:[1], di		;AN008;
+	mov	ds:[DEVMARK_SEG], di	;AN008;
 	xor	al,al			;AN004;
 	push	si			;AN004;
 	pop	di			;AN004; now es:si = es:di = [path]filename,0
@@ -2711,7 +2711,7 @@ SDVMK_FilePtr:				;AN004; now es:di -> start of file name
 	push	es			;AN004;
 	pop	ds			;AN004;
 	pop	es			;AN004; now, ds:si -> start of filename
-	mov	di, 8			;AN004;
+	mov	di, DEVMARK_FILENAME	;AN004;
 	push	di			;AN004;
 	mov	al, ' ' 		;AN004;
 	mov	cx, 8			;AN004;

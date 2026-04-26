@@ -56,7 +56,6 @@ DOSSIZE EQU	0A000H
 	INCLUDE devsym.INC
 	include ioctl.INC
 	include DEVMARK.inc
-	include doscntry.inc
 .list
 
 	IF	NOT IBM
@@ -78,14 +77,14 @@ ASSUME	CS:SYSINITSEG,DS:NOTHING,ES:NOTHING,SS:NOTHING
 ;	 EXTRN	 BADSIZ_POST:BYTE,BADLD_POST:BYTE
 	EXTRN	SYSSIZE:BYTE,BADCOUNTRY:BYTE
 
-	EXTRN  dosinfo:dword,entry_point:dword
+	EXTRN  dosinfo:dword,entry_point:dword,
 	EXTRN  MEMORY_SIZE:WORD,fcbs:byte,keep:byte
 	EXTRN  DEFAULT_DRIVE:BYTE,confbot:word,alloclim:word
 	EXTRN  BUFFERS:WORD,zero:byte,sepchr:byte
 	EXTRN  FILES:BYTE
 	EXTRN  count:word,chrptr:word
 	EXTRN  bufptr:byte,memlo:word,prmblk:byte,memhi:word
-	EXTRN  ldoff:word,area:word,PACKET:BYTE,UNITCOUNT:BYTE
+	EXTRN  ldoff:word,area:word,PACKET:BYTE,UNITCOUNT:BYTE,
 	EXTRN  BREAK_ADDR:DWORD,BPB_ADDR:DWORD,drivenumber:byte
 	extrn  COM_Level:byte, CMMT:byte, CMMT1:byte, CMMT2:byte
 	extrn  Cmd_Indicator:byte
@@ -343,21 +342,21 @@ Got_80:
 	mov	si,offset BPBTable
 	mov	si,word ptr [si+bx]	; get address of BPB
 Set_RecBPB:
-	mov	di,offset DeviceParameters+7	 ; es:di -> BPB
+	mov	di,offset DeviceParameters.DP_BPB	 ; es:di -> BPB
 	mov	cx,size a_BPB
 	cld
-	rep	movsb
+	repe	movsb
 	pop	es
 ASSUME ES:NOTHING
 	test	word ptr switches,flagseclim
 	jz	see_heads
 	mov	ax,word ptr slim
-	mov	word ptr DeviceParameters+13,ax
+	mov	word ptr DeviceParameters.DP_BPB.BPB_SectorsPerTrack,ax
 see_heads:
 	test	word ptr switches,flagheads
 	jz	Set_All_Done
 	mov	ax,word ptr hlim
-	mov	word ptr DeviceParameters+15,ax
+	mov	word ptr DeviceParameters.DP_BPB.BPB_Heads,ax
 ;
 ; We need to set the media byte and the total number of sectors to reflect the
 ; number of heads. We do this by multiplying the number of heads by the number
@@ -365,21 +364,21 @@ see_heads:
 ;
 	mov	cx,ax			; cx has number of heads
 	dec	cl			; get it 0-based
-	mov	ax,word ptr DeviceParameters+15	; this is OK for two heads
+	mov	ax,DeviceParameters.DP_BPB.BPB_TotalSectors	; this is OK for two heads
 	sar	ax,1			; ax contains # of sectors/head
 	sal	ax,cl
 	jc	Set_All_Done		; We have too many sectors - overflow!!
-	mov	word ptr DeviceParameters+15,ax
+	mov	DeviceParameters.DP_BPB.BPB_TotalSectors,ax
 ; Set up correct Media Descriptor Byte
 	cmp	cl,1
 	mov	bl,0F0H
 	mov	al,2			; AL contains sectors/cluster
 	ja	Got_Correct_Mediad
-	mov	bl,byte ptr DeviceParameters+10
+	mov	bl,byte ptr DeviceParameters.DP_BPB.BPB_MediaDescriptor
 	je	Got_Correct_Mediad
 ; We have one head - OK for 48tpi medium
 	mov	al,1			; AL contains sectors/cluster
-	mov	ch,byte ptr DeviceParameters+1
+	mov	ch,DeviceParameters.DP_DeviceType
 	cmp	ch,DEV_5INCH
 	jz	Dec_Mediad
 	mov	bl,0F0H
@@ -387,8 +386,8 @@ see_heads:
 Dec_Mediad:
 	dec	bl			; adjust for one head
 Got_Correct_Mediad:
-	mov	byte ptr DeviceParameters+10,bl
-	mov	byte ptr DeviceParameters+2,al
+	mov	byte ptr DeviceParameters.DP_BPB.BPB_MediaDescriptor,bl
+	mov	byte ptr DeviceParameters.DP_BPB.BPB_SectorsPerCluster,al
 	clc
 Set_All_Done:
 	RET
@@ -849,7 +848,7 @@ ROUND:
 	mov	es, si					;AN005;
 	sub	ax, si					;AN005;
 	dec	ax					;AN005;
-	mov	es:[3], ax			;AN005; Paragraph
+	mov	es:[DEVMARK_SIZE], ax			;AN005; Paragraph
 	and	cs:[SetDevMarkFlag], NOT_FOR_DEVMARK	    ;AN005;
 	pop	si					;AN005;
 	pop	es					;AN005;
@@ -1104,8 +1103,8 @@ SetDOSCntry_data:
 	ja	SetDOSData_fail
 	cmp	al, SetCountryInfo	;is the data for SetCountryInfo table?
 	jne	SetDOSCntry_Mov 	;no, don't worry
-	push	word ptr es:[di+26]	;AN009;Cannot destroy ccMono_ptr address. Save them.
-	push	word ptr es:[di+28]	;AN009;At this time DI -> ccCountryInfoLen
+	push	word ptr es:[di+ccMono_Ptr-ccCountryInfoLen]	;AN009;Cannot destroy ccMono_ptr address. Save them.
+	push	word ptr es:[di+ccMono_Ptr-ccCountryInfoLen+2]	;AN009;At this time DI -> ccCountryInfoLen
 	push	di			;save DI
 
 	push	ax
@@ -1118,8 +1117,8 @@ SetDOSCntry_Mov:
 	cmp	al, SetCountryInfo	;was the ccMono_ptr saved?
 	jne	SetDOSCntry_data_next
 	pop	di			;restore DI
-	pop	word ptr es:[di+28]	 ;AN009;restore
-	pop	word ptr es:[di+26]	 ;AN009;
+	pop	word ptr es:[di+ccMono_Ptr-ccCountryInfoLen+2]	 ;AN009;restore
+	pop	word ptr es:[di+ccMono_Ptr-ccCountryInfoLen]	 ;AN009;
 
 SetDOSCntry_data_next:
 	pop	si			;restore control buffer pointer
@@ -1147,7 +1146,7 @@ GetCountryDestination	proc	near
 ;	carry set if no matching data id found in DOS.
 
 	push	cx
-	add	di, 76			;skip the reserved area, syscodepage etc.
+	add	di, ccNumber_of_entries ;skip the reserved area, syscodepage etc.
 	mov	cx, word ptr es:[di]	;get the number of entries
 	inc	di
 	inc	di			;SI -> the first start entry id
@@ -1159,7 +1158,7 @@ GetCntryDest:
 	add	di, 5			;next data id
 	jmp	short GetCntryDest_loop
 GetCntryDest_1:
-	add	di, 39			;next data id
+	add	di, NEW_COUNTRY_SIZE + 3 ;next data id
 GetCntryDest_loop:
 	loop	GetCntryDest
 	stc

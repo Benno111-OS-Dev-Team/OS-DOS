@@ -51,8 +51,8 @@ cseg		segment public para 'code'
 		assume	cs:cseg,ds:nothing,es:nothing,ss:nothing
 
 include MSload.inc
-include ..\inc\bootform.inc		;AN000; Extended bpb, boot record defintion.
-include ..\inc\versiona.inc		;AN001; Version number for SYS.COM
+include Bootform.inc		;AN000; Extended bpb, boot record defintion.
+include versiona.inc		;AN001; Version number for SYS.COM
 
 sec9	equ	522h		;;** 8/3/87 DCL
 
@@ -168,37 +168,37 @@ Save_Input_Values:
 	pop	es			;;** DCL 8/3/87
 	assume	es:nothing
 
-	mov	cx,word ptr Boot_Sector+11			      ;AN000;
+	mov	cx,Boot_Sector.EXT_BOOT_BPB.EBPB_BYTESPERSECTOR      ;AN000;
 	mov	cs:Sector_Size, cx				     ;AN000;
-	mov	cl,byte ptr Boot_Sector+13			     ;AN000;
+	mov	cl,Boot_Sector.EXT_BOOT_BPB.EBPB_SECTORSPERCLUSTER   ;AN000;
 	mov	cs:Sectors_Per_Cluster, cl			     ;AN000;
-	mov	cx,word ptr Boot_Sector+24			     ;Get Sectors per track
+	mov	cx,Boot_Sector.EXT_BOOT_BPB.EBPB_SECTORSPERTRACK     ;Get Sectors per track
 	mov	cs:Sectors_Per_Track,cx
-	mov	cx,word ptr Boot_Sector+26			     ;Get BPB heads per cylinder
+	mov	cx,Boot_Sector.EXT_BOOT_BPB.EBPB_HEADS		     ;Get BPB heads per cylinder
 	mov	cs:Number_Of_Heads,cx
-	mov	cx,word ptr Boot_Sector+22			     ;Get sectors per FAT
+	mov	cx,Boot_Sector.EXT_BOOT_BPB.EBPB_SECTORSPERFAT	     ;Get sectors per FAT
 	mov	cs:Number_Of_FAT_Sectors,cx
-	mov	cx,word ptr Boot_Sector+14			     ;Get Reserved Sectors
+	mov	cx,Boot_Sector.EXT_BOOT_BPB.EBPB_RESERVEDSECTORS     ;Get Reserved Sectors
 	mov	cs:Reserved_Sectors,cx
-	mov	cx,word ptr Boot_Sector+28			 ;Get hidden sectors
+	mov	cx,word ptr Boot_Sector.EXT_BOOT_BPB.EBPB_HIDDENSECTOR	 ;Get hidden sectors
 	mov	cs:Hidden_Sectors_L,cx
-	mov	cx,word ptr Boot_Sector+19			     ;AN000;
+	mov	cx, Boot_Sector.EXT_BOOT_BPB.EBPB_TOTALSECTORS	     ;AN000;
 	mov	cs:Drive_Lim_L, cx				     ;AN000;
 
 ;J.K. First of all, check if it the boot record is an extended one.
 ;J.K. This is just a safe guard in case some user just "copy" the 4.00 IBMBIO.COM
 ;J.K. to a media with a conventional boot record.
 
-	cmp	byte ptr Boot_Sector+36, EXT_BOOT_SIGNATURE		;AN000;
+	cmp	Boot_Sector.EXT_BOOT_SIG, EXT_BOOT_SIGNATURE		;AN000;
 	jne	Relocate						;AN000;
 	mov	cs:First_Sector_H, AX					;AN000; start data sector (high)
-	mov	ax,word ptr Boot_Sector+30  ;AN000;
+	mov	ax,word ptr Boot_Sector.EXT_BOOT_BPB.EBPB_HIDDENSECTOR+2  ;AN000;
 	mov	cs:Hidden_Sectors_H,ax					  ;AN000;
 	cmp	cx, 0							;AN000; CX set already before (=Totalsectors)
 	jne	Relocate						;AN000;
-	mov	ax, word ptr Boot_Sector+32   ;AN000;
+	mov	ax, word ptr Boot_Sector.EXT_BOOT_BPB.EBPB_BIGTOTALSECTORS   ;AN000;
 	mov	cs:Drive_Lim_L, ax					     ;AN000;
-	mov	ax, word ptr Boot_Sector+34 ;AN000;
+	mov	ax, word ptr Boot_Sector.EXT_BOOT_BPB.EBPB_BIGTOTALSECTORS+2 ;AN000;
 	mov	cs:Drive_Lim_H, ax					  ;AN000;
 subttl	Relocate
 page
@@ -343,9 +343,9 @@ Find_Cluster_Size:
 
 	assume ds:bootseg
 
-	mov	ax,word ptr Boot_Sector+11    ;AC000;Get BPB bytes/sector
+	mov	ax,Boot_Sector.EXT_BOOT_BPB.EBPB_BYTESPERSECTOR    ;AC000;Get BPB bytes/sector
 	xor	bx,bx
-	mov	bl,byte ptr Boot_Sector+13 ;AC000;Get sectors/cluster
+	mov	bl,Boot_Sector.EXT_BOOT_BPB.EBPB_SECTORSPERCLUSTER ;AC000;Get sectors/cluster
 	mul	bx				;Bytes/cluster
 	mov	cs:Size_Cluster,ax		;Save it
 
@@ -379,13 +379,13 @@ Determine_FAT_Size:
 	shl	bx, 1				;AN000;2 FATs
 	sub	ax, bx				;AN000;
 	sbb	dx, 0				;AN000;now, dx;ax = tatal sectors - fat sectors
-	mov	bx, word ptr Boot_Sector+17 ;AN000;
+	mov	bx, Boot_Sector.EXT_BOOT_BPB.EBPB_ROOTENTRIES ;AN000;
 	mov	cl, 4				;AN000;
 	shr	bx, cl				;AN000;Sectors for dir entries = dir entries / Num_DIR_Sector
 	sub	ax, bx				;AN000;
 	sbb	dx, 0				;AN000;
 	xor	cx, cx				;AN000;
-	mov	cl, byte ptr Boot_Sector+13 ;AN000;
+	mov	cl, Boot_Sector.EXT_BOOT_BPB.EBPB_SECTORSPERCLUSTER ;AN000;
 	push	ax				;AN000;
 	mov	ax, dx				;AN000;
 	xor	dx, dx				;AN000;

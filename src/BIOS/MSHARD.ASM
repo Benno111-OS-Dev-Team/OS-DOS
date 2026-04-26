@@ -14,6 +14,9 @@
 ;		this program is IBM_DISK_IO.
 ;
 
+
+	.286c		;Use 80286 non-protected mode
+
 BIOSEG		= 040h		;Segment for ROM BIOS Data
 ROMSEG		= 0F000h	;Segment of ROM
 
@@ -281,7 +284,7 @@ DOC1:
 	MOV  DX, HF_PORT
 	CLD			;String op goes up
 	CLI			;Disable interrupts (BUG WAS FORGETTING THIS)
-  REP   INSW			;Read in sector
+  REPZ  INSW			;Read in sector
   	STI
 	TEST CMD_BLOCK[CMD_REG], 02
 	JZ   DOC2		;No ECC bytes to read.
@@ -291,7 +294,7 @@ DOC1:
 	MOV  CX, 4		;4 bytes of ECC
 	MOV  DX, HF_PORT
 	CLI
-  REP   INSB			;Read in ECC
+  REPZ  INSB			;Read in ECC
   	STI
 DOC2:
 	PUSH CS

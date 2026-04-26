@@ -98,7 +98,7 @@ FLAG_REC_SIG	 EQU	80H	;RECEIVE LINE SIGNAL DETECT
 	PUBLIC AUX$READ
 AUX$READ PROC NEAR
 	ASSUME	DS:CODE 	; SET BY AUX DEVICE DRIVER ENTRY ROUTINE
-	jcxz	AUX$READ_DONE	; if no characters, get out
+	jcxz	EXVEC2		; if no characters, get out
 	call	GETBX		; put address of AUXBUF in BX
 	xor	AX,AX		; clear AX register
 	xchg	AL,[BX] 	; Get character , if any, from
@@ -111,8 +111,7 @@ AUX1:				;
 AUX2:				;
 	stosb			; store character
 	loop	AUX1		; if more character, go around again
-; no more characters, fall through to the shared exit
-AUX$READ_DONE:
+EXVEC2: 			;
 	Jump	EXIT		; all done, successful exit
 AUX$READ ENDP
 
@@ -160,15 +159,18 @@ AUX$RDND PROC	NEAR
 	jnz	AUXRDX		;   then return character
 	call	AUXSTAT 	;   if not, get status of AUX device
 	TEST	AH,FLAG_DATA_READY ;TEST DATA READY
-	jz	BUS$EXIT		;   then device is busy (not ready)
+	jz	AUXBUS		;   then device is busy (not ready)
 
 	TEST	AL,FLAG_DSR	;TEST DATA SET READY
-	jz	BUS$EXIT		;   then device is busy (not ready)
+	jz	AUXBUS		;   then device is busy (not ready)
 	call	AUXIN		;   else aux is ready, get character
 	call	GETBX		; have bx point to AUXBUF
 	mov	[BX],AL 	; save character in buffer
 AUXRDX: 			;
 	Jump	RDEXIT		; return character
+
+AUXBUS: 			;
+	Jump	BUS$EXIT	; jump to device busy exit
 AUX$RDND ENDP
 
 ;----------------------------------------------------------------
@@ -184,10 +186,10 @@ AUX$WRST PROC	NEAR
 				; if this bit is not set,
 ;;Ver 3.30 modification -----------------------
 	TEST	AL,FLAG_DSR	;TEST DATA SET READY
-	jz	BUS$EXIT		;   then device is busy (not ready)
+	jz	AUXBUS		;   then device is busy (not ready)
 	TEST	AH,FLAG_TRANHOL_EMP ;TEST TRANSMIT HOLD REG EMPTY
 ;;End of modification -------------------------
-	jz	BUS$EXIT		;   then device is busy (not ready)
+	jz	AUXBUS		;   then device is busy (not ready)
 	Jump	Exit
 
 AUX$WRST ENDP
@@ -238,7 +240,7 @@ AUX$FLSH ENDP
 	PUBLIC	AUX$WRIT
 AUX$WRIT PROC	NEAR
 	ASSUME	DS:CODE 	; SET BY AUX DEVICE DRIVER ENTRY ROUTINE
-	jcxz	AUX$WRIT_DONE	; if CX is zero, no characters
+	jcxz	EXVEC2		; if CX is zero, no characters
 				;   to be written, jump to exit
 AUX$LOOP:
 	mov	AL,ES:[DI]	; get character to be written
@@ -256,8 +258,6 @@ AUX$LOOP:
 				; if CX is non-zero, still more
 AWOK:
 	loop	AUX$LOOP	; more characrter to print
-; no more characters, fall through to the shared exit
-AUX$WRIT_DONE:
 	Jump	Exit		; all done, successful return
 AUX$WRIT ENDP
 
