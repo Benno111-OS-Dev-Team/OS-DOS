@@ -183,7 +183,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $repoRoot = $env:GITHUB_WORKSPACE
-          $workSrc = Join-Path $repoRoot 'build\src'
+          $workSrc = Join-Path $repoRoot '\src\'
           $objRoot = Join-Path $repoRoot 'build\obj'
           $logRoot = Join-Path $repoRoot 'build\logs'
           $assembler = $env:UASM_EXE
