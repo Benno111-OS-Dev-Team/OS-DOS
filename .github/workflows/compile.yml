@@ -241,21 +241,22 @@ jobs:
           } else {
             $stubAsm = Join-Path $asmRoot 'cstart_t.asm'
             $stubObj = Join-Path $objRoot 'cstart_t.obj'
-            @'
-.286
-PUBLIC  _cstart_
-PUBLIC  _Not_Enough_Memory_
-PUBLIC  __exit_
-PUBLIC  __do_exit_with_msg__
-PUBLIC  __GETDS
-_cstart_:
-_Not_Enough_Memory_:
-__exit_:
-__do_exit_with_msg__:
-__GETDS:
-    ret
-END
-'@ | Set-Content -LiteralPath $stubAsm -Encoding ASCII
+            $stubLines = @(
+              '.286'
+              'PUBLIC  _cstart_'
+              'PUBLIC  _Not_Enough_Memory_'
+              'PUBLIC  __exit_'
+              'PUBLIC  __do_exit_with_msg__'
+              'PUBLIC  __GETDS'
+              '_cstart_:'
+              '_Not_Enough_Memory_:'
+              '__exit_:'
+              '__do_exit_with_msg__:'
+              '__GETDS:'
+              '    ret'
+              'END'
+            )
+            $stubLines | Set-Content -LiteralPath $stubAsm -Encoding ASCII
             & $env:UASM_EXE /c /nologo /Cp /Fo"$stubObj" "$stubAsm"
             if ($LASTEXITCODE -ne 0) {
               throw "Failed to build fallback cstart_t.obj at $stubObj"
