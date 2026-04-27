@@ -345,7 +345,6 @@ DODAB:
 ZZY     PROC    FAR
         RET                     ; Leave flags on stack
 ZZY     ENDP
-
 BADMEMERR:                              ; Allocation error loading transient
         MOV     DX,OFFSET RESGROUP:BMEMMES
 FATALC:
