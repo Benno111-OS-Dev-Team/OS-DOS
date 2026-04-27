@@ -97,7 +97,7 @@ ASSUME  DS:NOTHING,ES:NOTHING
         return
 ScanPlace   ENDP
 
-NRETJ:  JMP     NRET
+NRETJ:  JMP     NRETIBM
 
         procedure   PLACEBUF,NEAR
 ASSUME  DS:NOTHING,ES:NOTHING
@@ -205,13 +205,16 @@ NODEC:
         LDS     DI,[DI.NEXTBUF]
         CMP     DI,-1
         JNZ     DECLOOP
-        JMP     SHORT NRET
+        JMP     SHORT NRETIBM
+NRETIBM:
+        invoke  restore_world
+        return
         ENDIF
 
         invoke  save_world
         LES     CX,[DI.NEXTBUF]
         CMP     CX,-1           ; Buf is LAST?
-        JZ      NRET            ; Buffer already last
+        JZ      NRET2           ; Buffer already last
         MOV     BP,ES           ; Pointsave = Buf.nextbuf
         PUSH    DS
         POP     ES              ; Buf is ES:DI

@@ -209,7 +209,7 @@ NRETIBM:
         invoke  save_world
         LES     CX,[DI.NEXTBUF]
         CMP     CX,-1           ; Buf is LAST?
-        JZ      NRET            ; Buffer already last
+        JZ      NRET2           ; Buffer already last
         MOV     BP,ES           ; Pointsave = Buf.nextbuf
         PUSH    DS
         POP     ES              ; Buf is ES:DI
@@ -286,7 +286,7 @@ GOTHEEND2:
         POP     DS
         MOV     WORD PTR [SI.NEXTBUF],-1
         MOV     WORD PTR [SI.NEXTBUF+2],-1      ; Buf is LAST
-        JMP     SHORT NRET
+        JMP     SHORT NRET2
 
 PLACEHEAD   ENDP
 
