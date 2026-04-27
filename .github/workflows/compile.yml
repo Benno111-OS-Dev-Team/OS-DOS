@@ -124,6 +124,11 @@ jobs:
             $content = $content -replace '(?im)\bfalse\b', 'FALSE'
 
             switch ($asm.Name.ToUpperInvariant()) {
+              'COMMAND.ASM' {
+                $content = $content -replace '(?m)^(\s*)RET\s*(; Leave flags on stack)$', '$1RETF$2'
+                $content = $content -replace '(?m)(CALL\s+REMCHECK\s*;\s*.*\r?\n\s*)RET\s*$', '$1RETF'
+                $content = $content -replace '(?m)(CALL\s+HEADFIX\s*;\s*.*\r?\n\s*)RET\s*$', '$1RETF'
+              }
               'MSDATA.ASM' {
                 $content = $content -replace '(?m)^\s*short_addr\s+DEVIOBUF\s*$', '                short_addr  DSKCHRETBUF'
               }
