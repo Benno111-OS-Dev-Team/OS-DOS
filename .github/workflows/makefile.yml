@@ -65,12 +65,32 @@ jobs:
 
           $modules = New-Object System.Collections.Generic.List[string]
           $seen = New-Object System.Collections.Generic.HashSet[string] ([System.StringComparer]::OrdinalIgnoreCase)
+          $skipModules = @(
+            'STDIO',
+            'STDBUF',
+            'STDCALL',
+            'STDCTRLC',
+            'STDFCB',
+            'STDPROC',
+            'COMLINK',
+            'DOSLINK',
+            'COMSEG',
+            'COMSW',
+            'DOSSEG',
+            'DOSSYM',
+            'DEVSYM',
+            'DOSMAC',
+            'IFEQU'
+          )
           foreach ($linkFile in @('COMLINK', 'DOSLINK')) {
             $path = Join-Path $workSrc $linkFile
             $text = Get-Content -Path $path -Raw
             foreach ($match in [regex]::Matches($text, '(?i)\b[A-Z0-9_]+\b')) {
               $token = $match.Value.ToUpperInvariant()
               if ($token -match '^[A-Z0-9_]+$') {
+                if ($skipModules -contains $token) {
+                  continue
+                }
                 $asmPath = Join-Path $workSrc "$token.ASM"
                 if ((Test-Path $asmPath) -and $seen.Add($token)) {
                   $modules.Add($token)
@@ -81,6 +101,9 @@ jobs:
 
           $extraModules = @('MSDOS', 'MSCODE', 'SYSINIT', 'SYS', 'UINIT')
           foreach ($token in $extraModules) {
+            if ($skipModules -contains $token) {
+              continue
+            }
             if ($seen.Add($token) -and (Test-Path (Join-Path $workSrc "$token.ASM"))) {
               $modules.Add($token)
             }
@@ -105,7 +128,7 @@ jobs:
             $logPath = Join-Path $logRoot "$module.log"
 
             Write-Host "Assembling $module"
-            & ml /c /nologo /Cp /Fo"$objPath" "$asmPath" 2>&1 | Tee-Object -FilePath $logPath
+            & ml /c /nologo /Cp /Zm /omf /DTRUE=0FFFFH /DFALSE=0000H /Fo"$objPath" "$asmPath" 2>&1 | Tee-Object -FilePath $logPath
             if ($LASTEXITCODE -ne 0) {
               $failures.Add($module)
             }
