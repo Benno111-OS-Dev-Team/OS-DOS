@@ -44,16 +44,19 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          if (Test-Path -LiteralPath 'Msvc.mak') {
-            & nmake /nologo /f Msvc.mak
-          }
-          elseif (Test-Path -LiteralPath 'Msvc64.mak') {
-            & nmake /nologo /f Msvc64.mak
-          }
-          else {
+          $makefile = @(
+            'Makefile-Win-MSVC-32.mak',
+            'Makefile-Win-MSVC-64.mak',
+            'Msvc.mak',
+            'Msvc64.mak'
+          ) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+
+          if (-not $makefile) {
             Get-ChildItem -Name *.mak
             throw 'UASM makefile not found.'
           }
+
+          & nmake /nologo /f $makefile
 
       - name: Locate UASM
         shell: pwsh
