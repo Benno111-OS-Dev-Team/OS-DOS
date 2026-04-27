@@ -78,14 +78,8 @@ jobs:
           $workSrc = Join-Path $buildRoot 'src'
           $objRoot = Join-Path $buildRoot 'obj'
           $logRoot = Join-Path $buildRoot 'logs'
-
           New-Item -ItemType Directory -Force -Path $workSrc, $objRoot, $logRoot | Out-Null
           Copy-Item -Path (Join-Path $srcRoot '*') -Destination $workSrc -Recurse -Force
-          $cstartObj = Get-ChildItem -Path $env:WATCOM -Recurse -File -Filter cstart_t.obj | Select-Object -First 1
-          if (-not $cstartObj) {
-            throw "Could not locate cstart_t.obj under $env:WATCOM"
-          }
-          Copy-Item -Path $cstartObj.FullName -Destination (Join-Path $objRoot 'cstart_t.obj') -Force
 
           Copy-Item -Path (Join-Path $workSrc 'DOSMAC_v211.ASM') -Destination (Join-Path $workSrc 'DOSMAC.ASM') -Force
           Copy-Item -Path (Join-Path $workSrc 'DOSSYM_v211.ASM') -Destination (Join-Path $workSrc 'DOSSYM.ASM') -Force
@@ -231,6 +225,36 @@ jobs:
           }
 
           Write-Host "Compile completed successfully."
+
+      - name: Stage COM startup object
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $repoRoot = $env:GITHUB_WORKSPACE
+          $objRoot = Join-Path $repoRoot 'build\obj'
+          $watcomRoot = Split-Path -Path (Split-Path -Path (Get-Command wlink).Source -Parent) -Parent
+          $candidateRoots = @(
+            $watcomRoot
+            $env:WATCOM
+            'C:\WATCOM'
+            'C:\OpenWatcom'
+            'C:\openwatcom'
+          ) | Where-Object { $_ } | Select-Object -Unique
+
+          $cstartObj = $null
+          foreach ($candidateRoot in $candidateRoots) {
+            $localMatch = Get-ChildItem -Path $candidateRoot -Recurse -File -Filter cstart_t.obj -ErrorAction SilentlyContinue | Select-Object -First 1
+            if ($localMatch) {
+              $cstartObj = $localMatch
+              break
+            }
+          }
+
+          if (-not $cstartObj) {
+            throw "Could not locate cstart_t.obj under any Watcom root: $($candidateRoots -join ', ')"
+          }
+
+          Copy-Item -Path $cstartObj.FullName -Destination (Join-Path $objRoot 'cstart_t.obj') -Force
 
       - name: Link deliverables
         shell: pwsh
