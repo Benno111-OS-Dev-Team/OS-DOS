@@ -79,9 +79,11 @@ jobs:
 
           $comswPath = Join-Path $workSrc 'COMSW.ASM'
           $comsw = Get-Content -Path $comswPath -Raw
-          $comsw = $comsw -replace '(?m)^IBMVER\s+EQU\s+true.*$', 'IBMVER  EQU     false  ; CI compatibility build'
+          $comsw = $comsw -replace '(?m)^FALSE\s+EQU\s+0\s*$', 'FALSE   EQU     0'
+          $comsw = $comsw -replace '(?m)^TRUE\s+EQU\s+NOT\s+FALSE\s*$', 'TRUE    EQU     NOT FALSE'
+          $comsw = $comsw -replace '(?m)^IBMVER\s+EQU\s+true.*$', 'IBMVER  EQU     FALSE  ; CI compatibility build'
           $comsw = $comsw -replace '(?m)^IBM\s+EQU\s+IBMVER.*$', 'IBM     EQU     IBMVER'
-          $comsw = $comsw -replace '(?m)^MSVER\s+EQU\s+false.*$', 'MSVER   EQU     true   ; CI compatibility build'
+          $comsw = $comsw -replace '(?m)^MSVER\s+EQU\s+false.*$', 'MSVER   EQU     TRUE   ; CI compatibility build'
           [System.IO.File]::WriteAllText($comswPath, $comsw, [System.Text.Encoding]::ASCII)
 
           foreach ($asm in Get-ChildItem -Path $workSrc -Filter *.ASM -File) {
@@ -90,7 +92,7 @@ jobs:
             [System.IO.File]::WriteAllText($asm.FullName, $content, [System.Text.Encoding]::ASCII)
           }
 
-          $modules = @('COMMAND', 'TCODE')
+          $modules = @('COMMAND')
 
           $modules | Set-Content -Path (Join-Path $buildRoot 'modules.txt')
 
