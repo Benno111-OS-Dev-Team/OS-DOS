@@ -76,6 +76,9 @@ jobs:
 
           Copy-Item -Path (Join-Path $workSrc 'DOSMAC_v211.ASM') -Destination (Join-Path $workSrc 'DOSMAC.ASM') -Force
           Copy-Item -Path (Join-Path $workSrc 'DOSSYM_v211.ASM') -Destination (Join-Path $workSrc 'DOSSYM.ASM') -Force
+          $dosmac = Get-Content -Path (Join-Path $workSrc 'DOSMAC.ASM') -Raw
+          $dosmac = $dosmac -replace '(?m)^\s*JUMP\s+name\s*$', ' JMP name'
+          [System.IO.File]::WriteAllText((Join-Path $workSrc 'DOSMAC.ASM'), $dosmac, [System.Text.Encoding]::ASCII)
           Set-Content -Path (Join-Path $workSrc 'IO.ASM') -Value 'END' -Encoding ASCII
           $aliasLines = @(
             'WAIT EQU Wait'
@@ -186,6 +189,65 @@ jobs:
 
           $modules | Set-Content -Path (Join-Path $buildRoot 'modules.txt')
 
+          $keywords = @(
+            'INVOKE'
+            'JUMP'
+            'WAIT'
+            'EXIT'
+            'EXEC'
+            'SYSCALL'
+            'READ'
+            'WRITE'
+            'OPEN'
+            'CLOSE'
+            'LSEEK'
+            'ALLOC'
+            'DEALLOC'
+            'SET_CURRENT_PDB'
+            'GET_CURRENT_PDB'
+            'SET_VERIFY_ON_WRITE'
+            'RAW_CON_INPUT'
+            'STD_CON_INPUT'
+            'STD_CON_INPUT_NO_ECHO'
+            'STD_CON_STRING_OUTPUT'
+            'STD_CON_STRING_INPUT'
+            'STD_CON_INPUT_STATUS'
+            'STD_CON_INPUT_FLUSH'
+            'SET_INTERRUPT_VECTOR'
+            'DISK_RESET'
+            'CHAR_OPER'
+            'GET_IN_VARS'
+            'SETDPB'
+            'GET_VERIFY_ON_WRITE'
+            'DUP_PDB'
+            'RENAME'
+            'FILE_TIMES'
+            'ALLOCOPER'
+            'GETEXTENDEDERROR'
+            'CREATETEMPFILE'
+            'CREATENEWFILE'
+            'LOCKOPER'
+            'SERVERCALL'
+            'USERIDOPER'
+            'ASSIGNOPER'
+            'SET_OEM_HANDLER'
+            'UNLINK'
+            'CHMOD'
+            'IOCTL'
+            'XDUP'
+            'XDUP2'
+            'CURRENT_DIR'
+            'SETBLOCK'
+            'FIND_FIRST'
+            'FIND_NEXT'
+            'OUT'
+            'ECHO'
+            'GOTO'
+            'RETF'
+            'IRET'
+          )
+          $keywords | Set-Content -Path (Join-Path $buildRoot 'nokeyword.txt')
+
       - name: Compile modules
         shell: pwsh
         run: |
@@ -205,11 +267,8 @@ jobs:
 
             Write-Host "Assembling $module"
             $extraArgs = @('/Zm')
-            if ($module -eq 'COMMAND') {
-              $prefix = "OPTION CASEMAP:ALL`r`nOPTION NOKEYWORD:<INVOKE WAIT EXIT EXEC SYSCALL>`r`n"
-            } else {
-              $prefix = "OPTION CASEMAP:ALL`r`n"
-            }
+            $nokeyword = (Get-Content -Path (Join-Path $repoRoot 'build\nokeyword.txt') -Raw).Trim() -replace '\s+', ' '
+            $prefix = "OPTION CASEMAP:ALL`r`nOPTION NOKEYWORD:<$nokeyword>`r`n"
             $commandText = [System.IO.File]::ReadAllText($asmPath, [System.Text.Encoding]::ASCII)
             [System.IO.File]::WriteAllText($asmPath, $prefix + $commandText, [System.Text.Encoding]::ASCII)
             & $assembler @extraArgs /c /nologo /Cp /Fo"$objPath" "$asmPath" 2>&1 | Tee-Object -FilePath $logPath
