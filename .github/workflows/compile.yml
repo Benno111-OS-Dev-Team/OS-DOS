@@ -49,11 +49,11 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $uasmExe = Get-ChildItem -Path (Join-Path $env:GITHUB_WORKSPACE 'uasm') -Recurse -File |
-            Where-Object { $_.Name -match '^uasm\.exe$' } |
+            Where-Object { $_.Name -match '^(uasm32|uasm|hjwasm)\.exe$' } |
             Select-Object -First 1
 
           if (-not $uasmExe) {
-            throw "Could not locate a built UASM executable."
+            throw "Could not locate a UASM executable. Found files: $((Get-ChildItem -Path (Join-Path $env:GITHUB_WORKSPACE 'uasm') -Recurse -File | Select-Object -ExpandProperty Name) -join ', ')"
           }
 
           "UASM_EXE=$($uasmExe.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding ascii
