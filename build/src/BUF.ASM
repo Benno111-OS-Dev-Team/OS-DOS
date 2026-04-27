@@ -94,7 +94,7 @@ ASSUME  DS:NOTHING,ES:NOTHING
         return
 ScanPlace   ENDP
 
-NRETJ:  JMP     SHORT NRET
+NRETJ:  JMP     SHORT NRETIBM
 
         procedure   PLACEBUF,NEAR
 ASSUME  DS:NOTHING,ES:NOTHING
@@ -142,7 +142,7 @@ NEWHEAD:                        ; If Buf.pri < HEAD.pri
         MOV     WORD PTR [BUFFHEAD+2],ES        ; HEAD = Buf
         INC     AL                              ; Inserted = TRUE
         OR      AH,AH
-        JNZ     NRET            ; If Removed == TRUE
+        JNZ     NRETIBM         ; If Removed == TRUE
 BUFLOOP:
         PUSH    DS
         PUSH    SI
@@ -200,7 +200,10 @@ NODEC:
         LDS     DI,[DI.NEXTBUF]
         CMP     DI,-1
         JNZ     DECLOOP
-        JMP     SHORT NRET
+        JMP     SHORT NRETIBM
+NRETIBM:
+        invoke  restore_world
+        return
         ENDIF
 
         invoke  save_world
