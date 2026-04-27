@@ -38,6 +38,7 @@ iTEST=0
 PATHGEN =	1
 
 .SALL
+	OPTION M510		; Enable MASM 5.10 compatibility: global label scoping and EQU offsets with '.'
 	%OUT	...MSBIO1.ASM
 
 ; THIS IS A DOSMAC MACRO WHICH IS USED IN DEVSYM WHICH IS INCLUDED LATER
