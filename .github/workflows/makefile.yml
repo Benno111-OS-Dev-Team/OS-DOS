@@ -36,12 +36,26 @@ jobs:
         run: |
           where link || exit /b 1
 
-      - name: Build UASM
+      - name: Fetch UASM
         shell: cmd
         run: |
-          git clone --depth 1 --branch v2.57r https://github.com/Terraspace/UASM.git uasm
-          cd uasm
-          nmake /nologo /f Msvc.mak || exit /b 1
+          git clone --depth 1 --branch v2.57r https://github.com/Terraspace/UASM.git uasm || exit /b 1
+
+      - name: Build UASM
+        working-directory: uasm
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (Test-Path -LiteralPath 'Msvc.mak') {
+            & nmake /nologo /f Msvc.mak
+          }
+          elseif (Test-Path -LiteralPath 'Msvc64.mak') {
+            & nmake /nologo /f Msvc64.mak
+          }
+          else {
+            Get-ChildItem -Name *.mak
+            throw 'UASM makefile not found.'
+          }
 
       - name: Locate UASM
         shell: pwsh
