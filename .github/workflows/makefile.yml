@@ -76,6 +76,23 @@ jobs:
 
           Copy-Item -Path (Join-Path $workSrc 'DOSMAC_v211.ASM') -Destination (Join-Path $workSrc 'DOSMAC.ASM') -Force
           Copy-Item -Path (Join-Path $workSrc 'DOSSYM_v211.ASM') -Destination (Join-Path $workSrc 'DOSSYM.ASM') -Force
+          @'
+WAIT EQU Wait
+DISK_RESET EQU Disk_Reset
+EXIT EQU Exit
+DEALLOC EQU Dealloc
+SET_CURRENT_PDB EQU Set_Current_PDB
+GET_CURRENT_PDB EQU Get_Current_PDB
+ALLOC EQU Alloc
+SET_VERIFY_ON_WRITE EQU Set_Verify_On_Write
+CHAR_OPER EQU Char_Oper
+CLOSE EQU Close
+STD_CON_INPUT_FLUSH EQU Std_Con_Input_Flush
+OPEN EQU Open
+LSEEK EQU LSeek
+READ EQU Read
+SET_INTERRUPT_VECTOR EQU Set_Interrupt_Vector
+'@ | Add-Content -Path (Join-Path $workSrc 'DOSSYM.ASM') -Encoding ASCII
 
           $comswPath = Join-Path $workSrc 'COMSW.ASM'
           $comsw = Get-Content -Path $comswPath -Raw
