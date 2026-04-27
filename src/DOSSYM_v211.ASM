@@ -1,4 +1,4 @@
-include DOSMAC.ASM
+include DOSMAC_v211.ASM
 IF2
     %OUT    DOSSYM in Pass 2
 ENDIF
@@ -914,7 +914,7 @@ Setblock                        EQU 74  ; 74     4A
 ;    Process Group
 Exec                            EQU 75  ; 75     4B
 Exit                            EQU 76  ; 76     4C
-Wait                            EQU 77  ; 77     4D
+WAIT_OP                         EQU 77  ; 77     4D
 Find_First                      EQU 78  ; 78     4E
 ;   Special Group
 Find_Next                       EQU 79  ; 79     4F

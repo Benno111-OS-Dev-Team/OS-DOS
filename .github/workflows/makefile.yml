@@ -97,11 +97,10 @@ jobs:
             $content = $content -replace '(?im)^\s*INCLUDE\s+DOST:DOSSYM\.ASM\s*$', 'INCLUDE DOSSYM.ASM'
             $content = $content -replace '(?im)^\s*I_am\b', 'I_AM'
             $content = $content -replace '(?im)^\s*i_am\b', 'I_AM'
+            $content = $content -replace '(?im)\bi_need\b', 'I_NEED'
+            $content = $content -replace '(?im)\binvoke\b', 'INVOKE'
             $content = $content -replace '(?im)\btrue\b', 'TRUE'
             $content = $content -replace '(?im)\bfalse\b', 'FALSE'
-            if ($asm.Name -notin @('DOSMAC.ASM', 'DOSMAC_v211.ASM')) {
-              $content = $content -replace '(?im)\bINVOKE\b', 'CALL'
-            }
 
             switch ($asm.Name.ToUpperInvariant()) {
               'COMMAND.ASM' {

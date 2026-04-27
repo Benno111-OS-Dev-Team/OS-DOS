@@ -2,6 +2,8 @@
 ; Macro file for MSDOS.
 ;
 
+OPTION NOKEYWORD:<INVOKE>
+
 SUBTTL BREAK a listing into pages and give new subtitles
 PAGE
 BREAK MACRO subtitle
@@ -31,7 +33,7 @@ ENDM
 ;
 ; call a procedure that may be external. The call will be short.
 ;
-invoke MACRO name
+INVOKE MACRO name
 .xcref
  IF2
  IFNDEF name
@@ -54,7 +56,7 @@ transfer MACRO name
  ENDIF
  ENDIF
 .cref
- JUMP name
+ JMP name
 ENDM
 
 ;
