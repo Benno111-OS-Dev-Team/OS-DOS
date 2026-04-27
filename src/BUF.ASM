@@ -20,6 +20,9 @@ INCLUDE DEVSYM.ASM
         i_need  CurBuf,DWORD
         i_need  WPErr,BYTE
 
+        EXTRN   save_world:NEAR,restore_world:NEAR,FATSECRD:NEAR
+        EXTRN   DREAD:NEAR,DWRITE:NEAR
+
 SUBTTL SETVISIT,SKIPVISIT -- MANAGE BUFFER SCANS
 PAGE
         procedure   SETVISIT,near

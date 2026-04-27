@@ -41,6 +41,9 @@ NAME    Dev
         i_need  DevCall,DWORD
         i_need  VerFlg,BYTE
 
+        EXTRN   restore_world:NEAR,save_world:NEAR,CHARHARD:NEAR
+        EXTRN   STORE:NEAR,FINNOSAV:NEAR,LOAD:NEAR,GETRRPOS:NEAR
+
 SUBTTL IOFUNC -- DO FUNCTION 1-12 I/O
 PAGE
 IOFUNC_RETRY:
@@ -436,4 +439,4 @@ do_ext
 
 CODE    ENDS
     END
-                                                                                                    
+                                                                                                    

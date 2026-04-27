@@ -37,6 +37,10 @@ endif
         i_need  SWITCH_CHARACTER,BYTE
 
         extrn   sys_ret_ok:near,sys_ret_err:near
+        EXTRN   validate_path:NEAR,MAKENODE:NEAR,NEWDIR:NEAR,GETENT:NEAR
+        EXTRN   SETDOTENT:NEAR,GETBUFFR:NEAR,FLUSHBUF:NEAR,GETPATH:NEAR
+        EXTRN   PATHCHRCMP:NEAR,GETCURRDIR:NEAR,GET_USER_STACK:NEAR
+        EXTRN   STARTSRCH:NEAR,GETENTRY:NEAR,RELEASE:NEAR
 
 
 ; XENIX CALLS
@@ -504,4 +508,4 @@ $RMDIR  ENDP
 
 CODE    ENDS
         END
-                                                                                
+                                                                                

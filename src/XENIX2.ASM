@@ -42,6 +42,12 @@ NAME    XENIX
         i_need  CURBUF,DWORD                ; pointer to current buffer
         i_need  DMAADD,DWORD                ; pointer to current dma address
 
+        EXTRN   SYS_RET_OK:NEAR,SYS_RET_ERR:NEAR,MOVNAMENOSET:NEAR
+        EXTRN   FCB_CLOSE_INNER:NEAR,$FCB_RANDOM_READ_BLOCK:NEAR
+        EXTRN   $FCB_RANDOM_WRITE_BLOCK:NEAR
+        EXTRN   get_user_stack:NEAR,GET_IO_FCB:NEAR,IOFUNC:NEAR
+        EXTRN   GETTHISDRV:NEAR,FATREAD:NEAR,DEVIOCALL2:NEAR
+
 BREAK <Local data>
 
 CODE        ENDS

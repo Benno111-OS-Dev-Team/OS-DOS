@@ -54,6 +54,9 @@ INCLUDE DEVSYM.ASM
         i_need  SWITCH_CHARACTER,BYTE
         i_need  DEVICE_AVAILABILITY,BYTE
 
+        EXTRN   get_user_stack:NEAR,SYS_RET_OK:NEAR,SYS_RET_ERR:NEAR
+        EXTRN   GETTHISDRV:NEAR,FATREAD:NEAR,UNPACK:NEAR
+
 USERNUM DW      ?                       ; 24 bit user number
         DB      ?
         IF      IBM

@@ -9,6 +9,7 @@ ENDIF
 CONSTANTS       SEGMENT BYTE PUBLIC 'CONST'
         EXTRN   international_table:BYTE
         EXTRN   Current_Country:WORD
+        EXTRN   NULLDEV_SET:NEAR,NULLDEV_IO:NEAR,SYS_LEAVE:NEAR
 
 
         ORG     0

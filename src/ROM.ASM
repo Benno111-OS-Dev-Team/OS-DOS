@@ -32,6 +32,9 @@ NAME    ROM
         i_need  SECPOS,WORD
         i_need  VALSEC,WORD
 
+        EXTRN   UNPACK:NEAR,GETBUFFR:NEAR,PLACEBUF:NEAR,PLACEHEAD:NEAR
+        EXTRN   PACK:NEAR
+
         procedure   GET_random_record,NEAR
         entry   GETRRPOS1
         MOV     CX,1

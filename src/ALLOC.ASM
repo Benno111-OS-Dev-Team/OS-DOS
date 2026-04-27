@@ -31,6 +31,8 @@ PAGE
         i_need  LastArena,WORD          ; last free block found
         i_need  AllocMethod,BYTE        ; how to alloc first(best)last
 
+        EXTRN   SYS_RET_OK:NEAR,SYS_RET_ERR:NEAR,get_user_stack:NEAR
+
 ;
 ; arena_free_process
 ; input:    BX - PID of process

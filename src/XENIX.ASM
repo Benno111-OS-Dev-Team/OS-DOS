@@ -42,6 +42,12 @@ NAME    XENIX
         i_need  CURBUF,DWORD                ; pointer to current buffer
         i_need  DMAADD,DWORD                ; pointer to current dma address
 
+        EXTRN   PathChrCmp:NEAR,GetPath:NEAR,SYS_RET_ERR:NEAR,DOOPEN:NEAR
+        EXTRN   SYS_RET_OK:NEAR,RELEASE:NEAR,FLUSHBUF:NEAR,MakeNode:NEAR
+        EXTRN   Get_sf_from_jfn:NEAR,$CLOSE:NEAR,Get_user_stack:NEAR
+        EXTRN   $get_DPB:NEAR,GETCURRDIR:NEAR,MatchAttributes:NEAR
+        EXTRN   MOVNAMENOSET:NEAR,SetDirSrch:NEAR
+
 BREAK <Local data>
 
 CODE        ENDS
@@ -549,7 +555,7 @@ BREAK <$DUP2 - force a dup on a particular jfn>
         context DS
         POP     CX
         POP     BX
-        invoke  Get_jfn_pointer
+        invoke  GET_JFN_POINTER_ROUTINE
         XCHG    BX,CX
         JNC     dup_force
 lseek_bad_handle:

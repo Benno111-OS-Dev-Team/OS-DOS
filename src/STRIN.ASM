@@ -1,3 +1,5 @@
+        EXTRN   OUT_ROUTINE:NEAR,TAB:NEAR,$STD_CON_INPUT_NO_ECHO:NEAR
+
         procedure   $STD_CON_STRING_INPUT,NEAR   ;System call 10
 ASSUME  DS:NOTHING,ES:NOTHING
 
@@ -59,7 +61,7 @@ SAVCH:
         JAE     BUFFUL          ;No room
         STOSB
         INC     DH              ;Got a char
-        invoke  BUFOUT          ;Print control chars nicely
+        invoke  OUT_ROUTINE     ;Print control chars nicely
         CMP     BYTE PTR [INSMODE],0
         JNZ     GETCH           ;In insert mode, get more chars
         CMP     BH,BL
@@ -72,7 +74,7 @@ BACKSPJ: JMP    SHORT BACKSP
 
 BUFFUL:
         MOV     AL,7            ;Bell
-        invoke  OUT
+        invoke  OUT_ROUTINE
         JMP     SHORT GETCH
 
 ESC:
@@ -80,7 +82,7 @@ ESC:
 
 ENDLIN:
         STOSB                   ;Put the CR in the buffer
-        invoke  OUT             ;Echo it
+        invoke  OUT_ROUTINE     ;Echo it
         POP     DI              ;Get start of buffer
         MOV     [DI-1],DH       ;Tell user how many bytes
         INC     DH              ;DH is length including CR
@@ -97,9 +99,9 @@ COPYNEW:
 ;Output a CRLF
         entry   CRLF
         MOV     AL,c_CR
-        invoke  OUT
+        invoke  OUT_ROUTINE
         MOV     AL,c_LF
-        JMP     OUT
+        JMP     OUT_ROUTINE
 
 ;Output a CRLF which is not terminate buffer
 PHYCRLF:
@@ -109,7 +111,7 @@ PHYCRLF:
 ;Zap the line without zapping the template
         entry   KILNEW
         MOV     AL,"\"
-        invoke  OUT             ;Print the CANCEL indicator
+        invoke  OUT_ROUTINE     ;Print the CANCEL indicator
         POP     SI              ;Remember start of edit buffer
 PUTNEW:
         invoke  CRLF            ;Go to next line on screen
@@ -175,11 +177,11 @@ BACKUP:
         DEC     DI
 BACKMES:
         MOV     AL,c_BS         ;Backspace
-        invoke  OUT
+        invoke  OUT_ROUTINE
         MOV     AL," "          ;Erase
-        invoke  OUT
+        invoke  OUT_ROUTINE
         MOV     AL,c_BS         ;Backspace
-        JMP     OUT             ;Done
+        JMP     OUT_ROUTINE     ;Done
 
 ;User really wants an ESC character in his line
         entry   TwoEsc
@@ -208,7 +210,7 @@ COPYEACH:
         JZ      GETCH2                  ;At end of template, can't do anything
         LODSB
         STOSB
-        invoke  BUFOUT
+        invoke  OUT_ROUTINE
         INC     BH                      ;Ahead in template
         INC     DH                      ;Ahead in line
         LOOP    COPYEACH
@@ -268,7 +270,7 @@ NOTFND:
 
         entry   REEDIT
         MOV     AL,"@"          ;Output re-edit character
-        invoke  OUT
+        invoke  OUT_ROUTINE
         POP     DI
         PUSH    DI
         PUSH    ES

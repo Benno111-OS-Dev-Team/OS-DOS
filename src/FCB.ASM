@@ -27,6 +27,9 @@ INCLUDE DEVSYM.ASM
         i_need  SpaceFlag,BYTE
         i_need  Current_Country,WORD
 
+        EXTRN   DATE16:NEAR,GETTHISDRV:NEAR,DEVNAME:NEAR,FATREAD:NEAR
+        EXTRN   GETCURRDIR:NEAR
+
         procedure   MakeFcb,NEAR
 DRVBIT  EQU     2
 NAMBIT  EQU     4

@@ -14,6 +14,11 @@ INCLUDE DEVSYM.ASM
 .cref
 .list
 
+EXTRN   OUT_ROUTINE:NEAR
+EXTRN   CRLF:NEAR,SWAPBACK:NEAR,RESTORE_WORLD:NEAR,COMMAND:NEAR
+EXTRN   FLUSHBUF:NEAR,GET_IO_FCB:NEAR,IOFUNC:NEAR,DEVIOCALL2:NEAR
+EXTRN   $GET_INTERRUPT_VECTOR:NEAR,ARENA_FREE_PROCESS:NEAR,$CLOSE:NEAR
+
         i_need  DevIOBuf,BYTE
         i_need  DidCTRLC,BYTE
         i_need  INDOS,BYTE
@@ -178,7 +183,7 @@ STATCHK ENDP
 ; unchanged and RET (not IRET) with carry CLEAR.  If carry is SET then
 ; an terminate system call is simulated.
         MOV     AL,3                ; Display "^C"
-        invoke  BUFOUT
+        invoke  OUT_ROUTINE
         invoke  CRLF
         PUSH    SS
         POP     DS
