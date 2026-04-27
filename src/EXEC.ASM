@@ -112,8 +112,8 @@ exec_internal_buffer_size   EQU $-exec_internal_buffer
 IF IBM
 exec_ctrlc          DB  ?               ; state of users ctrlc flag
 Exec_low_seg        DW  ?
-CurrentPDB          DW  ?
-NUMIO               DB  ?
+exec_CurrentPDB     DW  ?
+exec_NUMIO          DB  ?
 ZEXECDATASIZ    =       $-ZERO
 ZEXECDATAEND    LABEL   BYTE
         PUBLIC  ZEXECDATAEND
@@ -149,7 +149,7 @@ IF IBM
 
         MOV     AH,Get_current_PDB
         INT     int_command
-        MOV     [CurrentPDB],BX
+        MOV     [exec_CurrentPDB],BX
 ;
 ; set up user return stack info
 ;
@@ -163,7 +163,7 @@ IF IBM
         MOV     DL,AL
         MOV     AH,Set_default_drive
         INT     int_command
-        MOV     [NUMIO],AL
+        MOV     [exec_NUMIO],AL
 ;
 ; determine lowest seg address for overwrite problem (round DOWN)
 ;
@@ -234,7 +234,7 @@ exec_check_environ:
         MOV     AX,[SI].Exec1_environ   ; address of environ
         OR      AX,AX
         JNZ     exec_scan_env
-        MOV     DS,[CurrentPDB]
+        MOV     DS,[exec_CurrentPDB]
         MOV     AX,DS:[PDB_environ]
         MOV     [exec_environ],AX
         OR      AX,AX
@@ -817,7 +817,7 @@ IF IBM
         MOV     AH,DUP_PDB
         INT     int_command
         MOV     ES,DX
-        MOV     [CurrentPDB],DX
+        MOV     [exec_CurrentPDB],DX
 ENDIF
 IF NOT IBM
         MOV     BYTE PTR [CreatePDB], 0FFH  ; indicate a new process
@@ -866,14 +866,14 @@ ENDIF
 ; Process BX into default AX (validity of drive specs on args)
 ;
         DEC     CL                      ; get 0FFh in CX
-        CMP     BH,[NUMIO]
+        CMP     BH,[exec_NUMIO]
         JBE     exec_BH_good
         MOV     BH,CL
         JMP     SHORT exec_BL
 exec_BH_good:
         XOR     BH,BH
 exec_BL:
-        CMP     BL,[NUMIO]
+        CMP     BL,[exec_NUMIO]
         JBE     exec_BL_good
         MOV     BL,CL
         JMP     SHORT exec_set_return
@@ -893,13 +893,13 @@ exec_set_return:
         POP     DS:[addr_int_terminate+2]   ; when the child exits.
 IF NOT IBM
         MOV     WORD PTR [DMAADD],80h
-        MOV     DS,[CurrentPDB]
+        MOV     DS,[exec_CurrentPDB]
         MOV     WORD PTR [DMAADD+2],DS
 ENDIF
 IF IBM
         PUSH    DX
         PUSH    DS
-        MOV     DS,[CurrentPDB]
+        MOV     DS,[exec_CurrentPDB]
         MOV     DX,80h
         MOV     AH,SET_DMA
         INT     int_command
@@ -959,7 +959,7 @@ exec_dealloc  ENDP
 
         procedure   exec_alloc,near
         PUSH        BX
-        MOV         BX,[CurrentPDB]
+        MOV         BX,[exec_CurrentPDB]
         CALL        exec_do_change_owner
         POP         BX
         return
