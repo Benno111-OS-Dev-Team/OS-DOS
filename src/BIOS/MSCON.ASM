@@ -1,5 +1,6 @@
 	PAGE ,132 ;
 	TITLE MSCON - BIOS
+	OPTION M510		; Enable MASM 5.10 compatibility: EQU offsets with '.'
 	%OUT	...MSCON.ASM
 ;==============================================================================
 ;REVISION HISTORY:
