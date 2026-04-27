@@ -14,6 +14,9 @@ INCLUDE DEVSYM.ASM
 .cref
 .list
 
+        EXTRN   COMMAND:NEAR,$SETBLOCK:NEAR,get_user_stack:NEAR
+        EXTRN   abort_inner:NEAR,SYS_RET_OK:NEAR
+
     i_need  CurrentPDB,WORD
     i_need  CreatePDB,BYTE
     i_need  NUMIO,BYTE
