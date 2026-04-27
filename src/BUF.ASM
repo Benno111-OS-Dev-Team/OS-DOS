@@ -117,7 +117,6 @@ ASSUME  DS:NOTHING,ES:NOTHING
 ; AL    -- Inserted, Buf has been inserted
 ; AH    -- Removed, Buf has been removed
 
-        IF      IBM
         IF      NOT IBM
         invoke  save_world
         XOR     AX,AX           ; Inserted = Removed = FALSE
@@ -207,7 +206,6 @@ NODEC:
         CMP     DI,-1
         JNZ     DECLOOP
         JMP     SHORT NRET
-        ENDIF
         ENDIF
 
         invoke  save_world
