@@ -181,7 +181,7 @@ DSKSTCOM        DB      DEVRDND
         I_AM    DSKSTST,WORD
                 DB      8 DUP (0)
         I_AM    DSKCHRET,BYTE
-                short_addr  DSKCHRETBUF
+                short_addr  DSKCHRET_TMP
                 DW      ?               ; DOS segment set at Init
         PUBLIC  DSKSTCNT
 DSKSTCNT        DW      1
@@ -237,7 +237,7 @@ DATA    SEGMENT WORD PUBLIC 'DATA'
         i_am    INBUF,128
         I_AM    CONBUF,131              ; The rest of INBUF and console buffer
         i_am    TIMEBUF,6
-        I_AM    DSKCHRETBUF,2               ; Buffer for I/O under file assignment
+        I_AM    DSKCHRET_TMP,2              ; Buffer for I/O under file assignment
         I_AM    EXITHOLD,DWORD
 
         PUBLIC  DevFCB

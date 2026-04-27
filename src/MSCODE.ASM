@@ -310,7 +310,7 @@ DISPATCH    LABEL WORD
         short_addr  $FCB_SEQ_WRITE                  ; 21     15
         short_addr  $FCB_CREATE                     ; 22     16
         short_addr  $FCB_RENAME                     ; 23     17
-        short_addr  CPMFUNC_ROUTINE                 ; 24     18
+        short_addr  CPMFUNC_ROUTINE_ENTRY           ; 24     18
         short_addr  $GET_DEFAULT_DRIVE              ; 25     19
         short_addr  $SET_DMA                        ; 26     1A
 
@@ -323,8 +323,8 @@ DISPATCH    LABEL WORD
 ;            C  A  V  E  A  T     P  R  O  G  R  A  M  M  E  R             ;
 ;----+----+----+----+----+----+----+----+----+----+----+----+----+----+----;
 
-        short_addr  CPMFUNC_ROUTINE                 ; 29     1D
-        short_addr  CPMFUNC_ROUTINE                 ; 30     1E
+        short_addr  CPMFUNC_ROUTINE_ENTRY           ; 29     1D
+        short_addr  CPMFUNC_ROUTINE_ENTRY           ; 30     1E
 ;----+----+----+----+----+----+----+----+----+----+----+----+----+----+----;
 ;            C  A  V  E  A  T     P  R  O  G  R  A  M  M  E  R             ;
 ;                                                                          ;
@@ -332,7 +332,7 @@ DISPATCH    LABEL WORD
 ;                                                                          ;
 ;            C  A  V  E  A  T     P  R  O  G  R  A  M  M  E  R             ;
 ;----+----+----+----+----+----+----+----+----+----+----+----+----+----+----;
-        short_addr  CPMFUNC_ROUTINE                 ; 32     20
+        short_addr  CPMFUNC_ROUTINE_ENTRY           ; 32     20
         short_addr  $FCB_RANDOM_READ                ; 33     21
         short_addr  $FCB_RANDOM_WRITE               ; 34     22
         short_addr  $GET_FCB_FILE_LENGTH            ; 35     23
@@ -407,8 +407,8 @@ MAXCALL =       ($-DISPATCH)/2 - 1
 ;----+----+----+----+----+----+----+----+----+----+----+----+----+----+----;
 ;            C  A  V  E  A  T     P  R  O  G  R  A  M  M  E  R             ;
 ;                                                                          ;
-        short_addr  SET_CURRENT_PDB_PROC            ; 80     50
-        short_addr  GET_CURRENT_PDB_PROC            ; 81     51
+        short_addr  SET_CURRENT_PDB_ROUTINE         ; 80     50
+        short_addr  GET_CURRENT_PDB_ROUTINE         ; 81     51
         short_addr  $GET_IN_VARS                    ; 82     52
         short_addr  $SETDPB                         ; 83     53
 ;                                                                          ;
@@ -428,7 +428,7 @@ MAXCALL =       ($-DISPATCH)/2 - 1
 
 MAXCOM  =       ($-DISPATCH)/2 - 1
 
-CPMFUNC_ROUTINE:
+CPMFUNC_ROUTINE_ENTRY:
         XOR     AL,AL
         return
 
@@ -468,23 +468,23 @@ ASSUME  SS:DOSGROUP
 ; $Set_current_PDB takes BX and sets it to be the current process
 ;   *** THIS FUNCTION CALL IS SUBJECT TO CHANGE!!! ***
 ;
-        procedure   SET_CURRENT_PDB_PROC,NEAR
+        procedure   SET_CURRENT_PDB_ROUTINE,NEAR
         ASSUME  DS:NOTHING,SS:NOTHING
         MOV     [CurrentPDB],BX
         return
-SET_CURRENT_PDB_PROC    ENDP
+SET_CURRENT_PDB_ROUTINE    ENDP
 
 ;
 ; $get_current_PDB returns in BX the current process
 ;   *** THIS FUNCTION CALL IS SUBJECT TO CHANGE!!! ***
 ;
-        procedure   GET_CURRENT_PDB_PROC,NEAR
+        procedure   GET_CURRENT_PDB_ROUTINE,NEAR
         ASSUME  DS:NOTHING,SS:NOTHING
         invoke  get_user_stack
         PUSH    [CurrentPDB]
         POP     [SI.user_BX]
         return
-GET_CURRENT_PDB_PROC    ENDP
+GET_CURRENT_PDB_ROUTINE    ENDP
 ;                                                                          ;
 ;            C  A  V  E  A  T     P  R  O  G  R  A  M  M  E  R             ;
 ;----+----+----+----+----+----+----+----+----+----+----+----+----+----+----;
