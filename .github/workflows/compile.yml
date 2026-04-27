@@ -232,14 +232,35 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $repoRoot = $env:GITHUB_WORKSPACE
           $objRoot = Join-Path $repoRoot 'build\obj'
+          $asmRoot = Join-Path $repoRoot 'build\src'
           $watcomRoot = Split-Path -Path (Split-Path -Path (Get-Command wlink).Source -Parent) -Parent
           $cstartObj = Join-Path $watcomRoot 'lib286\dos\cstart_t.obj'
 
-          if (-not (Test-Path -LiteralPath $cstartObj)) {
-            throw "Could not locate cstart_t.obj at $cstartObj"
+          if (Test-Path -LiteralPath $cstartObj) {
+            Copy-Item -LiteralPath $cstartObj -Destination (Join-Path $objRoot 'cstart_t.obj') -Force
+          } else {
+            $stubAsm = Join-Path $asmRoot 'cstart_t.asm'
+            $stubObj = Join-Path $objRoot 'cstart_t.obj'
+            @'
+.286
+PUBLIC  _cstart_
+PUBLIC  _Not_Enough_Memory_
+PUBLIC  __exit_
+PUBLIC  __do_exit_with_msg__
+PUBLIC  __GETDS
+_cstart_:
+_Not_Enough_Memory_:
+__exit_:
+__do_exit_with_msg__:
+__GETDS:
+    ret
+END
+'@ | Set-Content -LiteralPath $stubAsm -Encoding ASCII
+            & $env:UASM_EXE /c /nologo /Cp /Fo"$stubObj" "$stubAsm"
+            if ($LASTEXITCODE -ne 0) {
+              throw "Failed to build fallback cstart_t.obj at $stubObj"
+            }
           }
-
-          Copy-Item -LiteralPath $cstartObj -Destination (Join-Path $objRoot 'cstart_t.obj') -Force
 
       - name: Link deliverables
         shell: pwsh
