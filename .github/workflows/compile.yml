@@ -69,7 +69,7 @@ jobs:
             throw 'UASM makefile not found.'
           }
 
-          & nmake /nologo /f $makefile VCDIR=$compatRoot W32LIB=$sdkLib
+          & nmake /nologo /f $makefile VCDIR=$compatRoot W32LIB=$sdkLib LOPT=/NOLOGO
 
       - name: Locate UASM
         shell: pwsh
