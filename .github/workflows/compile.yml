@@ -152,6 +152,9 @@ jobs:
                 $content = $content -replace '\bJZ\s+RETF\b', 'JZ      RETFOUND'
                 $content = $content -replace '(?m)^RETF:$', 'RETFOUND:'
               }
+              'BUF.ASM' {
+                $content = $content -replace '\bNRETIBM\b', 'NRET2'
+              }
             }
 
             [System.IO.File]::WriteAllText($asm.FullName, $content, [System.Text.Encoding]::ASCII)
