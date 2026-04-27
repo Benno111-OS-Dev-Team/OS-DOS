@@ -1,0 +1,5 @@
+C:\Users\Benno111\AppData\Local\Temp\uasm-test\test.asm(1) : Error A2160: INVOKE requires prototype for procedure
+C:\Users\Benno111\AppData\Local\Temp\uasm-test\test.asm(2) : Error A2082: Must be in segment block
+C:\Users\Benno111\AppData\Local\Temp\uasm-test\test.asm(3) : Error A2163: Unmatched macro nesting
+C:\Users\Benno111\AppData\Local\Temp\uasm-test\test.asm(6) : Error A2082: Must be in segment block
+C:\Users\Benno111\AppData\Local\Temp\uasm-test\test.asm(7) : Error A2160: INVOKE requires prototype for procedure

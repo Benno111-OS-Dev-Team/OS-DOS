@@ -1,0 +1,4 @@
+C:\Users\Benno111\AppData\Local\Temp\uasm-test\test2.asm(7) : Error A2082: Must be in segment block
+C:\Users\Benno111\AppData\Local\Temp\uasm-test\test2.asm(8) : Error A2082: Must be in segment block
+ invoke(1)[test2.asm]: Macro called from
+  C:\Users\Benno111\AppData\Local\Temp\uasm-test\test2.asm(8): Main line code

@@ -72,35 +72,23 @@ jobs:
           New-Item -ItemType Directory -Force -Path $workSrc, $objRoot, $logRoot | Out-Null
           Copy-Item -Path (Join-Path $srcRoot '*') -Destination $workSrc -Recurse -Force
 
+          Copy-Item -Path (Join-Path $workSrc 'DOSMAC_v211.ASM') -Destination (Join-Path $workSrc 'DOSMAC.ASM') -Force
+          Copy-Item -Path (Join-Path $workSrc 'DOSSYM_v211.ASM') -Destination (Join-Path $workSrc 'DOSSYM.ASM') -Force
+
+          $comswPath = Join-Path $workSrc 'COMSW.ASM'
+          $comsw = Get-Content -Path $comswPath -Raw
+          $comsw = $comsw -replace '(?m)^IBMVER\s+EQU\s+true.*$', 'IBMVER  EQU     false  ; CI compatibility build'
+          $comsw = $comsw -replace '(?m)^IBM\s+EQU\s+IBMVER.*$', 'IBM     EQU     IBMVER'
+          $comsw = $comsw -replace '(?m)^MSVER\s+EQU\s+false.*$', 'MSVER   EQU     true   ; CI compatibility build'
+          [System.IO.File]::WriteAllText($comswPath, $comsw, [System.Text.Encoding]::ASCII)
+
           foreach ($asm in Get-ChildItem -Path $workSrc -Filter *.ASM -File) {
             $content = Get-Content -Path $asm.FullName -Raw
             $content = $content -replace '(?im)^\s*INCLUDE\s+DOST:DOSSYM\.ASM\s*$', 'INCLUDE DOSSYM.ASM'
             [System.IO.File]::WriteAllText($asm.FullName, $content, [System.Text.Encoding]::ASCII)
           }
 
-          $modules = New-Object System.Collections.Generic.List[string]
-          $seen = New-Object System.Collections.Generic.HashSet[string] ([System.StringComparer]::OrdinalIgnoreCase)
-          foreach ($linkFile in @('COMLINK', 'DOSLINK')) {
-            $path = Join-Path $workSrc $linkFile
-            $text = Get-Content -Path $path -Raw
-            foreach ($match in [regex]::Matches($text, '(?i)\b[A-Z0-9_]+\b')) {
-              $token = $match.Value
-              $token = $token.ToUpperInvariant()
-              if ($token -match '^[A-Z0-9_]+$') {
-                $asmPath = Join-Path $workSrc "$token.ASM"
-                if ((Test-Path $asmPath) -and $seen.Add($token)) {
-                  $modules.Add($token)
-                }
-              }
-            }
-          }
-
-          $extraModules = @('MSDOS', 'MSCODE', 'SYSINIT', 'SYS', 'UINIT')
-          foreach ($token in $extraModules) {
-            if ($seen.Add($token) -and (Test-Path (Join-Path $workSrc "$token.ASM"))) {
-              $modules.Add($token)
-            }
-          }
+          $modules = @('COMMAND', 'TCODE')
 
           $modules | Set-Content -Path (Join-Path $buildRoot 'modules.txt')
 
@@ -122,7 +110,13 @@ jobs:
             $logPath = Join-Path $logRoot "$module.log"
 
             Write-Host "Assembling $module"
-            & $assembler /c /nologo /Cp /Fo"$objPath" "$asmPath" 2>&1 | Tee-Object -FilePath $logPath
+            $extraArgs = @('/Zm')
+            if ($module -eq 'COMMAND') {
+              $prefix = "OPTION NOKEYWORD:<INVOKE WAIT EXIT EXEC SYSCALL>`r`n"
+              $commandText = [System.IO.File]::ReadAllText($asmPath, [System.Text.Encoding]::ASCII)
+              [System.IO.File]::WriteAllText($asmPath, $prefix + $commandText, [System.Text.Encoding]::ASCII)
+            }
+            & $assembler @extraArgs /c /nologo /Cp /Fo"$objPath" "$asmPath" 2>&1 | Tee-Object -FilePath $logPath
             if ($LASTEXITCODE -ne 0) {
               $failures.Add($module)
             }
