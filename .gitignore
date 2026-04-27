@@ -6,3 +6,5 @@ test*.err
 *.obj
 *.log
 *.tmp
+/*build*/
+/dist/

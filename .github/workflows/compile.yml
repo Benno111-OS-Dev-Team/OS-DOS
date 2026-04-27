@@ -78,31 +78,6 @@ jobs:
           $dosmac = $dosmac -replace '(?m)^\s*JUMP\s+name\s*$', ' JMP name'
           [System.IO.File]::WriteAllText((Join-Path $workSrc 'DOSMAC.ASM'), $dosmac, [System.Text.Encoding]::ASCII)
           Set-Content -Path (Join-Path $workSrc 'IO.ASM') -Value 'END' -Encoding ASCII
-          $aliasLines = @(
-            'WAIT EQU Wait'
-            'DISK_RESET EQU Disk_Reset'
-            'EXIT EQU Exit'
-            'DEALLOC EQU Dealloc'
-            'SET_CURRENT_PDB EQU Set_Current_PDB'
-            'GET_CURRENT_PDB EQU Get_Current_PDB'
-            'ALLOC EQU Alloc'
-            'SET_VERIFY_ON_WRITE EQU Set_Verify_On_Write'
-            'CHAR_OPER EQU Char_Oper'
-            'RAW_CON_IO EQU Raw_Con_IO'
-            'RAW_CON_INPUT EQU Raw_Con_Input'
-            'STD_CON_INPUT EQU Std_Con_Input'
-            'STD_CON_INPUT_NO_ECHO EQU Std_Con_Input_No_Echo'
-            'STD_CON_STRING_OUTPUT EQU Std_Con_String_Output'
-            'STD_CON_STRING_INPUT EQU Std_Con_String_Input'
-            'STD_CON_INPUT_STATUS EQU Std_Con_Input_Status'
-            'CLOSE EQU Close'
-            'STD_CON_INPUT_FLUSH EQU Std_Con_Input_Flush'
-            'OPEN EQU Open'
-            'LSEEK EQU LSeek'
-            'READ EQU Read'
-            'SET_INTERRUPT_VECTOR EQU Set_Interrupt_Vector'
-          )
-          Add-Content -Path (Join-Path $workSrc 'DOSSYM.ASM') -Value ($aliasLines -join "`r`n") -Encoding ASCII
 
           $comswPath = Join-Path $workSrc 'COMSW.ASM'
           $comsw = Get-Content -Path $comswPath -Raw
@@ -122,6 +97,9 @@ jobs:
             $content = $content -replace '(?im)^\s*i_am\b', 'I_AM'
             $content = $content -replace '(?im)\btrue\b', 'TRUE'
             $content = $content -replace '(?im)\bfalse\b', 'FALSE'
+            if ($asm.Name -notin @('DOSMAC.ASM', 'DOSMAC_v211.ASM')) {
+              $content = $content -replace '(?im)\bINVOKE\b', 'CALL'
+            }
 
             switch ($asm.Name.ToUpperInvariant()) {
               'COMMAND.ASM' {
@@ -180,72 +158,26 @@ jobs:
             [System.IO.File]::WriteAllText($asm.FullName, $content, [System.Text.Encoding]::ASCII)
           }
 
+          function Get-ModuleNames {
+            param([string]$Path)
+            $text = Get-Content -Path $Path -Raw
+            $text = $text -replace '\r?\n', ' '
+            $text = $text -replace '\s*\+\s*', ' '
+            $text = $text -replace ';', ' '
+            return $text -split '\s+' | Where-Object { $_ }
+          }
+
           $modules = @(
-            'COMMAND'
-            'UINIT'
-            'STDIO'
-            'TIME'
-          )
+            (Get-ModuleNames (Join-Path $srcRoot 'COMLINK'))
+            (Get-ModuleNames (Join-Path $srcRoot 'DOSLINK'))
+            'SKELIO'
+            'SYSINIT'
+            'SYSIMES'
+            'SYS'
+            'EXE2BIN'
+          ) | ForEach-Object { $_.ToUpperInvariant() } | Select-Object -Unique
 
           $modules | Set-Content -Path (Join-Path $buildRoot 'modules.txt')
-
-          $keywords = @(
-            'INVOKE'
-            'JUMP'
-            'WAIT'
-            'EXIT'
-            'EXEC'
-            'SYSCALL'
-            'READ'
-            'WRITE'
-            'OPEN'
-            'CLOSE'
-            'LSEEK'
-            'ALLOC'
-            'DEALLOC'
-            'SET_CURRENT_PDB'
-            'GET_CURRENT_PDB'
-            'SET_VERIFY_ON_WRITE'
-            'RAW_CON_INPUT'
-            'STD_CON_INPUT'
-            'STD_CON_INPUT_NO_ECHO'
-            'STD_CON_STRING_OUTPUT'
-            'STD_CON_STRING_INPUT'
-            'STD_CON_INPUT_STATUS'
-            'STD_CON_INPUT_FLUSH'
-            'SET_INTERRUPT_VECTOR'
-            'DISK_RESET'
-            'CHAR_OPER'
-            'GET_IN_VARS'
-            'SETDPB'
-            'GET_VERIFY_ON_WRITE'
-            'DUP_PDB'
-            'RENAME'
-            'FILE_TIMES'
-            'ALLOCOPER'
-            'GETEXTENDEDERROR'
-            'CREATETEMPFILE'
-            'CREATENEWFILE'
-            'LOCKOPER'
-            'SERVERCALL'
-            'USERIDOPER'
-            'ASSIGNOPER'
-            'SET_OEM_HANDLER'
-            'UNLINK'
-            'CHMOD'
-            'IOCTL'
-            'XDUP'
-            'XDUP2'
-            'CURRENT_DIR'
-            'SETBLOCK'
-            'FIND_FIRST'
-            'FIND_NEXT'
-            'OUT'
-            'ECHO'
-            'GOTO'
-            'IRET'
-          )
-          $keywords | Set-Content -Path (Join-Path $buildRoot 'nokeyword.txt')
 
       - name: Compile modules
         shell: pwsh
@@ -266,8 +198,7 @@ jobs:
 
             Write-Host "Assembling $module"
             $extraArgs = @('/Zm')
-            $nokeyword = (Get-Content -Path (Join-Path $repoRoot 'build\nokeyword.txt') -Raw).Trim() -replace '\s+', ' '
-            $prefix = "OPTION CASEMAP:ALL`r`nOPTION NOKEYWORD:<$nokeyword>`r`n"
+            $prefix = "OPTION CASEMAP:ALL`r`n"
             $commandText = [System.IO.File]::ReadAllText($asmPath, [System.Text.Encoding]::ASCII)
             [System.IO.File]::WriteAllText($asmPath, $prefix + $commandText, [System.Text.Encoding]::ASCII)
             & $assembler @extraArgs /c /nologo /Cp /Fo"$objPath" "$asmPath" 2>&1 | Tee-Object -FilePath $logPath
@@ -284,9 +215,53 @@ jobs:
 
           Write-Host "Compile completed successfully."
 
+      - name: Link deliverables
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $repoRoot = $env:GITHUB_WORKSPACE
+          $objRoot = Join-Path $repoRoot 'build\obj'
+          $distRoot = Join-Path $repoRoot 'dist'
+          $logRoot = Join-Path $repoRoot 'build\logs'
+
+          New-Item -ItemType Directory -Force -Path $distRoot | Out-Null
+
+          function Get-ModuleNames {
+            param([string]$Path)
+            $text = Get-Content -Path $Path -Raw
+            $text = $text -replace '\r?\n', ' '
+            $text = $text -replace '\s*\+\s*', ' '
+            $text = $text -replace ';', ' '
+            return $text -split '\s+' | Where-Object { $_ }
+          }
+
+          function Link-Group {
+            param(
+              [string]$OutputName,
+              [string[]]$Modules
+            )
+
+            $objArgs = $Modules | ForEach-Object { Join-Path $objRoot "$_.obj" }
+            $outPath = Join-Path $distRoot $OutputName
+            $logPath = Join-Path $logRoot "$OutputName.link.log"
+            Write-Host "Linking $OutputName"
+            & link /nologo "/out:$outPath" @objArgs 2>&1 | Tee-Object -FilePath $logPath
+            if ($LASTEXITCODE -ne 0) {
+              throw "Link failed for $OutputName"
+            }
+          }
+
+          $commandModules = Get-ModuleNames (Join-Path $repoRoot 'src\COMLINK') | ForEach-Object { $_.ToUpperInvariant() }
+          $dosModules = Get-ModuleNames (Join-Path $repoRoot 'src\DOSLINK') | ForEach-Object { $_.ToUpperInvariant() }
+          Link-Group -OutputName 'COMMAND.COM' -Modules $commandModules
+          Link-Group -OutputName 'MSDOS.SYS' -Modules $dosModules
+          Link-Group -OutputName 'IO.SYS' -Modules @('SKELIO','SYSINIT','SYSIMES')
+          Link-Group -OutputName 'SYS.EXE' -Modules @('SYS')
+          Link-Group -OutputName 'EXE2BIN.EXE' -Modules @('EXE2BIN')
+
       - name: Upload object files
         uses: actions/upload-artifact@v4
         with:
-          name: os-dos-objects-${{ github.run_number }}
-          path: build/obj
+          name: os-dos-images-${{ github.run_number }}
+          path: dist
           if-no-files-found: error

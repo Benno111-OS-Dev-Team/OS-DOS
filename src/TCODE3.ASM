@@ -44,7 +44,7 @@ ASSUME  CS:TRANGROUP,DS:NOTHING,ES:NOTHING,SS:NOTHING
         EXTRN   PRINT:NEAR,TCOMMAND:NEAR,DELIM:NEAR,GETBATBYT:NEAR
         EXTRN   FCB_TO_ASCZ:NEAR
 
-        PUBLIC  GOTO,$IF,IFERLEV,SHIFT,IFEXISTS
+        PUBLIC  GOTO_CMD,$IF,IFERLEV,SHIFT,IFEXISTS
         PUBLIC  STRCOMP,MesTran,$FOR,IFNOT
         PUBLIC  FORPROC,BATOPEN,BATCLOSE
         PUBLIC  IOSET,TESTDOREIN,TESTDOREOUT
@@ -305,7 +305,7 @@ IFINDCOM:
         JCXZ    IFSTRING
         JMP     SHORT FIRSTCOMP
 IFCOMP:
-        JNZ     IFDIF
+        JNZ     IFDIFF
 FIRSTCOMP:
         LODSB
         MOV     AH,ES:[DI]
@@ -316,7 +316,7 @@ FIRSTCOMP:
         CMP     AL,AH
 IFLP:
         LOOP    IFCOMP
-IFDIF:
+IFDIFF:
         LAHF
         ADD     DI,CX           ; Bump to next position without affecting flags
         MOV     BX,[DI]         ; Get handler address
@@ -479,7 +479,7 @@ SKIPCRLP:
 
 
 ASSUME  DS:TRANGROUP,ES:TRANGROUP
-GOTO:
+GOTO_CMD:
         MOV     DS,[RESSEG]
 ASSUME  DS:RESGROUP
         TEST    [BATCH],-1
@@ -674,4 +674,4 @@ STRCOMP:
 
 TRANCODE        ENDS
         END
-                                                
+                                                
