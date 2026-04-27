@@ -233,22 +233,10 @@ jobs:
           $repoRoot = $env:GITHUB_WORKSPACE
           $objRoot = Join-Path $repoRoot 'build\obj'
           $watcomRoot = Split-Path -Path (Split-Path -Path (Get-Command wlink).Source -Parent) -Parent
-          $candidateFiles = @(
-            (Join-Path $watcomRoot 'lib286\dos\cstart_t.obj')
-            (Join-Path $watcomRoot 'lib286\cstart_t.obj')
-            (Join-Path $env:WATCOM 'lib286\dos\cstart_t.obj')
-            (Join-Path $env:WATCOM 'lib286\cstart_t.obj')
-            'C:\WATCOM\lib286\dos\cstart_t.obj'
-            'C:\WATCOM\lib286\cstart_t.obj'
-            'C:\OpenWatcom\lib286\dos\cstart_t.obj'
-            'C:\OpenWatcom\lib286\cstart_t.obj'
-            'C:\openwatcom\lib286\dos\cstart_t.obj'
-            'C:\openwatcom\lib286\cstart_t.obj'
-          ) | Where-Object { $_ } | Select-Object -Unique
+          $cstartObj = Join-Path $watcomRoot 'lib286\dos\cstart_t.obj'
 
-          $cstartObj = $candidateFiles | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-          if (-not $cstartObj) {
-            throw "Could not locate cstart_t.obj. Checked: $($candidateFiles -join ', ')"
+          if (-not (Test-Path -LiteralPath $cstartObj)) {
+            throw "Could not locate cstart_t.obj at $cstartObj"
           }
 
           Copy-Item -LiteralPath $cstartObj -Destination (Join-Path $objRoot 'cstart_t.obj') -Force
