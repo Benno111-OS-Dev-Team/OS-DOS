@@ -296,13 +296,20 @@ jobs:
             $logPath = Join-Path $logRoot "$OutputName.link.log"
             $linkPath = Join-Path $logRoot "$OutputName.lnk"
             $linkScript = @('option quiet', "name $outPath")
-            if ($System -eq 'com') {
-              $linkScript += "libpath $objRoot"
-            }
-            $linkScript += "system $System"
             $fileArgs = @()
             $fileArgs += $objArgs
-            if ($System -eq 'com' -or $System -eq 'dos') {
+            if ($System -eq 'com') {
+              $linkScript += 'system begin osdoscom'
+              $linkScript += "  option osname='DOS .COM'"
+              $linkScript += "  libpath $objRoot"
+              $linkScript += "  libpath $watcomRoot\lib286"
+              $linkScript += "  libpath $watcomRoot\lib286\dos"
+              $linkScript += '  libfile cstart_t.obj'
+              $linkScript += '  format dos com'
+              $linkScript += 'end'
+              $linkScript += 'system osdoscom'
+            } else {
+              $linkScript += "system $System"
               $linkScript += "libpath $watcomRoot\lib286"
               $linkScript += "libpath $watcomRoot\lib286\dos"
             }
