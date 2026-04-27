@@ -29,11 +29,6 @@ jobs:
         with:
           arch: x86
 
-      - name: Verify toolchain
-        shell: cmd
-        run: |
-          where link || exit /b 1
-
       - name: Download UASM
         shell: pwsh
         run: |
@@ -57,6 +52,21 @@ jobs:
           }
 
           "UASM_EXE=$($uasmExe.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding ascii
+
+      - name: Download Open Watcom
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $owExe = Join-Path $env:GITHUB_WORKSPACE 'open-watcom-c-win32-1.9.exe'
+          Invoke-WebRequest -Uri 'https://github.com/open-watcom/open-watcom-1.9/releases/download/ow1.9/open-watcom-c-win32-1.9.exe' -OutFile $owExe
+          Start-Process -FilePath $owExe -ArgumentList '-s' -Wait -WindowStyle Hidden
+          "WATCOM=C:\WATCOM" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding ascii
+          "C:\WATCOM\binnt" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding ascii
+
+      - name: Verify toolchain
+        shell: cmd
+        run: |
+          where wlink || exit /b 1
 
       - name: Prepare build tree
         shell: pwsh
@@ -225,6 +235,7 @@ jobs:
           $objRoot = Join-Path $repoRoot 'build\obj'
           $distRoot = Join-Path $repoRoot 'dist'
           $logRoot = Join-Path $repoRoot 'build\logs'
+          $wlinkExe = (Get-Command wlink).Source
 
           New-Item -ItemType Directory -Force -Path $distRoot | Out-Null
 
@@ -240,14 +251,24 @@ jobs:
           function Link-Group {
             param(
               [string]$OutputName,
-              [string[]]$Modules
+              [string[]]$Modules,
+              [ValidateSet('com', 'dos')]
+              [string]$System
             )
 
             $objArgs = $Modules | ForEach-Object { Join-Path $objRoot "$_.obj" }
             $outPath = Join-Path $distRoot $OutputName
             $logPath = Join-Path $logRoot "$OutputName.link.log"
+            $linkPath = Join-Path $logRoot "$OutputName.lnk"
+            $linkScript = @(
+              'option quiet'
+              "system $System"
+              "name $outPath"
+              "file $($objArgs -join ', ')"
+            )
+            Set-Content -Path $linkPath -Value $linkScript -Encoding ASCII
             Write-Host "Linking $OutputName"
-            & link /nologo "/out:$outPath" @objArgs 2>&1 | Tee-Object -FilePath $logPath
+            & $wlinkExe "@$linkPath" 2>&1 | Tee-Object -FilePath $logPath
             if ($LASTEXITCODE -ne 0) {
               throw "Link failed for $OutputName"
             }
@@ -255,11 +276,11 @@ jobs:
 
           $commandModules = Get-ModuleNames (Join-Path $repoRoot 'src\COMLINK') | ForEach-Object { $_.ToUpperInvariant() }
           $dosModules = Get-ModuleNames (Join-Path $repoRoot 'src\DOSLINK') | ForEach-Object { $_.ToUpperInvariant() }
-          Link-Group -OutputName 'COMMAND.COM' -Modules $commandModules
-          Link-Group -OutputName 'MSDOS.SYS' -Modules $dosModules
-          Link-Group -OutputName 'IO.SYS' -Modules @('SKELIO','SYSINIT','SYSIMES')
-          Link-Group -OutputName 'SYS.EXE' -Modules @('SYS')
-          Link-Group -OutputName 'EXE2BIN.EXE' -Modules @('EXE2BIN')
+          Link-Group -OutputName 'COMMAND.COM' -Modules $commandModules -System 'com'
+          Link-Group -OutputName 'MSDOS.SYS' -Modules $dosModules -System 'dos'
+          Link-Group -OutputName 'IO.SYS' -Modules @('SKELIO','SYSINIT','SYSIMES') -System 'dos'
+          Link-Group -OutputName 'SYS.EXE' -Modules @('SYS') -System 'dos'
+          Link-Group -OutputName 'EXE2BIN.EXE' -Modules @('EXE2BIN') -System 'dos'
 
       - name: Upload object files
         uses: actions/upload-artifact@v4
