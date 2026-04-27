@@ -39,7 +39,7 @@ DivMesLen   DB  $-DivMes        ; Length of the above message in bytes
         PUBLIC  Current_Country
 
         IF KANJI
-Current_Country DW      OFFSET DOSGROUP:JAPTABLE
+Current_Country DW      OFFSET DOSGROUP:JAPTABLE_KANJI
         ELSE
 Current_Country DW      OFFSET DOSGROUP:USTABLE
         ENDIF
@@ -83,7 +83,7 @@ international_table LABEL       BYTE
         IF KANJI
                     DB  SIZE internat_block   ; Size in bytes of this table
                     DB  81              ; Country code
-JAPTABLE internat_block <2,'\',0,0,0,0,',',0,'.',0,'-',0,':',0,0,0,1,OFFSET DOSGROUP:MAP_DCASE , 0,',',0>
+JAPTABLE_KANJI internat_block <2,'\',0,0,0,0,',',0,'.',0,'-',0,':',0,0,0,1,OFFSET DOSGROUP:MAP_DCASE , 0,',',0>
         ENDIF
 
                     DB  SIZE internat_block   ; Size in bytes of this table
@@ -109,7 +109,7 @@ GRMTABLE internat_block <1,'D','M',0,0,0,'.',0,',',0,'.',0,'.',0,3,2,1,OFFSET DO
 FRNTABLE internat_block <1,'F',0,0,0,0,' ',0,',',0,'/',0,':',0,3,2,1,OFFSET DOSGROUP:MAP_DCASE,0,';',0>
                     DB  SIZE internat_block   ; Size in bytes of this table
                     DB  81              ; Country code
-JAPTABLE internat_block <2,9DH,0,0,0,0,',',0,'.',0,'-',0,':',0,0,0,1,OFFSET DOSGROUP:MAP_DCASE , 0,',',0>
+JAPTABLE_IBM internat_block <2,9DH,0,0,0,0,',',0,'.',0,'-',0,':',0,0,0,1,OFFSET DOSGROUP:MAP_DCASE , 0,',',0>
 ENDIF
 ENDIF
                     DB  -1              ; End of tables

@@ -106,8 +106,8 @@ DEVHEAD LABEL   DWORD
 					; BIOS at DOS Init
 
         DW      DEVTYP OR ISNULL
-        short_addr  SNULDEV
-        short_addr  INULDEV
+        short_addr  NULLDEV_SET
+        short_addr  NULLDEV_IO
         DB      "NUL     "
 
 
@@ -180,7 +180,7 @@ DSKSTCOM        DB      DEVRDND
         I_AM    DSKSTST,WORD
                 DB      8 DUP (0)
         I_AM    DSKCHRET,BYTE
-                short_addr  DSKCHRETBUF_AREA
+                short_addr  DSKCHRETBUF
                 DW      ?               ; DOS segment set at Init
         PUBLIC  DSKSTCNT
 DSKSTCNT        DW      1
@@ -223,7 +223,7 @@ OEM_HANDLER     DD      -1
 
         PUBLIC  LEAVEADDR
 LEAVEADDR LABEL WORD
-        short_addr    LEAVE
+        short_addr    SYS_LEAVE
 
 CONSTANTS       ENDS
 
@@ -236,7 +236,7 @@ DATA    SEGMENT WORD PUBLIC 'DATA'
         i_am    INBUF,128
         I_AM    CONBUF,131              ; The rest of INBUF and console buffer
         i_am    TIMEBUF,6
-        I_AM    DSKCHRETBUF_AREA,2          ; Buffer for I/O under file assignment
+        I_AM    DSKCHRETBUF,2               ; Buffer for I/O under file assignment
         I_AM    EXITHOLD,DWORD
 
         PUBLIC  DevFCB

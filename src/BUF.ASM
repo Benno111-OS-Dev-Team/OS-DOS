@@ -94,7 +94,7 @@ ASSUME  DS:NOTHING,ES:NOTHING
         return
 ScanPlace   ENDP
 
-NRETJ:  JMP     SHORT NRET
+NRETJ:  JMP     NRET
 
         procedure   PLACEBUF,NEAR
 ASSUME  DS:NOTHING,ES:NOTHING
@@ -124,7 +124,9 @@ ASSUME  DS:NOTHING,ES:NOTHING
         MOV     ES,SI           ; Buf is ES:DI
         LDS     SI,[BUFFHEAD]   ; Curbuf = HEAD
         CALL    POINTCOMP       ; Buf == HEAD?
-        JNZ     TNEWHEAD
+        JZ      @F
+        JMP     TNEWHEAD
+@@:
         CMP     CX,-1           ; Buf is LAST?
         JZ      NRETJ           ; Only one buffer, nothing to do
         MOV     WORD PTR [BUFFHEAD],CX

@@ -17,7 +17,6 @@ BREAK <I_NEED: declare a variable external, if necessary, and allocate a size>
 ; declare a variable external and allocate a size
 ;
 I_NEED MACRO sym,len
- DATA SEGMENT BYTE PUBLIC 'DATA'
  IFIDN <len>,<WORD>
  EXTRN &sym:WORD
  ELSE
@@ -27,7 +26,6 @@ I_NEED MACRO sym,len
  EXTRN &sym:BYTE
  ENDIF
  ENDIF
- DATA ENDS
 ENDM
 
 ;
@@ -35,11 +33,6 @@ ENDM
 ;
 INVOKE MACRO name
 .xcref
-IF2
-IFNDEF name
-EXTRN name:NEAR
-ENDIF
-ENDIF
 .cref
  CALL name
 ENDM
@@ -50,13 +43,8 @@ PAGE
 ;
 transfer MACRO name
 .xcref
-IF2
-IFNDEF name
-EXTRN name:NEAR
-ENDIF
-ENDIF
 .cref
- JMP name
+ JMP NEAR PTR name
 ENDM
 
 ;
@@ -65,11 +53,6 @@ ENDM
 short_addr MACRO name
  IFDIF <name>,<?>
 .xcref
-IF2
-IFNDEF name
-EXTRN name:NEAR
-ENDIF
-ENDIF
 .cref
  DW OFFSET DOSGROUP:name
  ELSE
@@ -82,11 +65,6 @@ ENDM
 ;
 long_addr MACRO name
 .xcref
-IF2
-IFNDEF name
-EXTRN name:NEAR
-ENDIF
-ENDIF
 .cref
  DD name
 ENDM

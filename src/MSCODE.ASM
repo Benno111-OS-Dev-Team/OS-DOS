@@ -192,7 +192,7 @@ DISPCALL:
 ASSUME  DS:NOTHING
         return
 
-        entry LEAVE
+        entry SYS_LEAVE
 ASSUME  SS:NOTHING                      ; User routines may misbehave
         CLI
         DEC     [INDOS]
@@ -464,14 +464,14 @@ GET_CURRENT_PDB_PROC    ENDP
 ;----+----+----+----+----+----+----+----+----+----+----+----+----+----+----;
 
 BREAK <NullDev -- Driver for null device>
-        procedure   SNULDEV,FAR
+        procedure   NULLDEV_SET,FAR
 ASSUME DS:NOTHING,ES:NOTHING,SS:NOTHING
         MOV     WORD PTR [NULLDEVPT],BX
         MOV     WORD PTR [NULLDEVPT+2],ES
         return
-SNULDEV ENDP
+NULLDEV_SET ENDP
 
-        procedure   INULDEV,FAR
+        procedure   NULLDEV_IO,FAR
         PUSH    ES
         PUSH    BX
         LES     BX,[NULLDEVPT]
@@ -480,7 +480,7 @@ SNULDEV ENDP
         POP     ES
         return
 
-INULDEV ENDP
+NULLDEV_IO ENDP
 
 
 BREAK <AbsDRD, AbsDWRT -- INT int_disk_read, int_disk_write handlers>>

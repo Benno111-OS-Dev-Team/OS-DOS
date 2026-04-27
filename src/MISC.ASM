@@ -243,11 +243,15 @@ ASSUME  DS:NOTHING,ES:NOTHING
         invoke  MOVNAMENOSET
 ASSUME  ES:DOSGROUP
         MOV     DI,DX
-        JC      NEAR PTR KILLSRCH1
+        JNC     @F
+        JMP     KILLSRCH1
+@@:
         MOV     AX,[DI.FILDIRENT]
         LES     BP,DWORD PTR [DI.fcb_DRVBP]
         OR      AX,AX
-        JS      NEAR PTR KILLSRCH1
+        JNS     @F
+        JMP     KILLSRCH1
+@@:
         MOV     BX,[DI.fcb_DRVBP+4]
         PUSH    DX
         PUSH    DS
