@@ -81,6 +81,7 @@ jobs:
 
           New-Item -ItemType Directory -Force -Path $workSrc, $objRoot, $logRoot | Out-Null
           Copy-Item -Path (Join-Path $srcRoot '*') -Destination $workSrc -Recurse -Force
+          Copy-Item -Path (Join-Path $env:WATCOM 'lib286\dos\cstart_t.obj') -Destination (Join-Path $objRoot 'cstart_t.obj') -Force
 
           Copy-Item -Path (Join-Path $workSrc 'DOSMAC_v211.ASM') -Destination (Join-Path $workSrc 'DOSMAC.ASM') -Force
           Copy-Item -Path (Join-Path $workSrc 'DOSSYM_v211.ASM') -Destination (Join-Path $workSrc 'DOSSYM.ASM') -Force
@@ -263,6 +264,9 @@ jobs:
             $logPath = Join-Path $logRoot "$OutputName.link.log"
             $linkPath = Join-Path $logRoot "$OutputName.lnk"
             $linkScript = @('option quiet', "system $System", "name $outPath")
+            if ($System -eq 'com') {
+              $linkScript += "libpath $objRoot"
+            }
             if ($System -eq 'com' -or $System -eq 'dos') {
               $linkScript += "libpath $watcomRoot\lib286"
               $linkScript += "libpath $watcomRoot\lib286\dos"
