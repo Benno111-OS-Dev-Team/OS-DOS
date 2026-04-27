@@ -117,7 +117,7 @@ ASSUME  DS:NOTHING,ES:NOTHING
 ; AL    -- Inserted, Buf has been inserted
 ; AH    -- Removed, Buf has been removed
 
-        IF      NOT IBM
+        IF      IBM EQ 0
         invoke  save_world
         XOR     AX,AX           ; Inserted = Removed = FALSE
         LES     CX,[DI.NEXTBUF]

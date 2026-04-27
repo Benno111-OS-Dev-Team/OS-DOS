@@ -50,7 +50,7 @@ IF IBM
         error   error_invalid_function
 $EXEC   ENDP
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
 INCLUDE EXEC.ASM
 ENDIF
 

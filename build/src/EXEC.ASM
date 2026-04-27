@@ -124,7 +124,7 @@ ZERO =   $
         procedure   $EXEC,FAR
         ASSUME  CS:EGROUP,SS:RESGROUP,ES:NOTHING,DS:NOTHING
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         procedure   $Exec,NEAR
         ASSUME  DS:NOTHING, ES:NOTHING
         EXTRN   $OPEN:NEAR,$IOCTL:NEAR,$ALLOC:NEAR,$READ:NEAR,$CLOSE:NEAR
@@ -205,7 +205,7 @@ IF IBM
         MOV     AX,(OPEN SHL 8) + 0
         INT     int_command
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         XOR     AL,AL                   ; open for reading
         invoke  $OPEN                   ; is the file there?
 ENDIF
@@ -216,7 +216,7 @@ IF IBM
         MOV     AX,(ioctl SHL 8)        ; get device information
         INT     int_command
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         XOR     AL,AL
         invoke  $IOCTL
 ENDIF
@@ -266,7 +266,7 @@ IF IBM
         MOV     AH,ALLOC
         INT     int_command
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         invoke  $ALLOC                  ; can we get the space?
 ENDIF
         POP     DS
@@ -299,7 +299,7 @@ IF IBM
         POP     DS                      ; and put it in DS:DX
         ASSUME  DS:EGROUP
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         PUSH    SS
         POP     DS                      ; and put it in DS:DX
         ASSUME  DS:DOSGROUP
@@ -309,7 +309,7 @@ ENDIF
 IF IBM
         MOV     DX,OFFSET EGROUP:exec_signature
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         MOV     DX,OFFSET DOSGROUP:exec_signature
 ENDIF
         PUSH    ES
@@ -319,7 +319,7 @@ IF IBM
         MOV     AH,READ
         INT     int_command
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         invoke  $READ
 ENDIF
         CALL    exec_alloc
@@ -367,7 +367,7 @@ exec_save_start:
 IF IBM
         JMP     exec_find_res
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         JMP     SHORT exec_find_res
 ENDIF
 
@@ -387,7 +387,7 @@ IF IBM
         MOV     AH,CLOSE
         INT     int_command
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         invoke  $CLOSE
 ENDIF
         POP     AX
@@ -397,7 +397,7 @@ exec_allocate:
 IF IBM
         ASSUME  DS:EGROUP
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         ASSUME  DS:DOSGROUP
 ENDIF
         PUSH    AX
@@ -407,7 +407,7 @@ IF IBM
         MOV     AH,ALLOC
         INT     int_command
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         invoke  $ALLOC                  ; should have carry set and BX has max
 ENDIF
         POP     DS
@@ -440,7 +440,7 @@ IF IBM
         MOV     AH,ALLOC
         INT     int_command
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         invoke  $ALLOC                  ; get the space
 ENDIF
         POP     DS
@@ -505,7 +505,7 @@ IF IBM
         MOV     AX,(LSEEK SHL 8) + 0
         INT     int_command
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         XOR     AL,AL
         invoke  $LSEEK                  ; seek to resident
 ENDIF
@@ -534,7 +534,7 @@ IF IBM
         MOV     AH,READ
         INT     int_command
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         invoke  $READ                   ; WOMP!
 ENDIF
         CALL    exec_alloc
@@ -543,7 +543,7 @@ ENDIF
 IF IBM
         ASSUME  DS:EGROUP
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         ASSUME  DS:DOSGROUP
 ENDIF
         CMP     CX,AX                   ; did we read enough?
@@ -585,7 +585,7 @@ IF IBM
         MOV     AX,(LSEEK SHL 8) + 0
         INT     int_command
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         XOR     AX,AX
         invoke  $LSEEK
 ENDIF
@@ -604,7 +604,7 @@ exec_read_reloc:
 IF IBM
         MOV     DX,OFFSET EGROUP:exec_signature
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         MOV     DX,OFFSET DOSGROUP:exec_signature
 ENDIF
         MOV     CX,((exec_internal_buffer_size)/4)*4
@@ -615,7 +615,7 @@ IF IBM
         MOV     AH,READ
         INT     int_command
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         invoke  $READ
 ENDIF
         CALL    exec_alloc
@@ -626,7 +626,7 @@ ENDIF
 IF IBM
         MOV     DI,OFFSET EGROUP:exec_signature   ; Pointer to byte location in header
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         MOV     DI,OFFSET DOSGROUP:exec_signature   ; Pointer to byte location in header
 ENDIF
 ;
@@ -683,7 +683,7 @@ IF IBM
         MOV     AH,ALLOC
         INT     int_command
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         invoke  $ALLOC                  ; largest piece available as error
 ENDIF
         OR      BX,BX
@@ -693,7 +693,7 @@ IF IBM
         MOV     AH,ALLOC
         INT     int_command
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         PUSH    BX
         invoke  $ALLOC                  ; largest piece available as error
         POP     BX                      ; get size of block...
@@ -735,7 +735,7 @@ IF IBM
         MOV     AX,(LSEEK SHL 8) + 0
         INT     int_command
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         XOR     AX,AX                   ; seek relative to beginning
         invoke  $LSEEK                  ; back to beginning of file
 ENDIF
@@ -749,7 +749,7 @@ IF IBM
         MOV     AH,READ
         INT     int_command
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         invoke  $READ                   ; read in com file
 ENDIF
         CALL    exec_alloc
@@ -760,7 +760,7 @@ IF IBM
         JMP     exec_no_mem
 exec_skip:
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         JZ      exec_no_memj            ; exactly the wrong number... no memory
 ENDIF
         TEST    BYTE PTR [exec_func],exec_func_overlay
@@ -784,7 +784,7 @@ IF IBM
         MOV     AH,CLOSE
         INT     int_command
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         invoke  $CLOSE                  ; release the jfn
 ENDIF
         CALL    exec_alloc
@@ -819,7 +819,7 @@ IF IBM
         MOV     ES,DX
         MOV     [exec_CurrentPDB],DX
 ENDIF
-IF NOT IBM
+IF IBM EQ 0
         MOV     BYTE PTR [CreatePDB], 0FFH  ; indicate a new process
         invoke  $Dup_PDB                    ; ES is now PDB
 ENDIF
@@ -891,7 +891,7 @@ exec_set_return:
         MOV     DS,AX
         POP     DS:[addr_int_terminate] ; save them where we can get them later
         POP     DS:[addr_int_terminate+2]   ; when the child exits.
-IF NOT IBM
+IF IBM EQ 0
         MOV     WORD PTR [DMAADD],80h
         MOV     DS,[exec_CurrentPDB]
         MOV     WORD PTR [DMAADD+2],DS
@@ -930,7 +930,7 @@ IF IBM
 ENDIF
         LDS     SI,DWORD PTR [exec_init_IP] ; get entry point
         CLI
-IF NOT IBM
+IF IBM EQ 0
         MOV     BYTE PTR INDOS,0
 ENDIF
         MOV     SS,[exec_init_SS]       ; set up user's stack
