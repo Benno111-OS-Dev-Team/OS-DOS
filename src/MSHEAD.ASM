@@ -185,7 +185,7 @@ CODE            ENDS
 LAST            SEGMENT BYTE PUBLIC 'LAST'
 LAST            ENDS
 
-DOSGROUP    GROUP   CODE,CONSTANTS,DATA,LAST
+DOSGROUP    GROUP   START,CODE,CONSTANTS,DATA,LAST
 
 ; The following segment is defined such that the data/const classes appear
 ; before the code class for ROMification
