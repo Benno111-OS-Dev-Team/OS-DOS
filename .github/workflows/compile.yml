@@ -260,12 +260,13 @@ jobs:
             $outPath = Join-Path $distRoot $OutputName
             $logPath = Join-Path $logRoot "$OutputName.link.log"
             $linkPath = Join-Path $logRoot "$OutputName.lnk"
-            $linkScript = @(
-              'option quiet'
-              "system $System"
-              "name $outPath"
-              "file $($objArgs -join ', ')"
-            )
+            $linkScript = @('option quiet', "system $System", "name $outPath")
+            if ($System -eq 'com') {
+              $linkScript += 'libpath C:\WATCOM\lib286'
+              $linkScript += 'libpath C:\WATCOM\lib286\dos'
+              $linkScript += 'libfile cstart_t.obj'
+            }
+            $linkScript += "file $($objArgs -join ', ')"
             Set-Content -Path $linkPath -Value $linkScript -Encoding ASCII
             Write-Host "Linking $OutputName"
             & $wlinkExe "@$linkPath" 2>&1 | Tee-Object -FilePath $logPath
