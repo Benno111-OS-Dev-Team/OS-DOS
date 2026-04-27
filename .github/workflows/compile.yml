@@ -276,10 +276,11 @@ jobs:
             $outPath = Join-Path $distRoot $OutputName
             $logPath = Join-Path $logRoot "$OutputName.link.log"
             $linkPath = Join-Path $logRoot "$OutputName.lnk"
-            $linkScript = @('option quiet', "system $System", "name $outPath")
+            $linkScript = @('option quiet', "name $outPath")
             if ($System -eq 'com') {
               $linkScript += "libpath $objRoot"
             }
+            $linkScript += "system $System"
             if ($System -eq 'com' -or $System -eq 'dos') {
               $linkScript += "libpath $watcomRoot\lib286"
               $linkScript += "libpath $watcomRoot\lib286\dos"
