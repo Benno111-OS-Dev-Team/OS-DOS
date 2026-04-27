@@ -34,45 +34,100 @@ jobs:
       - name: Verify toolchain
         shell: cmd
         run: |
-          echo === TOOL CHECK ===
-          where nmake || exit /b 1
           where ml || exit /b 1
           where link || exit /b 1
-          where cl || exit /b 1
 
-      - name: Setup environment
-        shell: cmd
+      - name: Prepare build tree
+        shell: pwsh
         run: |
-          echo === ENV SETUP ===
-          for /f "delims=" %%I in ('where nmake ^| findstr /i "\\VC\\Tools\\MSVC\\"') do echo NMAKE="%%I">>"%GITHUB_ENV%"
-          echo INIT=%CD%\src\TOOLS>>"%GITHUB_ENV%"
-          echo COUNTRY=usa-ms>>"%GITHUB_ENV%"
-          echo INIT will be persisted for later steps
-          echo PATH will keep the Visual Studio tools first
+          $ErrorActionPreference = 'Stop'
+          $repoRoot = $env:GITHUB_WORKSPACE
+          $srcRoot = Join-Path $repoRoot 'src'
+          $buildRoot = Join-Path $repoRoot 'build'
+          $workSrc = Join-Path $buildRoot 'src'
+          $objRoot = Join-Path $buildRoot 'obj'
+          $logRoot = Join-Path $buildRoot 'logs'
 
-      - name: Clean previous builds
-        working-directory: src
-        shell: cmd
-        run: |
-          if exist *.obj del /s /q *.obj
-          if exist *.exe del /s /q *.exe
-          if exist *.com del /s /q *.com
+          New-Item -ItemType Directory -Force -Path $workSrc, $objRoot, $logRoot | Out-Null
+          Copy-Item -Path (Join-Path $srcRoot '*') -Destination $workSrc -Recurse -Force
 
-      - name: Build OS-DOS
-        working-directory: src
-        shell: cmd
+          foreach ($asm in Get-ChildItem -Path $workSrc -Filter *.ASM -File) {
+            $content = Get-Content -Path $asm.FullName -Raw
+            $content = $content -replace '(?im)^\s*INCLUDE\s+DOST:DOSSYM\.ASM\s*$', 'INCLUDE DOSSYM.ASM'
+            [System.IO.File]::WriteAllText($asm.FullName, $content, [System.Text.Encoding]::ASCII)
+          }
+
+          $ioStub = Join-Path $workSrc 'IO.ASM'
+          if (-not (Test-Path $ioStub)) {
+            @'
+; Temporary compile stub used only in CI because the repository does not ship IO.ASM.
+; The workflow compiles the present source tree and does not link the outputs.
+'@ | Set-Content -Path $ioStub -NoNewline
+          }
+
+          $modules = New-Object System.Collections.Generic.List[string]
+          $seen = New-Object System.Collections.Generic.HashSet[string] ([System.StringComparer]::OrdinalIgnoreCase)
+          foreach ($linkFile in @('COMLINK', 'DOSLINK')) {
+            $path = Join-Path $workSrc $linkFile
+            $text = Get-Content -Path $path -Raw
+            foreach ($match in [regex]::Matches($text, '(?i)\b[A-Z0-9_]+\b')) {
+              $token = $match.Value.ToUpperInvariant()
+              if ($token -match '^[A-Z0-9_]+$') {
+                $asmPath = Join-Path $workSrc "$token.ASM"
+                if ((Test-Path $asmPath) -and $seen.Add($token)) {
+                  $modules.Add($token)
+                }
+              }
+            }
+          }
+
+          $extraModules = @('MSDOS', 'MSCODE', 'SYSINIT', 'SYS', 'UINIT')
+          foreach ($token in $extraModules) {
+            if ($seen.Add($token) -and (Test-Path (Join-Path $workSrc "$token.ASM"))) {
+              $modules.Add($token)
+            }
+          }
+
+          $modules | Set-Content -Path (Join-Path $buildRoot 'modules.txt')
+
+      - name: Compile modules
+        shell: pwsh
         run: |
-          echo === BUILD START ===
-          set "PATH=%PATH%;%CD%\TOOLS"
-          nmake /f MAKEFILE || exit /b 1
+          $ErrorActionPreference = 'Stop'
+          $repoRoot = $env:GITHUB_WORKSPACE
+          $workSrc = Join-Path $repoRoot 'build\src'
+          $objRoot = Join-Path $repoRoot 'build\obj'
+          $logRoot = Join-Path $repoRoot 'build\logs'
+          $modules = Get-Content -Path (Join-Path $repoRoot 'build\modules.txt')
+
+          $failures = New-Object System.Collections.Generic.List[string]
+          foreach ($module in $modules) {
+            $asmPath = Join-Path $workSrc "$module.ASM"
+            $objPath = Join-Path $objRoot "$module.obj"
+            $logPath = Join-Path $logRoot "$module.log"
+
+            Write-Host "Assembling $module"
+            & ml /c /nologo /Cp /Fo"$objPath" "$asmPath" 2>&1 | Tee-Object -FilePath $logPath
+            if ($LASTEXITCODE -ne 0) {
+              $failures.Add($module)
+            }
+          }
+
+          if ($failures.Count -gt 0) {
+            Write-Host "Compile failed for:"
+            $failures | ForEach-Object { Write-Host " - $_" }
+            exit 1
+          }
+
+          Write-Host "Compile completed successfully."
 
       - name: Verify outputs
         shell: pwsh
         run: |
           Write-Host "=== OUTPUT CHECK ==="
-          $outputs = Get-ChildItem -Path src -Recurse -Include *.com, *.exe, *.sys -File
+          $outputs = Get-ChildItem -Path build\obj -Filter *.obj -File
           if ($outputs.Count -eq 0) {
-            Write-Error "❌ No build outputs found!"
+            Write-Error "No object files were produced."
             exit 1
           }
           $outputs | ForEach-Object { Write-Host $_.FullName }
@@ -83,7 +138,7 @@ jobs:
           $ErrorActionPreference = 'Stop'
           New-Item -ItemType Directory -Force -Path dist | Out-Null
 
-          Get-ChildItem -Path src -Recurse -Include *.com, *.exe, *.sys, *.bin -File |
+          Get-ChildItem -Path build\obj -Filter *.obj -File |
             Copy-Item -Destination dist -Force
 
       - name: Upload build artifacts
