@@ -36,53 +36,22 @@ jobs:
         run: |
           where link || exit /b 1
 
-      - name: Fetch UASM
-        shell: cmd
-        run: |
-          git clone --depth 1 --branch v2.57r https://github.com/Terraspace/UASM.git uasm || exit /b 1
-
-      - name: Build UASM
-        working-directory: uasm
+      - name: Download UASM
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $vcTools = $env:VCToolsInstallDir
-          if (-not $vcTools) {
-            throw 'VCToolsInstallDir is not set.'
-          }
-          $clBin = Split-Path -Path (Get-Command cl).Source -Parent
-          $sdkVersion = $env:WindowsSDKVersion.TrimEnd('\')
-          $sdkRoot = Join-Path $env:WindowsSdkDir "Lib\$sdkVersion"
-          $umLib = Join-Path $sdkRoot 'um\x86'
-          $ucrtLib = Join-Path $sdkRoot 'ucrt\x86'
-          $compatRoot = Join-Path $env:GITHUB_WORKSPACE 'uasm-compat'
-
-          New-Item -ItemType Directory -Force -Path $compatRoot | Out-Null
-          New-Item -ItemType Junction -Force -Path (Join-Path $compatRoot 'bin') -Target $clBin | Out-Null
-          New-Item -ItemType Junction -Force -Path (Join-Path $compatRoot 'include') -Target (Join-Path $vcTools 'include') | Out-Null
-          New-Item -ItemType Junction -Force -Path (Join-Path $compatRoot 'lib') -Target (Join-Path $vcTools 'lib\x86') | Out-Null
-          $env:LIB = (Join-Path $vcTools 'lib\x86') + ';' + $umLib + ';' + $ucrtLib
-
-          $makefile = @(
-            'Makefile-Win-MSVC-32.mak',
-            'Makefile-Win-MSVC-64.mak',
-            'Msvc.mak',
-            'Msvc64.mak'
-          ) | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-
-          if (-not $makefile) {
-            Get-ChildItem -Name *.mak
-            throw 'UASM makefile not found.'
-          }
-
-          & nmake /nologo /f $makefile VCDIR=$compatRoot W32LIB=$umLib LOPT=/NOLOGO
+          $uasmZip = Join-Path $env:GITHUB_WORKSPACE 'uasm257_x86.zip'
+          Invoke-WebRequest -Uri 'https://github.com/Terraspace/UASM/releases/download/v2.57r/uasm257_x86.zip' -OutFile $uasmZip
+          $uasmRoot = Join-Path $env:GITHUB_WORKSPACE 'uasm'
+          New-Item -ItemType Directory -Force -Path $uasmRoot | Out-Null
+          Expand-Archive -Path $uasmZip -DestinationPath $uasmRoot -Force
 
       - name: Locate UASM
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           $uasmExe = Get-ChildItem -Path (Join-Path $env:GITHUB_WORKSPACE 'uasm') -Recurse -File |
-            Where-Object { $_.Name -match '^(uasm|hjwasm)\.exe$' } |
+            Where-Object { $_.Name -match '^uasm\.exe$' } |
             Select-Object -First 1
 
           if (-not $uasmExe) {
