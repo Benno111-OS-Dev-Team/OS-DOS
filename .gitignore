@@ -1,0 +1,6 @@
+*.err
+/fullbuild_test/
+/fullbuild_test2/
+/*fullbuild_test*/
+test*.err
+*.obj

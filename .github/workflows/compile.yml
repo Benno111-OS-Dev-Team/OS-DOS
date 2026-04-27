@@ -74,6 +74,7 @@ jobs:
 
           Copy-Item -Path (Join-Path $workSrc 'DOSMAC_v211.ASM') -Destination (Join-Path $workSrc 'DOSMAC.ASM') -Force
           Copy-Item -Path (Join-Path $workSrc 'DOSSYM_v211.ASM') -Destination (Join-Path $workSrc 'DOSSYM.ASM') -Force
+          Set-Content -Path (Join-Path $workSrc 'IO.ASM') -Value 'END' -Encoding ASCII
           $aliasLines = @(
             'WAIT EQU Wait'
             'DISK_RESET EQU Disk_Reset'
@@ -114,10 +115,100 @@ jobs:
           foreach ($asm in Get-ChildItem -Path $workSrc -Filter *.ASM -File) {
             $content = Get-Content -Path $asm.FullName -Raw
             $content = $content -replace '(?im)^\s*INCLUDE\s+DOST:DOSSYM\.ASM\s*$', 'INCLUDE DOSSYM.ASM'
+            $content = $content -replace '(?im)^\s*I_am\b', 'I_AM'
+            $content = $content -replace '(?im)^\s*i_am\b', 'I_AM'
+            $content = $content -replace '(?im)\btrue\b', 'TRUE'
+            $content = $content -replace '(?im)\bfalse\b', 'FALSE'
+
+            switch ($asm.Name.ToUpperInvariant()) {
+              'MSDATA.ASM' {
+                $content = $content -replace '(?m)^\s*short_addr\s+DEVIOBUF\s*$', '                short_addr  DSKCHRETBUF'
+              }
+              'MSINIT.ASM' {
+                $content = $content -replace '(?i)\bEXTRN\s+QUIT:NEAR,IRET:NEAR,ABSDRD:FAR,ABSDWRT:FAR\b', 'EXTRN   QUIT:NEAR,IRETRTN:NEAR,ABSDRD:FAR,ABSDWRT:FAR'
+                $content = $content -replace '(?i)\bOFFSET\s+DOSGROUP:IRET\b', 'OFFSET DOSGROUP:IRETRTN'
+              }
+              'TCODE2.ASM' {
+                $content = $content -replace '(?m)^\s*EXTRN\s+OUT:NEAR,DRVBAD:NEAR,SETPATH:NEAR,PRINT:NEAR\s*$', '        EXTRN   OUT_ROUTINE:NEAR,DRVBAD:NEAR,SETPATH:NEAR,PRINT:NEAR'
+                $content = $content -replace '\bCALL\s+OUT\b', 'CALL    OUT_ROUTINE'
+                $content = $content -replace '\bJMP\s+OUT\b', 'JMP     OUT_ROUTINE'
+              }
+              'TCODE3.ASM' {
+                $content = $content -replace '(?m)^\s*PUBLIC\s+GOTO,\$IF,IFERLEV,SHIFT,IFEXISTS\b', '        PUBLIC  GOTO_CMD,$IF,IFERLEV,SHIFT,IFEXISTS'
+                $content = $content -replace '\bJNZ\s+IFDIF\b', 'JNZ     IFDIFF'
+                $content = $content -replace '(?m)^IFDIF:$', 'IFDIFF:'
+                $content = $content -replace '(?m)^GOTO:$', 'GOTO_CMD:'
+              }
+              'TCODE4.ASM' {
+                $content = $content -replace '(?m)^\s*EXTRN\s+DISPSIZE:NEAR,OUT:NEAR,OUT2:NEAR\b', '        EXTRN   DISPSIZE:NEAR,OUT_ROUTINE:NEAR,OUT2:NEAR'
+                $content = $content -replace '\bCALL\s+OUT\b', 'CALL    OUT_ROUTINE'
+                $content = $content -replace '\bJMP\s+OUT\b', 'JMP     OUT_ROUTINE'
+              }
+              'TCODE5.ASM' {
+                $content = $content -replace '(?m)^\s*PUBLIC\s+DELIM,OUT,OUT2,SETPATH,PATHCRUNCH\b', '        PUBLIC  DELIM,OUT_ROUTINE,OUT2,SETPATH,PATHCRUNCH'
+                $content = $content -replace '\bCALL\s+OUT\b', 'CALL    OUT_ROUTINE'
+                $content = $content -replace '\bJMP\s+OUT\b', 'JMP     OUT_ROUTINE'
+                $content = $content -replace '(?m)^OUT:$', 'OUT_ROUTINE:'
+              }
+              'TUCODE.ASM' {
+                $content = $content -replace '(?m)^\s*EXTRN\s+CRPRINT:NEAR,OUT:NEAR,ZPRINT:NEAR\b', '        EXTRN   CRPRINT:NEAR,OUT_ROUTINE:NEAR,ZPRINT:NEAR'
+                $content = $content -replace '(?m)^\s*PUBLIC\s+NOTEST2,ECHO,CNTRLC,VERIFY,PRINTVOL,GetDate,PRINT_DATE\b', '        PUBLIC  NOTEST2,ECHO_CMD,CNTRLC,VERIFY,PRINTVOL,GetDate,PRINT_DATE'
+                $content = $content -replace '\bCALL\s+OUT\b', 'CALL    OUT_ROUTINE'
+                $content = $content -replace '\bJMP\s+OUT\b', 'JMP     OUT_ROUTINE'
+                $content = $content -replace '(?m)^ECHO:$', 'ECHO_CMD:'
+              }
+              'TDATA.ASM' {
+                $content = $content -replace '(?m)^\s*EXTRN\s+PRINT_L:NEAR,PRINT_B:NEAR,CRLF2:NEAR,OUT:NEAR,PRINT_ESC:NEAR\s*$', '        EXTRN   PRINT_L:NEAR,PRINT_B:NEAR,CRLF2:NEAR,OUT_ROUTINE:NEAR,PRINT_ESC:NEAR'
+                $content = $content -replace '(?m)^\s*EXTRN\s+ADD_PROMPT:NEAR,PATH:NEAR,\$EXIT:NEAR,CTTY:NEAR,ECHO:NEAR\s*$', '        EXTRN   ADD_PROMPT:NEAR,PATH:NEAR,$EXIT:NEAR,CTTY:NEAR,ECHO_CMD:NEAR'
+                $content = $content -replace '(?m)^\s*EXTRN\s+GOTO:NEAR,SHIFT:NEAR,\$IF:NEAR,\$FOR:NEAR,CLS:NEAR\s*$', '        EXTRN   GOTO_CMD:NEAR,SHIFT:NEAR,$IF:NEAR,$FOR:NEAR,CLS:NEAR'
+                $content = $content -replace 'OFFSET\s+TRANGROUP:OUT\b', 'OFFSET TRANGROUP:OUT_ROUTINE'
+                $content = $content -replace 'OFFSET\s+TRANGROUP:ECHO\b', 'OFFSET TRANGROUP:ECHO_CMD'
+                $content = $content -replace 'OFFSET\s+TRANGROUP:GOTO\b', 'OFFSET TRANGROUP:GOTO_CMD'
+              }
+              'DIR.ASM' {
+                $content = $content -replace '\bSHORT\s+RETF\b', 'SHORT RETFOUND'
+                $content = $content -replace '\bJZ\s+RETF\b', 'JZ      RETFOUND'
+                $content = $content -replace '(?m)^RETF:$', 'RETFOUND:'
+              }
+            }
+
             [System.IO.File]::WriteAllText($asm.FullName, $content, [System.Text.Encoding]::ASCII)
           }
 
-          $modules = @('COMMAND')
+          $modules = @(
+            'COMMAND'
+            'RUCODE'
+            'RDATA'
+            'INIT'
+            'UINIT'
+            'TCODE'
+            'TCODE2'
+            'TCODE3'
+            'TCODE4'
+            'TCODE5'
+            'TUCODE'
+            'COPY'
+            'COPYPROC'
+            'CPARSE'
+            'TDATA'
+            'GETSET'
+            'DIRCALL'
+            'ALLOC'
+            'DEV'
+            'DIR'
+            'DISK'
+            'FAT'
+            'ROM'
+            'MSDOS'
+            'MSCODE'
+            'DOSMES'
+            'MISC'
+            'STDBUF'
+            'STDPROC'
+            'STDIO'
+            'TIME'
+            'XENIX'
+          )
 
           $modules | Set-Content -Path (Join-Path $buildRoot 'modules.txt')
 
@@ -141,10 +232,12 @@ jobs:
             Write-Host "Assembling $module"
             $extraArgs = @('/Zm')
             if ($module -eq 'COMMAND') {
-              $prefix = "OPTION NOKEYWORD:<INVOKE WAIT EXIT EXEC SYSCALL>`r`n"
-              $commandText = [System.IO.File]::ReadAllText($asmPath, [System.Text.Encoding]::ASCII)
-              [System.IO.File]::WriteAllText($asmPath, $prefix + $commandText, [System.Text.Encoding]::ASCII)
+              $prefix = "OPTION CASEMAP:ALL`r`nOPTION NOKEYWORD:<INVOKE WAIT EXIT EXEC SYSCALL>`r`n"
+            } else {
+              $prefix = "OPTION CASEMAP:ALL`r`n"
             }
+            $commandText = [System.IO.File]::ReadAllText($asmPath, [System.Text.Encoding]::ASCII)
+            [System.IO.File]::WriteAllText($asmPath, $prefix + $commandText, [System.Text.Encoding]::ASCII)
             & $assembler @extraArgs /c /nologo /Cp /Fo"$objPath" "$asmPath" 2>&1 | Tee-Object -FilePath $logPath
             if ($LASTEXITCODE -ne 0) {
               $failures.Add($module)
