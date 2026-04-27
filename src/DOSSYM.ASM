@@ -643,6 +643,40 @@ arena_owner_system  EQU 0               ; free block indication
 
 arena_signature_normal  EQU 4Dh         ; valid signature, not end of arena
 arena_signature_end     EQU 5Ah         ; valid signature, last block in arena
+
+BREAK <International call block>
+
+internat_block STRUC
+Date_tim_format DW      ?           ; 0-USA, 1-EUR, 2-JAP
+Currency_sym    DB      ?           ; Currency Symbol 5 bytes
+                DB      ?
+                DB      ?
+                DB      ?
+                DB      ?
+Thous_sep       DB      ?           ; Thousands separator 2 bytes
+                DB      ?
+Decimal_sep     DB      ?           ; Decimal separator 2 bytes
+                DB      ?
+Date_sep        DB      ?           ; Date separator 2 bytes
+                DB      ?
+Time_sep        DB      ?           ; Decimal separator 2 bytes
+                DB      ?
+Bit_feild       DB      ?           ; Bit values
+                                    ;   Bit 0 = 0 if currency symbol first
+                                    ;         = 1 if currency symbol last
+                                    ;   Bit 1 = 0 if No space after currency symbol
+                                    ;         = 1 if space after currency symbol
+Currency_cents  DB      ?           ; Number of places after currency dec point
+Time_24         DB      ?           ; 1 if 24 hour time, 0 if 12 hour time
+Map_call        DW      ?           ; Address of case mapping call (DWORD)
+                DW      ?           ; This is two words so it can be initialized
+                                    ; in pieces.
+Data_sep        DB      ?           ; Data list separator character
+                DB      ?
+internat_block ENDS
+
+internat_block_max      EQU     32
+
 ;                                                                          ;
 ;            C  A  V  E  A  T     P  R  O  G  R  A  M  M  E  R             ;
 ;----+----+----+----+----+----+----+----+----+----+----+----+----+----+----;

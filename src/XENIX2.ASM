@@ -115,7 +115,7 @@ BREAK <get_sf_from_jfn - translate a jfn into sf pointer>
         procedure   get_sf_from_jfn,NEAR
         ASSUME  DS:DOSGROUP,ES:NOTHING
         PUSH    AX                      ; save him
-        invoke  get_jfn_pointer
+        invoke  GET_JFN_POINTER_ROUTINE
         JC      get_sf_jfn_invalid
         MOV     AL,ES:[DI]              ; get sfn
         CMP     AL,0FFh                 ; is it free?
@@ -135,7 +135,7 @@ BREAK <get_jfn_pointer - map a jfn into a pointer to jfn>
 ;               ES:DI is pointer to jfn
 ;           JC  <bad jfn>
 ;
-        procedure   Get_jfn_pointer,NEAR
+        procedure   GET_JFN_POINTER_ROUTINE,NEAR
         ASSUME  DS:DOSGROUP,ES:NOTHING
         CMP     BX,FilPerProc
         JAE     get_jfn_bad
@@ -148,7 +148,7 @@ BREAK <get_jfn_pointer - map a jfn into a pointer to jfn>
 get_jfn_bad:
         STC
         RET
-get_jfn_pointer ENDP
+GET_JFN_POINTER_ROUTINE ENDP
 
 
 BREAK <$Close - release a handle>
@@ -166,7 +166,7 @@ BREAK <$Close - release a handle>
 
         context DS
 
-        invoke  get_jfn_pointer         ; get jfn loc
+        invoke  GET_JFN_POINTER_ROUTINE ; get jfn loc
         JNC     close_jfn
 close_bad_handle:
         error   error_invalid_handle
@@ -220,7 +220,7 @@ BREAK <PushDMA, PopDMA, ptr_normalize - set up local dma and save old>
         PUSH    ES
         PUSH    BX
         PUSH    PushSave
-        invoke  ptr_normalize           ; get new dma
+        invoke  PTR_NORMALIZE_ROUTINE   ; get new dma
         MOV     WORD PTR [DMAADD],DX    ; save IT!
         MOV     WORD PTR [DMAADD+2],DS
         MOV     ES,PushES
@@ -244,7 +244,7 @@ PopDMA  ENDP
 ; ptr_normalize
 ; input:    DS:DX is a pointer
 ; output:   DS:DX is normalized (DX < 10h)
-        procedure   ptr_normalize,NEAR
+        procedure   PTR_NORMALIZE_ROUTINE,NEAR
         PUSH    CX                      ; T1 = CX
         PUSH    DX                      ; T2 = DX
         MOV     CL,4
@@ -270,7 +270,7 @@ PopDMA  ENDP
 ;       POP     AX
 
         RET
-ptr_normalize   ENDP
+PTR_NORMALIZE_ROUTINE ENDP
 
 BREAK <$Read - Do file/device I/O>
 ;

@@ -214,12 +214,12 @@ NODEC:
         POP     ES              ; Buf is ES:DI
         LDS     SI,[BUFFHEAD]   ; Curbuf = HEAD
         CALL    POINTCOMP       ; Buf == HEAD?
-        JNZ     BUFLOOP
+        JNZ     BUFLOOP2
         MOV     WORD PTR [BUFFHEAD],CX
         MOV     WORD PTR [BUFFHEAD+2],BP        ; HEAD = Pointsave
         JMP     SHORT LOOKEND
 
-BUFLOOP:
+BUFLOOP2:
         PUSH    DS
         PUSH    SI
         LDS     SI,[SI.NEXTBUF]
@@ -227,7 +227,7 @@ BUFLOOP:
         JZ      GOTTHEBUF
         POP     AX
         POP     AX
-        JMP     SHORT BUFLOOP
+        JMP     SHORT BUFLOOP2
 
 GOTTHEBUF:
         POP     SI
@@ -251,7 +251,7 @@ GOTHEEND:
         MOV     WORD PTR [SI.NEXTBUF+2],ES      ; Curbuf.nextbuf = Buf
         MOV     WORD PTR ES:[DI.NEXTBUF],-1
         MOV     WORD PTR ES:[DI.NEXTBUF+2],-1      ; Buf is LAST
-NRET:
+NRET2:
         invoke  restore_world
         return
 
@@ -285,7 +285,7 @@ GOTHEEND2:
         POP     DS
         MOV     WORD PTR [SI.NEXTBUF],-1
         MOV     WORD PTR [SI.NEXTBUF+2],-1      ; Buf is LAST
-        JMP     SHORT NRET
+        JMP     SHORT NRET2
 
 PLACEHEAD   ENDP
 

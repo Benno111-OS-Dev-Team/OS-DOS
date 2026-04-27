@@ -12,7 +12,7 @@ TITLE   COMMAND Transient Initialized DATA
 TRANCODE        SEGMENT PUBLIC
         EXTRN   PRINT_DATE:NEAR,PRINT_TIME:NEAR,PRINT_DEFAULT_DIRECTORY:NEAR
         EXTRN   PRINT_DRIVE:NEAR,PRINT_VERSION:NEAR,PRINT_G:NEAR
-        EXTRN   PRINT_L:NEAR,PRINT_B:NEAR,CRLF2:NEAR,OUT:NEAR,PRINT_ESC:NEAR
+        EXTRN   PRINT_L:NEAR,PRINT_B:NEAR,CRLF2:NEAR,OUT_ROUTINE:NEAR,PRINT_ESC:NEAR
         EXTRN   PRINT_BACK:NEAR,PRINT_EQ:NEAR
 
         EXTRN   IFNOT:NEAR,IFERLEV:NEAR,IFEXISTS:NEAR
@@ -21,8 +21,8 @@ TRANCODE        SEGMENT PUBLIC
         EXTRN   TCOMMAND:NEAR,COPY:NEAR,PAUSE:NEAR,DATE:NEAR,CTIME:NEAR
         EXTRN   VERSION:NEAR,VOLUME:NEAR,$CHDIR:NEAR,$MKDIR:NEAR,$RMDIR:NEAR
         EXTRN   CNTRLC:NEAR,VERIFY:NEAR,ADD_NAME_TO_ENVIRONMENT:NEAR
-        EXTRN   ADD_PROMPT:NEAR,PATH:NEAR,$EXIT:NEAR,CTTY:NEAR,ECHO:NEAR
-        EXTRN   GOTO:NEAR,SHIFT:NEAR,$IF:NEAR,$FOR:NEAR,CLS:NEAR
+        EXTRN   ADD_PROMPT:NEAR,PATH:NEAR,$EXIT:NEAR,CTTY:NEAR,ECHO_CMD:NEAR
+        EXTRN   GOTO_CMD:NEAR,SHIFT:NEAR,$IF:NEAR,$FOR:NEAR,CLS:NEAR
 TRANCODE        ENDS
 
 ; Data for transient portion
@@ -56,7 +56,8 @@ OVERWR  DB      "File cannot be copied onto itself",13,10,"$"
 LOSTERR DB      "Content of destination lost before copy",13,10,"$"
 
 ;"COPIED_PRE<# files copied>COPIED_POST"
-COPIED_POST  DB      " File(s) copied",13,10ŠCOPIED_PRE   DB      "$"
+COPIED_POST  DB      " File(s) copied",13,10
+COPIED_PRE   DB      "$"
 
 ;"DIRMES_PRE<# files in dir>DIRMES_POST"
 DIRMES_POST  DB      " File(s) "
@@ -110,7 +111,7 @@ BAD_ON_OFF DB   "Must specify ON or OFF"        ;Note Run over to next message
 
 ;"DIRHEAD_PRE<path of dir>DIRHEAD_POST"
 DIRHEAD_POST DB      13,10,"$"
-DIRHEAD_PRE  DB      " Directory of  $"Š
+DIRHEAD_PRE  DB      " Directory of  $"
 NULPATH DB      "No Path $"
 PATH_TEXT    DB "PATH="
 PROMPT_TEXT  DB "PROMPT="
@@ -131,6 +132,7 @@ BADARGS DB      "Invalid number of parameters",13,10,"$"
 DEVWMES DB      "Error writing to device"
 ACRLF   DB      13,10,"$"
 DBACK   DB      8," ",8,0               ; DESTRUCTIVE BACK SPACE
+
 
 CLSSTRING DB    4,01BH,"[2J"            ; ANSI Clear screen
 
@@ -154,7 +156,7 @@ PROMPT_TABLE LABEL BYTE
         DB      "_"
         DW      OFFSET TRANGROUP:CRLF2
         DB      "$"
-        DW      OFFSET TRANGROUP:OUT
+        DW      OFFSET TRANGROUP:OUT_ROUTINE
         DB      "E"
         DW      OFFSET TRANGROUP:PRINT_ESC
         DB      "H"
@@ -164,7 +166,8 @@ PROMPT_TABLE LABEL BYTE
         DB      0                       ; NUL TERMINATED
 
 IFTAB   LABEL   BYTE                    ; Table of IF conditionals
-        DB      3,"NOT"                 ; First byte is countŠ        DW      OFFSET TRANGROUP:IFNOT
+        DB      3,"NOT"                 ; First byte is count
+        DW      OFFSET TRANGROUP:IFNOT
         DB      10,"ERRORLEVEL"
         DW      OFFSET TRANGROUP:IFERLEV
         DB      5,"EXIST"
@@ -218,14 +221,15 @@ COMTAB  DB      4,"DIR",1               ; Table for internal command names
         DB      7,"PROMPT",0
         DW      OFFSET TRANGROUP:ADD_PROMPT
         DB      5,"PATH",0
-        DW      OFFSET TRANGROUP:PATHŠ        DB      5,"EXIT",0
+        DW      OFFSET TRANGROUP:PATH
+        DB      5,"EXIT",0
         DW      OFFSET TRANGROUP:$EXIT
         DB      5,"CTTY",1
         DW      OFFSET TRANGROUP:CTTY
         DB      5,"ECHO",0
-        DW      OFFSET TRANGROUP:ECHO
+        DW      OFFSET TRANGROUP:ECHO_CMD
         DB      5,"GOTO",0
-        DW      OFFSET TRANGROUP:GOTO
+        DW      OFFSET TRANGROUP:GOTO_CMD
         DB      6,"SHIFT",0
         DW      OFFSET TRANGROUP:SHIFT
         DB      3,"IF",0

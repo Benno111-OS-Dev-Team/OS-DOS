@@ -30,6 +30,8 @@ INCLUDE DEVSYM.ASM
 .cref
 .list
 
+EXTRN   OUT_ROUTINE:NEAR
+
 
 ifndef  Kanji
 Kanji   equ 0
@@ -473,7 +475,7 @@ ASSUME  DS:NOTHING,ES:NOTHING
         LODS    CS:BYTE PTR [SI]
         CMP     AL,"$"
         retz
-        invoke  OUT
+        invoke  OUT_ROUTINE
         JMP     SHORT OUTMES
         return
 OutMes  ENDP
@@ -558,7 +560,7 @@ Create_copy:
 
 Create_dup_jfn:
         PUSH    ES                      ; save new PDB
-        invoke  get_jfn_pointer         ; ES:DI is jfn
+        invoke  GET_JFN_POINTER_ROUTINE ; ES:DI is jfn
         JC      create_skip             ; not a valid jfn
         PUSH    ES                      ; save him
         PUSH    DI

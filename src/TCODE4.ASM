@@ -46,7 +46,7 @@ ASSUME  CS:TRANGROUP,DS:NOTHING,ES:NOTHING,SS:NOTHING
         EXTRN   CERROR:NEAR,SWITCH:NEAR,PWD:NEAR,SETREST:NEAR,MESTRAN:NEAR
         EXTRN   NOTFNDERR:NEAR,CHKCNT:NEAR,GETKEYSTROKE:NEAR
         EXTRN   SETPATH:NEAR,PATHCRUNCH:NEAR,PRINT:NEAR,ZPRINT:NEAR
-        EXTRN   DISPSIZE:NEAR,OUT:NEAR,OUT2:NEAR,ERROR_PRINT:NEAR
+        EXTRN   DISPSIZE:NEAR,OUT_ROUTINE:NEAR,OUT2:NEAR,ERROR_PRINT:NEAR
         EXTRN   SCANOFF:NEAR,OUTBYTE:NEAR,GETNUM:NEAR,ERROR_OUTPUT:NEAR
 
 
@@ -230,7 +230,7 @@ SCROLL:
 
 SAMLIN:
         MOV     AL,9            ; Output a tab
-        CALL    OUT
+        CALL    OUT_ROUTINE
         JMP     SHORT SCROLL
 
 SHONAME:
@@ -251,7 +251,7 @@ SHONAME:
 
 ONESPC:
         MOV     AL," "
-        JMP     OUT
+        JMP     OUT_ROUTINE
 
 CRLF2:
         PUSH    DX
@@ -999,4 +999,4 @@ NEXT:
 
 TRANCODE        ENDS
                 END
-                                                    
+                                                    

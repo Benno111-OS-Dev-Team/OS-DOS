@@ -35,11 +35,11 @@ ENDM
 ;
 INVOKE MACRO name
 .xcref
- IF2
- IFNDEF name
- EXTRN name:NEAR
- ENDIF
- ENDIF
+IF2
+IFNDEF name
+EXTRN name:NEAR
+ENDIF
+ENDIF
 .cref
  CALL name
 ENDM
@@ -50,11 +50,11 @@ PAGE
 ;
 transfer MACRO name
 .xcref
- IF2
- IFNDEF name
- EXTRN name:NEAR
- ENDIF
- ENDIF
+IF2
+IFNDEF name
+EXTRN name:NEAR
+ENDIF
+ENDIF
 .cref
  JMP name
 ENDM
@@ -65,11 +65,11 @@ ENDM
 short_addr MACRO name
  IFDIF <name>,<?>
 .xcref
- IF2
- IFNDEF name
- EXTRN name:NEAR
- ENDIF
- ENDIF
+IF2
+IFNDEF name
+EXTRN name:NEAR
+ENDIF
+ENDIF
 .cref
  DW OFFSET DOSGROUP:name
  ELSE
@@ -82,10 +82,11 @@ ENDM
 ;
 long_addr MACRO name
 .xcref
- IF2
- IFNDEF name
- EXTRN name:NEAR
- ENDIF
+IF2
+IFNDEF name
+EXTRN name:NEAR
+ENDIF
+ENDIF
 .cref
  DD name
 ENDM

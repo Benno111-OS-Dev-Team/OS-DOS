@@ -1249,7 +1249,8 @@ NotDig: STC
         RET
 
 GETNUM: XOR     BX,BX                   ; running count is zero
-B2:     CALL    ToDigit                 ; do we have a digit
+GETNUM_B2:
+        CALL    ToDigit                 ; do we have a digit
         JC      BadNum                  ; no, bomb
         XCHG    AX,BX                   ; put total in AX
         PUSH    BX                      ; save digit
@@ -1261,12 +1262,13 @@ B2:     CALL    ToDigit                 ; do we have a digit
         JC      BADNUM                  ; too big a number
         XCHG    AX,BX                   ; stash total
         CALL    GETCHR                  ; GET NEXT DIGIT
-        JC      B1                      ; no more characters
+        JC      GETNUM_B1               ; no more characters
         OR      AL,AL                   ; end of line separator?
-        JNZ     B2                      ; no, try as a valid character
+        JNZ     GETNUM_B2              ; no, try as a valid character
         INC     COUNT                   ; one more character to scan
         DEC     CHRPTR                  ; back up over separator
-B1:     MOV     AX,BX                   ; get proper count
+GETNUM_B1:
+        MOV     AX,BX                   ; get proper count
         OR      AX,AX
         RET
 ;
