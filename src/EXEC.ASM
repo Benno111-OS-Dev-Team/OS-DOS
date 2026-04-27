@@ -126,7 +126,8 @@ ZERO =   $
 ENDIF
 IF NOT IBM
         procedure   $Exec,NEAR
-        ASSUME  DS:NOTHING, ES:NOTHING
+        context  ds
+        ASSUME  ES:NOTHING
 ENDIF
 ;
 ; validate function
@@ -228,11 +229,27 @@ exec_check_environ:
         TEST    BYTE PTR [exec_func],exec_func_overlay   ; overlays... no environment
         JNZ     exec_read_header
         LDS     SI,DWORD PTR [exec_blk] ; get block
+IF NOT IBM
+        ASSUME  DS:NOTHING
+ENDIF
         MOV     AX,[SI].Exec1_environ   ; address of environ
         OR      AX,AX
         JNZ     exec_scan_env
+IF IBM
         MOV     DS,[exec_CurrentPDB]
+ELSE
+        PUSH    SS
+        POP     DS
+        ASSUME  DS:DOSGROUP
+        MOV     DS,[CurrentPDB]
+ENDIF
+        ASSUME  DS:NOTHING
         MOV     AX,DS:[PDB_environ]
+IF NOT IBM
+        PUSH    SS
+        POP     DS
+        ASSUME  DS:DOSGROUP
+ENDIF
         MOV     [exec_environ],AX
         OR      AX,AX
         JZ      exec_read_header
@@ -267,12 +284,21 @@ IF NOT IBM
         invoke  $ALLOC                  ; can we get the space?
 ENDIF
         POP     DS
+IF NOT IBM
+        ASSUME  DS:NOTHING
+ENDIF
         POP     CX
         JNC     exec_save_environ
         JMP     exec_no_mem             ; nope... cry and sob
 
 exec_save_environ:
         MOV     ES,AX
+IF NOT IBM
+        PUSH    DS
+        PUSH    SS
+        POP     DS
+        ASSUME  DS:DOSGROUP
+ENDIF
         MOV     [exec_environ],AX       ; save him for a rainy day
 IF IBM
         PUSH    CX
@@ -281,6 +307,10 @@ IF IBM
         CMP     BX,[exec_low_seg]
         POP     CX
         JA      exec_no_mem
+ENDIF
+IF NOT IBM
+        POP     DS
+        ASSUME  DS:NOTHING
 ENDIF
         XOR     SI,SI
         XOR     DI,DI
@@ -376,7 +406,13 @@ exec_bad_file:
         MOV     AL,exec_bad_format
 
 exec_bomb:
+IF IBM
         ASSUME  DS:NOTHING,ES:NOTHING
+ELSE
+        PUSH    SS
+        POP     DS
+        ASSUME  DS:DOSGROUP,ES:NOTHING
+ENDIF
         PUSH    AX
         MOV     BX,[exec_fh]
         CALL    exec_dealloc
@@ -596,7 +632,11 @@ exec_get_entries:
         MOV     DX,[exec_rle_count]     ; Number of entries left
 
 exec_read_reloc:
+IF IBM
         ASSUME  DS:NOTHING
+ELSE
+        ASSUME  DS:DOSGROUP
+ENDIF
         PUSH    DX
 IF IBM
         MOV     DX,OFFSET EGROUP:exec_signature
@@ -739,6 +779,9 @@ ENDIF
         MOV     BX,[exec_fh]
         POP     CX                      ; number to read
         MOV     DS,[exec_dma]
+IF NOT IBM
+        ASSUME  DS:NOTHING
+ENDIF
         XOR     DX,DX
         PUSH    CX
         CALL    exec_dealloc
@@ -750,6 +793,11 @@ IF NOT IBM
         invoke  $READ                   ; read in com file
 ENDIF
         CALL    exec_alloc
+IF NOT IBM
+        PUSH    SS
+        POP     DS
+        ASSUME  DS:DOSGROUP
+ENDIF
         POP     SI                      ; get number of bytes to read
         CMP     AX,SI                   ; did we read them all?
 IF IBM
@@ -775,6 +823,11 @@ ENDIF
         MOV     WORD PTR DS:[SI],0      ; 0 for return
 
 exec_set_PDB:
+IF NOT IBM
+        PUSH    SS
+        POP     DS
+        ASSUME  DS:DOSGROUP
+ENDIF
         MOV     BX,[exec_fh]            ; we are finished with the file.
         CALL    exec_dealloc
 IF IBM
@@ -802,14 +855,30 @@ exec_build_header:
         JZ      NO_OWNER                ; no environment
         DEC     AX                      ; point to header
         MOV     DS,AX
+IF NOT IBM
+        ASSUME  DS:NOTHING
+ENDIF
         MOV     DS:[SI],DX              ; assign ownership
 NO_OWNER:
+IF NOT IBM
+        PUSH    SS
+        POP     DS
+        ASSUME  DS:DOSGROUP
+ENDIF
         MOV     AX,[exec_load_block]    ; get load block pointer
         DEC     AX
         MOV     DS,AX                   ; point to header
+IF NOT IBM
+        ASSUME  DS:NOTHING
+ENDIF
         MOV     DS:[SI],DX              ; assign ownership
 
         PUSH    DX
+IF NOT IBM
+        PUSH    SS
+        POP     DS
+        ASSUME  DS:DOSGROUP
+ENDIF
 IF IBM
         MOV     AH,DUP_PDB
         INT     int_command
@@ -819,6 +888,9 @@ ENDIF
 IF NOT IBM
         MOV     BYTE PTR [CreatePDB], 0FFH  ; indicate a new process
         invoke  $Dup_PDB                    ; ES is now PDB
+        PUSH    SS
+        POP     DS
+        ASSUME  DS:DOSGROUP
 ENDIF
         POP     DX
         PUSH    [exec_environ]
@@ -858,19 +930,30 @@ ENDIF
         MOV     CX,80h
         MOV     DI,CX
         REP     MOVSB                   ; Wham!
+IF NOT IBM
+        ASSUME  DS:NOTHING
+ENDIF
 
 ;
 ; Process BX into default AX (validity of drive specs on args)
 ;
         DEC     CL                      ; get 0FFh in CX
+IF IBM
         CMP     BH,[exec_NUMIO]
+ELSE
+        CMP     BH,[NUMIO]
+ENDIF
         JBE     exec_BH_good
         MOV     BH,CL
         JMP     SHORT exec_BL
 exec_BH_good:
         XOR     BH,BH
 exec_BL:
+IF IBM
         CMP     BL,[exec_NUMIO]
+ELSE
+        CMP     BL,[NUMIO]
+ENDIF
         JBE     exec_BL_good
         MOV     BL,CL
         JMP     SHORT exec_set_return
@@ -889,9 +972,13 @@ exec_set_return:
         POP     DS:[addr_int_terminate] ; save them where we can get them later
         POP     DS:[addr_int_terminate+2]   ; when the child exits.
 IF NOT IBM
+        ASSUME  DS:NOTHING
         MOV     WORD PTR [DMAADD],80h
-        MOV     DS,[exec_CurrentPDB]
+        MOV     DS,[CurrentPDB]
         MOV     WORD PTR [DMAADD+2],DS
+        PUSH    SS
+        POP     DS
+        ASSUME  DS:DOSGROUP
 ENDIF
 IF IBM
         PUSH    DX
