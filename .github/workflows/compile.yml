@@ -44,9 +44,11 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $clExe = (Get-Command cl).Source
-          $clBin = Split-Path -Path $clExe -Parent
-          $vcTools = Split-Path -Path (Split-Path -Path (Split-Path -Path $clExe -Parent) -Parent) -Parent
+          $vcTools = $env:VCToolsInstallDir
+          if (-not $vcTools) {
+            throw 'VCToolsInstallDir is not set.'
+          }
+          $clBin = Split-Path -Path (Get-Command cl).Source -Parent
           $sdkLib = Join-Path $env:WindowsSdkDir ("Lib\" + $env:WindowsSDKVersion.Trim() + "\um\x86")
           $compatRoot = Join-Path $env:GITHUB_WORKSPACE 'uasm-compat'
 
