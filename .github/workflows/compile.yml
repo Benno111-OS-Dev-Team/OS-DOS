@@ -266,7 +266,7 @@ jobs:
               $linkScript += 'libpath C:\WATCOM\lib286\dos'
             }
             if ($System -eq 'com') {
-              $linkScript += 'libfile cstart_t.obj'
+              $linkScript += 'libfile C:\WATCOM\lib286\dos\cstart_t.obj'
             }
             $linkScript += "file $($objArgs -join ', ')"
             Set-Content -Path $linkPath -Value $linkScript -Encoding ASCII
