@@ -3,8 +3,8 @@ FALSE   EQU     NOT TRUE
 
 ; Use the switches below to produce the standard Microsoft version or the IBM
 ; version of the operating system
-MSVER   EQU     FALSE
-IBM     EQU     TRUE
+MSVER   EQU     TRUE
+IBM     EQU     FALSE
 WANG    EQU     FALSE
 ALTVECT EQU     FALSE
 

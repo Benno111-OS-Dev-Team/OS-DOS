@@ -47,6 +47,7 @@ NAME    XENIX
         EXTRN   Get_sf_from_jfn:NEAR,$CLOSE:NEAR,Get_user_stack:NEAR
         EXTRN   $get_DPB:NEAR,GETCURRDIR:NEAR,MatchAttributes:NEAR
         EXTRN   MOVNAMENOSET:NEAR,SetDirSrch:NEAR
+        EXTRN   GET_JFN_POINTER_ROUTINE:NEAR,GETENT:NEAR,NEXTENT:NEAR
 
 BREAK <Local data>
 
