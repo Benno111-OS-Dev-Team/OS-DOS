@@ -44,6 +44,17 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          $clExe = (Get-Command cl).Source
+          $clBin = Split-Path -Path $clExe -Parent
+          $vcTools = Split-Path -Path (Split-Path -Path (Split-Path -Path $clExe -Parent) -Parent) -Parent
+          $sdkLib = Join-Path $env:WindowsSdkDir ("Lib\" + $env:WindowsSDKVersion.Trim() + "\um\x86")
+          $compatRoot = Join-Path $env:GITHUB_WORKSPACE 'uasm-compat'
+
+          New-Item -ItemType Directory -Force -Path $compatRoot | Out-Null
+          New-Item -ItemType Junction -Force -Path (Join-Path $compatRoot 'bin') -Target $clBin | Out-Null
+          New-Item -ItemType Junction -Force -Path (Join-Path $compatRoot 'include') -Target (Join-Path $vcTools 'include') | Out-Null
+          New-Item -ItemType Junction -Force -Path (Join-Path $compatRoot 'lib') -Target (Join-Path $vcTools 'lib\x86') | Out-Null
+
           $makefile = @(
             'Makefile-Win-MSVC-32.mak',
             'Makefile-Win-MSVC-64.mak',
@@ -56,7 +67,7 @@ jobs:
             throw 'UASM makefile not found.'
           }
 
-          & nmake /nologo /f $makefile
+          & nmake /nologo /f $makefile VCDIR=$compatRoot W32LIB=$sdkLib
 
       - name: Locate UASM
         shell: pwsh
