@@ -125,9 +125,6 @@ jobs:
 
             switch ($asm.Name.ToUpperInvariant()) {
               'COMMAND.ASM' {
-                $content = $content -replace '(?ms)ZZY\s+PROC\s+FAR\s*\r?\n\s*RET\s*(; Leave flags on stack)?\s*\r?\n\s*ZZY\s+ENDP', "ZZY     PROC    FAR`r`n        RETF`r`nZZY     ENDP"
-                $content = $content -replace '(?ms)TREMCHECK\s+PROC\s+FAR\s*\r?\n\s*CALL\s+REMCHECK\s*\r?\n\s*RET\s*\r?\n\s*TREMCHECK\s+ENDP', "TREMCHECK PROC   FAR`r`n        CALL    REMCHECK`r`n        RETF`r`nTREMCHECK ENDP"
-                $content = $content -replace '(?ms)THEADFIX\s+PROC\s+FAR\s*\r?\n\s*CALL\s+HEADFIX\s*\r?\n\s*RET\s*\r?\n\s*THEADFIX\s+ENDP', "THEADFIX PROC   FAR`r`n        CALL    HEADFIX`r`n        RETF`r`nTHEADFIX ENDP"
               }
               'MSDATA.ASM' {
                 $content = $content -replace '(?m)^\s*short_addr\s+DEVIOBUF\s*$', '                short_addr  DSKCHRETBUF'
@@ -246,9 +243,6 @@ jobs:
             'OUT'
             'ECHO'
             'GOTO'
-            'RETF'
-            'RETf'
-            'retf'
             'IRET'
           )
           $keywords | Set-Content -Path (Join-Path $buildRoot 'nokeyword.txt')
