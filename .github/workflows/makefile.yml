@@ -34,8 +34,28 @@ jobs:
       - name: Verify toolchain
         shell: cmd
         run: |
-          where ml || exit /b 1
           where link || exit /b 1
+
+      - name: Build UASM
+        shell: cmd
+        run: |
+          git clone --depth 1 --branch v2.57r https://github.com/Terraspace/UASM.git uasm
+          cd uasm
+          nmake /nologo /f Msvc.mak || exit /b 1
+
+      - name: Locate UASM
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $uasmExe = Get-ChildItem -Path (Join-Path $env:GITHUB_WORKSPACE 'uasm') -Recurse -File |
+            Where-Object { $_.Name -match '^(uasm|hjwasm)\.exe$' } |
+            Select-Object -First 1
+
+          if (-not $uasmExe) {
+            throw "Could not locate a built UASM executable."
+          }
+
+          "UASM_EXE=$($uasmExe.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding ascii
 
       - name: Prepare build tree
         shell: pwsh
@@ -55,12 +75,6 @@ jobs:
             $content = Get-Content -Path $asm.FullName -Raw
             $content = $content -replace '(?im)^\s*INCLUDE\s+DOST:DOSSYM\.ASM\s*$', 'INCLUDE DOSSYM.ASM'
             [System.IO.File]::WriteAllText($asm.FullName, $content, [System.Text.Encoding]::ASCII)
-          }
-
-          $ioStub = Join-Path $workSrc 'IO.ASM'
-          if (-not (Test-Path $ioStub)) {
-            $stub = "; Temporary compile stub used only in CI because the repository does not ship IO.ASM.`r`n; The workflow compiles the present source tree and does not link the outputs.`r`n"
-            Set-Content -Path $ioStub -Value $stub -NoNewline
           }
 
           $modules = New-Object System.Collections.Generic.List[string]
@@ -119,6 +133,7 @@ jobs:
           $workSrc = Join-Path $repoRoot 'build\src'
           $objRoot = Join-Path $repoRoot 'build\obj'
           $logRoot = Join-Path $repoRoot 'build\logs'
+          $assembler = $env:UASM_EXE
           $modules = Get-Content -Path (Join-Path $repoRoot 'build\modules.txt')
 
           $failures = New-Object System.Collections.Generic.List[string]
@@ -128,7 +143,7 @@ jobs:
             $logPath = Join-Path $logRoot "$module.log"
 
             Write-Host "Assembling $module"
-            & ml /c /nologo /Cp /Zm /omf /DTRUE=0FFFFH /DFALSE=0000H /Fo"$objPath" "$asmPath" 2>&1 | Tee-Object -FilePath $logPath
+            & $assembler /c /nologo /Cp /Fo"$objPath" "$asmPath" 2>&1 | Tee-Object -FilePath $logPath
             if ($LASTEXITCODE -ne 0) {
               $failures.Add($module)
             }
