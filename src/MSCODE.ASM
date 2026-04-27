@@ -106,7 +106,7 @@ NOTOEM:
         JBE     SAVREGS
 BADCALL:
         MOV     AL,0
-entry   IRET
+entry   IRETRTN
         IRET
 
 entry   CALL_ENTRY                      ; System call entry point and dispatcher
