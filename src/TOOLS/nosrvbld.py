@@ -21,6 +21,8 @@ def parse_msg_file(msg_path):
     current_num = None
     current_lines = []
 
+    # Use errors='replace' to handle vintage DOS source files that may contain
+    # non-ASCII characters (e.g. extended ASCII in comments or message text).
     with open(msg_path, 'r', errors='replace') as f:
         lines = f.readlines()
 
@@ -75,6 +77,8 @@ def parse_skl_file(skl_path):
     current_class = None
     current_entries = []
 
+    # Use errors='replace' to handle vintage DOS source files that may contain
+    # non-ASCII characters (e.g. extended ASCII in comments).
     with open(skl_path, 'r', errors='replace') as f:
         lines = f.readlines()
 
@@ -166,7 +170,7 @@ def build_cl_file(name, suffix, entries, sections, skl_section):
 
         msg_lines = section_msgs.get(num)
         if msg_lines is None:
-            # Message not found; emit a warning but skip silently
+            # Message not found; emit a warning and skip this entry
             sys.stderr.write(
                 f"Warning: message {num} not found in section "
                 f"'{skl_section if kind == 'def' else args['section']}'\n"
@@ -208,6 +212,8 @@ def main():
         suffix = class_id_to_suffix(class_id)
         content = build_cl_file(basename, suffix, entries, sections, skl_section)
         out_path = os.path.join(out_dir, f"{basename}.cl{suffix}")
+        # Write with Unix line endings (LF only) to match the original tool's
+        # output format, which the existing checked-in .cl files use.
         with open(out_path, 'w', newline='\n') as f:
             f.write(content)
 
