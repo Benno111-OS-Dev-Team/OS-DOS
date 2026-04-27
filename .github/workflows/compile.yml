@@ -1,0 +1,128 @@
+name: Compile OS-DOS
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: compile-os-dos-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Compile assembly sources
+    runs-on: windows-2022
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup MSVC (x86)
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+
+      - name: Verify assembler availability
+        shell: cmd
+        run: |
+          where ml || exit /b 1
+          where link || exit /b 1
+
+      - name: Prepare build tree
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $repoRoot = $env:GITHUB_WORKSPACE
+          $srcRoot = Join-Path $repoRoot 'src'
+          $buildRoot = Join-Path $repoRoot 'build'
+          $workSrc = Join-Path $buildRoot 'src'
+          $objRoot = Join-Path $buildRoot 'obj'
+          $logRoot = Join-Path $buildRoot 'logs'
+
+          New-Item -ItemType Directory -Force -Path $workSrc, $objRoot, $logRoot | Out-Null
+          Copy-Item -Path (Join-Path $srcRoot '*') -Destination $workSrc -Recurse -Force
+
+          foreach ($asm in Get-ChildItem -Path $workSrc -Filter *.ASM -File) {
+            $content = Get-Content -Path $asm.FullName -Raw
+            $content = $content -replace '(?im)^\s*INCLUDE\s+DOST:DOSSYM\.ASM\s*$', 'INCLUDE DOSSYM.ASM'
+            [System.IO.File]::WriteAllText($asm.FullName, $content, [System.Text.Encoding]::ASCII)
+          }
+
+          $ioStub = Join-Path $workSrc 'IO.ASM'
+          if (-not (Test-Path $ioStub)) {
+            @'
+; Temporary compile stub used only in CI because the repository does not ship IO.ASM.
+; The workflow compiles the present source tree and does not link the outputs.
+'@ | Set-Content -Path $ioStub -NoNewline
+          }
+
+          $modules = New-Object System.Collections.Generic.List[string]
+          $seen = New-Object System.Collections.Generic.HashSet[string] ([System.StringComparer]::OrdinalIgnoreCase)
+          foreach ($linkFile in @('COMLINK', 'DOSLINK')) {
+            $path = Join-Path $workSrc $linkFile
+            $text = Get-Content -Path $path -Raw
+            foreach ($match in [regex]::Matches($text, '(?i)\b[A-Z0-9_]+\b')) {
+              $token = $match.Value
+              $token = $token.ToUpperInvariant()
+              if ($token -match '^[A-Z0-9_]+$') {
+                $asmPath = Join-Path $workSrc "$token.ASM"
+                if ((Test-Path $asmPath) -and $seen.Add($token)) {
+                  $modules.Add($token)
+                }
+              }
+            }
+          }
+
+          $extraModules = @('MSDOS', 'MSCODE', 'SYSINIT', 'SYS', 'UINIT')
+          foreach ($token in $extraModules) {
+            if ($seen.Add($token) -and (Test-Path (Join-Path $workSrc "$token.ASM"))) {
+              $modules.Add($token)
+            }
+          }
+
+          $modules | Set-Content -Path (Join-Path $buildRoot 'modules.txt')
+
+      - name: Compile modules
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $repoRoot = $env:GITHUB_WORKSPACE
+          $workSrc = Join-Path $repoRoot 'build\src'
+          $objRoot = Join-Path $repoRoot 'build\obj'
+          $logRoot = Join-Path $repoRoot 'build\logs'
+          $modules = Get-Content -Path (Join-Path $repoRoot 'build\modules.txt')
+
+          $failures = New-Object System.Collections.Generic.List[string]
+          foreach ($module in $modules) {
+            $asmPath = Join-Path $workSrc "$module.ASM"
+            $objPath = Join-Path $objRoot "$module.obj"
+            $logPath = Join-Path $logRoot "$module.log"
+
+            Write-Host "Assembling $module"
+            & ml /c /nologo /Cp /Fo"$objPath" "$asmPath" 2>&1 | Tee-Object -FilePath $logPath
+            if ($LASTEXITCODE -ne 0) {
+              $failures.Add($module)
+            }
+          }
+
+          if ($failures.Count -gt 0) {
+            Write-Host "Compile failed for:"
+            $failures | ForEach-Object { Write-Host " - $_" }
+            exit 1
+          }
+
+          Write-Host "Compile completed successfully."
+
+      - name: Upload object files
+        uses: actions/upload-artifact@v4
+        with:
+          name: os-dos-objects-${{ github.run_number }}
+          path: build/obj
+          if-no-files-found: error

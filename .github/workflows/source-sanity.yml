@@ -1,0 +1,78 @@
+name: Source Sanity
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-sanity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate source tree
+    runs-on: windows-2022
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check DOS source hygiene
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $srcDir = Join-Path $env:GITHUB_WORKSPACE 'src'
+          $problems = New-Object System.Collections.Generic.List[string]
+          $externalIncludes = @('IO.ASM')
+
+          foreach ($file in Get-ChildItem -Path $srcDir -File) {
+            if ($file.Extension -ieq '.OVR') {
+              continue
+            }
+
+            $bytes = [System.IO.File]::ReadAllBytes($file.FullName)
+            if ($bytes.Length -gt 0 -and ($bytes[-1] -eq 0 -or $bytes[-1] -eq 26)) {
+              $problems.Add("Trailing DOS padding found in $($file.Name)")
+            }
+          }
+
+          $includePattern = '(?im)^\s*INCLUDE\s+([^\s;]+)'
+          $referenced = New-Object System.Collections.Generic.HashSet[string] ([System.StringComparer]::OrdinalIgnoreCase)
+
+          foreach ($asm in Get-ChildItem -Path $srcDir -Filter *.ASM -File) {
+            $content = Get-Content -Path $asm.FullName -Raw
+            foreach ($match in [regex]::Matches($content, $includePattern)) {
+              $include = $match.Groups[1].Value
+              $colon = $include.LastIndexOf(':')
+              if ($colon -ge 0) {
+                $include = $include.Substring($colon + 1)
+              }
+
+              [void]$referenced.Add($include)
+            }
+          }
+
+          foreach ($include in $referenced) {
+            if ($externalIncludes -contains $include) {
+              continue
+            }
+
+            if (-not (Test-Path -Path (Join-Path $srcDir $include))) {
+              $problems.Add("Missing INCLUDE target: $include")
+            }
+          }
+
+          if ($problems.Count -gt 0) {
+            Write-Host "Source sanity check failed:"
+            $problems | ForEach-Object { Write-Host " - $_" }
+            exit 1
+          }
+
+          Write-Host "Source sanity check passed."
