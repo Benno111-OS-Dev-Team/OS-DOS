@@ -242,6 +242,8 @@ jobs:
             'ECHO'
             'GOTO'
             'RETF'
+            'RETf'
+            'retf'
             'IRET'
           )
           $keywords | Set-Content -Path (Join-Path $buildRoot 'nokeyword.txt')
