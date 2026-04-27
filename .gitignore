@@ -4,3 +4,5 @@
 /*fullbuild_test*/
 test*.err
 *.obj
+*.log
+*.tmp

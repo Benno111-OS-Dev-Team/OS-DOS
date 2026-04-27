@@ -1,0 +1,12 @@
+; Use the following booleans to set assembly flags
+FALSE   EQU     0
+TRUE    EQU     NOT FALSE
+
+IBMVER  EQU     FALSE  ; CI compatibility build
+IBM     EQU     IBMVER
+MSVER   EQU     TRUE   ; CI compatibility build
+
+HIGHMEM EQU     FALSE   ; Run resident part above transient (high memory)
+KANJI   EQU     FALSE   ; Support for dual byte Microsoft KANJI standard
+IBMJAPAN        EQU     FALSE   ;MUST BE TRUE (along with IBM and KANJI)
+
