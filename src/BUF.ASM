@@ -97,7 +97,7 @@ ASSUME  DS:NOTHING,ES:NOTHING
         return
 ScanPlace   ENDP
 
-NRETJ:  JMP     NRETIBM
+NRETJ:  JMP     NRET
 
         procedure   PLACEBUF,NEAR
 ASSUME  DS:NOTHING,ES:NOTHING
