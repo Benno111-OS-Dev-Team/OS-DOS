@@ -59,10 +59,8 @@ jobs:
 
           $ioStub = Join-Path $workSrc 'IO.ASM'
           if (-not (Test-Path $ioStub)) {
-            @'
-; Temporary compile stub used only in CI because the repository does not ship IO.ASM.
-; The workflow compiles the present source tree and does not link the outputs.
-'@ | Set-Content -Path $ioStub -NoNewline
+            $stub = "; Temporary compile stub used only in CI because the repository does not ship IO.ASM.`r`n; The workflow compiles the present source tree and does not link the outputs.`r`n"
+            Set-Content -Path $ioStub -Value $stub -NoNewline
           }
 
           $modules = New-Object System.Collections.Generic.List[string]
