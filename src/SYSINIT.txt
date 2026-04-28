@@ -11,12 +11,6 @@ transfered with a long jump to the external  variable  SYSINIT
 This word contains the segment number where DOS starts in
 memory.  The OEM bios must set this value.
 
-    FINAL_DOS_LOCATION      WORD
-
-This word contains the segment number where DOS will run.
-If DOS is already loaded in place, set this to match
-CURRENT_DOS_LOCATION.  The OEM bios must set this value.
-
     DEVICE_LIST             DWORD
 
 This  double  word  pointer  points  to  the  linked  list  of
@@ -72,9 +66,6 @@ NOTES:
 highest 10K of memory ("highest" is determined by the  value
 of the MEMORY_SIZE variable), DO NOT DO WRITES THERE.
      Since this is called AFTER DOS is initialized, you can
-make system calls.  If DOS is booted in place, the code for
-this routine must remain in memory separately from the DOS
-image, and FINAL_DOS_LOCATION should point at the in-place
-segment.
+make system calls.
      If you don't want  anything done just set this to point
 at a FAR RET instruction.
