@@ -402,7 +402,7 @@ jobs:
                   log_error(f"Missing required file: {p}")
                   raise RuntimeError(f"Missing required file: {p}")
               data = p.read_bytes()
-                      log_warn(f"{name} is MZ; stripping {header_size} bytes of EXE header for flat boot image")
+                      log_info(f"{name}: stripping {header_size} bytes of EXE header for flat boot image")
               clusters = max(1, math.ceil(len(data) / (bps * sectors_per_cluster)))
               log_info(f"{name}: {len(data)} bytes -> {clusters} cluster(s)")
               file_data.append((name, attr, data, clusters))
