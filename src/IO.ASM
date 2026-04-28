@@ -74,24 +74,16 @@ ASSUME  SS:DOSGROUP,CS:DOSGROUP
         EXTRN   get_sf_from_jfn:NEAR
         EXTRN   save_world:NEAR,restore_world:NEAR
 
-; Byte offset of sys_fcb inside sf_entry (past sf_ref_count, sf_mode, sf_attr)
-SF_FCB_OFF  EQU     3
-
 ;=========================================================================
-SUBTTL  GET_IO_FCB - map JFN to sys_fcb pointer
+SUBTTL  GET_IO_FCB - map JFN to sf_entry pointer
 ;=========================================================================
 ; Input:   BX = JFN  (0=stdin  1=stdout  2=stderr  3=aux  4=prn)
-; Output:  NC -> DS:SI = pointer to sys_fcb entry
+; Output:  NC -> ES:DI = pointer to sf_entry  (CF propagated from get_sf_from_jfn)
 ;          C  -> invalid JFN
 ;
         procedure   GET_IO_FCB,NEAR
         ASSUME  DS:DOSGROUP,ES:NOTHING
         INVOKE  get_sf_from_jfn         ; ES:DI -> sf_entry, CF on error
-        retc
-        MOV     SI,DI
-        ADD     SI,SF_FCB_OFF           ; skip sf_ref_count/mode/attr
-        MOV     DS,ES                   ; DS:SI -> sys_fcb
-        ASSUME  DS:NOTHING
         return
 GET_IO_FCB  ENDP
 
