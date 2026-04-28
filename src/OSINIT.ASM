@@ -108,9 +108,10 @@ DOSINIT:
         MOV     AX,CS
         MOV     SS,AX
 ASSUME  SS:DOSGROUP
-        MOV     WORD PTR [DEVHEAD+2],BX
-        MOV     WORD PTR [DEVHEAD],SI   ; DS:SI Points to CONSOLE Device
-        PUSH    DS
+        PUSH    CS
+        POP     ES
+        MOV     WORD PTR ES:[DEVHEAD+2],BX
+        MOV     WORD PTR ES:[DEVHEAD],SI   ; DS:SI Points to CONSOLE Device
         MOV     DS,BX
         CALL    CHARINIT
         PUSH    SI
@@ -140,17 +141,15 @@ ASSUME  ES:DOSGROUP
         MOV     AX,DS
         STOSW
         OR      BYTE PTR [SI.SDEVATT],ISCIN OR ISCOUT
-        MOV     AX,DS
-        POP     DS
-        MOV     WORD PTR [BCON],SI
-        MOV     WORD PTR [BCON+2],AX
+        MOV     WORD PTR ES:[BCON],SI
+        MOV     WORD PTR ES:[BCON+2],DS
 CHAR_INIT_LOOP:
         LDS     SI,DWORD PTR [SI]               ; AUX device
         CALL    CHARINIT
         TEST    BYTE PTR [SI.SDEVATT],ISCLOCK
         JZ      CHAR_INIT_LOOP
-        MOV     WORD PTR [BCLOCK],SI
-        MOV     WORD PTR [BCLOCK+2],DS
+        MOV     WORD PTR ES:[BCLOCK],SI
+        MOV     WORD PTR ES:[BCLOCK+2],DS
         MOV     BP,OFFSET DOSGROUP:MEMSTRT      ; ES:BP points to DPB
 PERDRV:
         LDS     SI,DWORD PTR [SI]               ; Next device
@@ -162,9 +161,9 @@ PERDRV:
         MOV     CL,[CALLUNIT]
         XOR     CH,CH
         MOV     [SI.SDEVNAME],CL                ; Number of units in name field
-        MOV     DL,[NUMIO]
+        MOV     DL,ES:[NUMIO]
         XOR     DH,DH
-        ADD     [NUMIO],CL
+        ADD     BYTE PTR ES:[NUMIO],CL
         PUSH    DS
         PUSH    SI
         LDS     BX,[CALLBPB]
@@ -179,9 +178,9 @@ PERUNIT:
         PUSH    DX
         invoke  $SETDPB
         MOV     AX,ES:[BP.dpb_sector_size]
-        CMP     AX,[MAXSEC]
+        CMP     AX,ES:[MAXSEC]
         JBE     NOTMAX
-        MOV     [MAXSEC],AX
+        MOV     ES:[MAXSEC],AX
 NOTMAX:
         POP     DX
         POP     CX
