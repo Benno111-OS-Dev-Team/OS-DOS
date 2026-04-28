@@ -275,7 +275,7 @@ bad_file:
 xERROR:
         MOV     AH,STD_CON_STRING_OUTPUT
         INT     21H
-        RET                             ;FAR return to MS-DOS
+        RET                             ;FAR return to OS-DOS
 TOOBIG:
         MOV     DX,OFFSET NOROOM
         JMP     xERROR

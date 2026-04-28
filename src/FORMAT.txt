@@ -43,7 +43,7 @@ control (by the OS-DEV-TEAM module) is like this:
       +---->--------------------------+
 
     The INIT,  DISKFORMAT,  and  BADSECTOR  routines  are free
-to use any MS-DOS system calls, except for  calls  that  cause
+to use any OS-DOS system calls, except for  calls  that  cause
 disk accesses  on  the  disk  being  formatted.   DONE may use
 ANY calls, since by the time it is called  the  new  disk  has
 been formatted.
@@ -84,12 +84,12 @@ provided by the OEM:
         optimization.  The 0 byte fools IBM 1.X versions  into
         thinking  these entries are allocated instead of free,
         NOTE that IBM Personnal Computer DOS version 2.00  and
-        MS-DOS  version  1.25  will have no trouble with these
+        OS-DOS  version  1.25  will have no trouble with these
         disks, since they have the same optimization.  The "O"
         switch causes FORMAT to re-do the directory with a 0E5
         Hex byte at the start of each entry so that  the  disk
         may  be  used with 1.X versions of IBM PC DOS, as well
-        as MS-DOS 1.25/2.00 and IBM PC DOS 2.00.  This  switch
+        as OS-DOS 1.25/2.00 and IBM PC DOS 2.00.  This  switch
         should  only  be  given when needed because it takes a
         fair  amount  of  time  for  FORMAT  to  perform   the
         conversion,  and  it noticably decreases 1.25 and 2.00
@@ -274,7 +274,7 @@ following linker command will do:
         LINK FORMAT FORMES OEMFOR;
 
 This command will produce a file  called  FORMAT.EXE.   FORMAT
-has been  designed  to  run  under  MS-DOS  as a simple binary
+has been  designed  to  run  under  OS-DOS  as a simple binary
 .COM file.  This conversion is performed by  LOCATE  (EXE2BIN)
 with the command
 

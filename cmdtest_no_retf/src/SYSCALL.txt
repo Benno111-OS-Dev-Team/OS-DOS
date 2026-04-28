@@ -16,7 +16,7 @@
 
 
 
-                          MS-DOS 2.0
+                          OS-DOS 2.0
 
                     System Calls Reference
 
@@ -430,9 +430,9 @@
         ; BL:CX is the (24 bit) user number
 
     Description:
-            Return MS-DOS version  number.   On  return  AL.AH
+            Return OS-DOS version  number.   On  return  AL.AH
         will  be  the  two  part version designation, ie.  for
-        MS-DOS 1.28 AL would be 1 and AH would be 28.  For pre
+        OS-DOS 1.28 AL would be 1 and AH would be 28.  For pre
         1.28 DOS AL = 0.  Note that version 1.1 is the same as
         1.10, not the same as 1.01.
 

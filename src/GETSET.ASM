@@ -1,4 +1,4 @@
-TITLE  GETSET - GETting and SETting MS-DOS system calls
+TITLE  GETSET - GETting and SETting OS-DOS system calls
 NAME   GETSET
 ;
 ; System Calls which get and set various things
@@ -65,7 +65,7 @@ OEMNUM  DB      0                       ; 8 bit OEM number
 OEMNUM  DB      0FFH                    ; 8 bit OEM number
         ENDIF
 
-MSVERS  EQU     THIS WORD               ; MS-DOS version in hex for $GET_VERSION
+MSVERS  EQU     THIS WORD               ; OS-DOS version in hex for $GET_VERSION
 MSMAJOR DB      DOS_MAJOR_VERSION
 MSMINOR DB      DOS_MINOR_VERSION
 
@@ -77,7 +77,7 @@ ASSUME  DS:NOTHING,ES:NOTHING
 ; Inputs:
 ;       None
 ; Function:
-;       Return MS-DOS version number
+;       Return OS-DOS version number
 ; Outputs:
 ;       OEM number in BH
 ;       User number in BL:CX (24 bits)

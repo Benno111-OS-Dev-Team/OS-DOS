@@ -1,8 +1,8 @@
-TITLE   DEBUGger for MS-DOS
+TITLE   DEBUGger for OS-DOS
 ; DEBUG-86 8086 debugger runs under 86-DOS       version 2.30
 ;
 ; Modified 5/4/82 by AaronR to do all I/O direct to devices
-; Runs on MS-DOS 1.28 and above
+; Runs on OS-DOS 1.28 and above
 ; REV 1.20
 ;       Tab expansion
 ;       New device interface (1.29 and above)

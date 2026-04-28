@@ -42,7 +42,7 @@ as follows:
 
 The user manual contains some significant errors.  Most of these are
 due to last minute changes to achieve a greater degree of compatibility
-with IBM's implementation of MS-DOS (PC DOS).  This includes the use
+with IBM's implementation of OS-DOS (PC DOS).  This includes the use
 of "\" instead of "/" as the path separator, and "/" instead of "-"
 as the switch character.  For transporting of batch files across
 machines, OS-DEV-TEAM encourages the use of "\" and "/" respectively
@@ -127,7 +127,7 @@ The following problems are known to exist:
 
 
     Chris Larson
-    MS-DOS Product Marketing Manager
+    OS-DOS Product Marketing Manager
     (206) 828-8080
 
 

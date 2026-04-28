@@ -1,6 +1,6 @@
         TITLE   CLOCK - Enable/disable clock interrupts
 
-; "CLOCK" module for MS-DOS profile program. This implements the
+; "CLOCK" module for OS-DOS profile program. This implements the
 ;       PROFIL program on the Seattle Computer Products 8086 system
 
 INTSEG  SEGMENT AT 0

@@ -7,7 +7,7 @@ TRUE    EQU     NOT FALSE
 .xcref
         INCLUDE DOSSYM.ASM
 ;The DOST: prefix is a DEC TOPS/20 directory prefix. Remove it for
-;   assembly in MS-DOS assembly environments using MASM. The DOSSYM.ASM
+;   assembly in OS-DOS assembly environments using MASM. The DOSSYM.ASM
 ;   file must exist though, it is included with OEM distribution.
 .cref
 .list

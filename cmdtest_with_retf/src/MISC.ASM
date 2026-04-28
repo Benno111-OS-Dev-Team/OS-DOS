@@ -1,4 +1,4 @@
-TITLE MISC - Miscellanious routines for MS-DOS
+TITLE MISC - Miscellanious routines for OS-DOS
 NAME  MISC
 ;
 ; Miscellaneous system calls most of which are CAVEAT

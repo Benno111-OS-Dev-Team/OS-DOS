@@ -1,4 +1,4 @@
-                  MS-DOS 2.0 Device Drivers
+                  OS-DOS 2.0 Device Drivers
 
 INTRODUCTION
 
@@ -21,7 +21,7 @@ from the old jump-table style  to  one  in  which  the  device
 drivers  are  linked  together  in  a  list.   This allows new
 drivers for  optional  hardware  to  be  installed  (and  even
 written) in  the  field  by other vendors or the user himself.
-This flexibility is one of the major new  features  of  MS-DOS
+This flexibility is one of the major new  features  of  OS-DOS
 2.0.
 
     Each driver  in  the  chain  defines two entry points; the
@@ -29,7 +29,7 @@ strategy routine and  the  interrupt  routine.   The  2.0  DOS
 does not  really make use of two entry points (it simply calls
 strategy, then immediately calls interrupt).  This dual  entry
 point scheme  is  designed  to facilitate future multi-tasking
-versions of MS-DOS.  In multi-tasking  environments  I/O  must
+versions of OS-DOS.  In multi-tasking  environments  I/O  must
 be asynchronous,  to  accomplish  this  the  strategy  routine
 will be called to queue  (internally)  a  request  and  return
 quickly.  It  is  then  the  responsibility  of  the interrupt
@@ -57,7 +57,7 @@ has the same  format  for  all  requests  (called  the  static
 request header),  which  is  followed  by information specific
 to the request.  Thus packets have a variable size and format.
 
-    At this points it should be  emphasized  that  MS-DOS  2.0
+    At this points it should be  emphasized  that  OS-DOS  2.0
 does not  implement most of these features, as future versions
 will.  There is no global or local queue.   Only  one  request
 is pending at any one time, and the DOS waits for this current
@@ -108,7 +108,7 @@ of all  drivers:   if  driver  ALPHA is the first block driver
 in the device chain, and it defines 4 units (0-3),  then  they
 will be  A,B,C  and  D.   If  BETA  is the second block driver
 and defines three units (0-2),  then  they  will  be  E,F  and
-G and  so  on.   MS-DOS  2.0 is not limited to 16 block device
+G and  so  on.   OS-DOS  2.0 is not limited to 16 block device
 units, as  previous  versions  were.   The  theoretical  limit
 is 63  (2^6  -  1),  but  it should be noted that after 26 the
 drive letters get a little strange (like ] \  and  ^).   NOTE:
@@ -267,7 +267,7 @@ NOTE:  Since  SYSINIT  may  install  the  driver anywhere, you
 
 INSTALLATION OF DEVICE DRIVERS
 
-    Unlike past versions MS-DOS 2.0 allows new device  drivers
+    Unlike past versions OS-DOS 2.0 allows new device  drivers
 to   be   installed   dynamically   at  boot  time.   This  is
 accomplished by the new SYSINIT module supplied by  OS-DEV-TEAM,
 which reads  and  processes  the CONFIG.SYS file.  This module
@@ -546,7 +546,7 @@ NOTE: THE FOLLOWING APPLIES TO BLOCK DEVICE DRIVERS.
 do a write operation of 64K bytes which seems to  be  a  "wrap
 around" of  the transfer address in the BIOS I/O packet.  This
 arises due to an optimization  added  to  the  write  code  in
-MS-DOS.  It will only manifest on user WRITEs which are within
+OS-DOS.  It will only manifest on user WRITEs which are within
 a sector size of 64K bytes on files which are  "growing"  past
 the current  EOF.   IT  IS  ALLOWABLE  FOR  THE BIOS TO IGNORE
 THE BALANCE OF  THE  WRITE  WHICH  "WRAPS  AROUND"  IF  IT  SO
@@ -566,7 +566,7 @@ NON DESRUCTIVE READ NO WAIT - ES:BX ->
             +------------------------------------+
 
     This call is analogous to the console  input  status  call
-on MS-DOS  1.25.   If  the  character  device returns Busy bit
+on OS-DOS  1.25.   If  the  character  device returns Busy bit
 = 0 (characters in  buffer),  then  the  next  character  that
 would be  read  is  returned.   This  character is NOT removed
 from the input buffer (hence the term Non  Destructive  Read).

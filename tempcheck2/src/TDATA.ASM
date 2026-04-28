@@ -95,7 +95,7 @@ DMES    DB      " <DIR>   $"
 VERMES_PRE  DB      "TeleVideo Personal Computer DOS Version "
         ENDIF
         IF      MSVER
-VERMES_PRE  DB      "MS-DOS Version "
+VERMES_PRE  DB      "OS-DOS Version "
         ENDIF
 VERMES_POST DB      "$"
 

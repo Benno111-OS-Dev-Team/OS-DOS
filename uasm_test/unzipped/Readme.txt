@@ -35,12 +35,12 @@ JWasm Readme
       Windows.
 
     - JWASMD.EXE, a precompiled DOS binary, runs in DOS 32bit protected-mode.
-      It requires a 80386 cpu and needs a MS-DOS v5 compatible DOS to run
+      It requires a 80386 cpu and needs a OS-DOS v5 compatible DOS to run
       (FreeDOS v1 will do). Long filenames (LFN) are supported. JWASMD.EXE
       won't run on 64-bit Windows.
 
     - JWASMR.EXE is a DOS real-mode program which runs on any x86 cpu.
-      Similar to JWASMD.EXE it needs a MS-DOS v5 compatible DOS. This version
+      Similar to JWASMD.EXE it needs a OS-DOS v5 compatible DOS. This version
       has some restrictions, to limit the amount of memory the binary will need.
 
     Memory requirements depend on the source which is assembled. The source

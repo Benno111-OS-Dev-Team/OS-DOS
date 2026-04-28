@@ -16,7 +16,7 @@
 
 
 
-                          MS-DOS 2.0
+                          OS-DOS 2.0
 
                       Utility Extensions
 
@@ -370,7 +370,7 @@ BREAK [{ON | OFF}]
     Where xxx is "on" or "off".
 
 PROMPT [<prompt-text>]
-    Set the  system  prompt.   MS-DOS  prompts  are  now  user
+    Set the  system  prompt.   OS-DOS  prompts  are  now  user
     settable, all  of the text on the command line is taken to
     be the new prompt.  If no text is present  the  prompt  is
     set  to  the  default  prompt.  There are meta strings for
@@ -392,7 +392,7 @@ PROMPT [<prompt-text>]
 
     EXAMPLE:
         PROMPT $n:
-                Would set the normal MS-DOS prompt.
+                Would set the normal OS-DOS prompt.
         PROMPT $n>
                 Would det the normal PC-DOS prompt.
         PROMPT Time = $t$_Date = $d
@@ -511,7 +511,7 @@ RECOVER - recover files from a trashed disk.
 
 
 
-DEBUG ON MS-DOS 2.0
+DEBUG ON OS-DOS 2.0
 
 
     When 2.0 DEBUG is invoked it  sets  up  a  program  header
@@ -643,11 +643,11 @@ FORMAT enhancements
 
 
 
-CHKDSK FOR MS-DOS 2.0
+CHKDSK FOR OS-DOS 2.0
 
 
-    MS-DOS  2.0  has  a tree structured directory scheme which
-did not exist on previous versions of  MS-DOS.   As  a  result
+    OS-DOS  2.0  has  a tree structured directory scheme which
+did not exist on previous versions of  OS-DOS.   As  a  result
 CHKDSK  is  a  much  more  complex  program  than  in previous
 versions since it must perform a tree traversal to find all of
 the  files  on  a  given  disk.   It  employes  a  depth first
@@ -695,7 +695,7 @@ which causes a  trace  of  the  files  and  directories  being
 processed to be printed as CHKDSK runs.
 
 
-FILTERS FOR MS-DOS 2.0
+FILTERS FOR OS-DOS 2.0
 
     A filter is a utility  that  reads  from  standard  input,
 modifies  the  information in some way, then writes the result
@@ -703,7 +703,7 @@ to standard output.  In this way the data is said to have been
 "filtered"  by  the  program.   Since different filters can be
 piped together in many different ways a few filters  can  take
 the place of a large number of specific purpose programs.  The
-following describes the filters that are provided with  MS-DOS
+following describes the filters that are provided with  OS-DOS
 2.0:
 
 CIPHER <key word>

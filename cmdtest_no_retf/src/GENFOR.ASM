@@ -1,4 +1,4 @@
-; Generic FORMAT module for any ms-dos disk erases the directory,
+; Generic FORMAT module for any OS-DOS disk erases the directory,
 ; zeros FAT, and marks bad sectors
 
         INCLUDE DOST:DOSSYM.ASM

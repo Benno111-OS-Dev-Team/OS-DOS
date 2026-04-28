@@ -25,7 +25,7 @@ DATE
 TIME
         Same as before
 VER
-        Prints MS-DOS version number
+        Prints OS-DOS version number
 VOL   [d:]
         Prints the volume ID of drive d:  (default if missing)
 CHDIR  [d:]path
@@ -98,7 +98,7 @@ RECOVER
         squeezes bad sectors out of files
 PRINT
         The infamous background file  printing  utility  which
-        fools you  into  thinking  MS-DOS  can do something it
+        fools you  into  thinking  OS-DOS  can do something it
         really can't.
 FILCOM
         Has not changed a bit

@@ -1,11 +1,11 @@
-                MS-DOS PROGRAM PROFILER
+                OS-DOS PROGRAM PROFILER
                   FOR .EXE .COM FILES
 
 
 I. PURPOSE
 
         The PROFIL program is designed to produce an execution
-    profile of MS-DOS 1.25 or  2.00  .EXE  or  .COM  files  on
+    profile of OS-DOS 1.25 or  2.00  .EXE  or  .COM  files  on
     8086/8088 systems  which  have a programmable interrupting
     clock.  The method employed is  to  chop  the  program  up
     into   a  sequence  of  "buckets"  and  to  increment  the

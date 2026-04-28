@@ -391,8 +391,8 @@ jobs:
           # bootable disk image. The system files are converted to flat images
           # by applying their relocation fixups at the expected load segments.
           files = [
-              ("IO.SYS", 0x06, 0x00C0),
-              ("OSDOS.SYS", 0x06, 0x01C0),
+              ("IO.SYS", 0x06, 0x0070),
+              ("OSDOS.SYS", 0x06, 0x0170),
               ("COMMAND.COM", 0x20, None),
               ("SYS.EXE", 0x20, None),
               ("EXE2BIN.EXE", 0x20, None),

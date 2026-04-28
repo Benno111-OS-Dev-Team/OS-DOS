@@ -1,4 +1,4 @@
-TITLE   RECOVER MS-DOS File/Disk Recovery Utility
+TITLE   RECOVER OS-DOS File/Disk Recovery Utility
 ;----------------------------------------------------------
 ;
 ;       Recover - Program to rebuild an ms.dos directory

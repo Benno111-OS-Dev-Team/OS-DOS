@@ -1,4 +1,4 @@
-; IO.ASM -- Standard I/O routines for MS-DOS
+; IO.ASM -- Standard I/O routines for OS-DOS
 ; Included by STDIO.ASM within the DOSGROUP segment context.
 ;
 ; STDIO.ASM already includes STDSW.ASM (defines ESCCH, CANCEL, etc.)
