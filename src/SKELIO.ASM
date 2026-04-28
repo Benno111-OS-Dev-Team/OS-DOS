@@ -1394,16 +1394,11 @@ HWINIT: XOR     BP,BP
 
         MOV     DX,OFFSET BOOTMSG_4
         CALL    BOOTMSG
-
-        MOV     BX,ROM_INIT
-        CALL    ROM_CALL
-        MOV     AH,0
-        MOV     MCON,AX
-
         MOV     DX,OFFSET BOOTMSG_1
         CALL    BOOTMSG
-        MOV     DX,OFFSET BOOTMSG_2
-        CALL    BOOTMSG
+
+        MOV     AX,0001H
+        MOV     MCON,AX
 
         MOV     AX,SEG SYSINIT
         MOV     DS,AX
