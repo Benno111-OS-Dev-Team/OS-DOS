@@ -110,6 +110,8 @@ DOSINIT:
 ASSUME  SS:DOSGROUP
         MOV     WORD PTR [DEVHEAD+2],BX
         MOV     WORD PTR [DEVHEAD],SI   ; DS:SI Points to CONSOLE Device
+        PUSH    DS
+        MOV     DS,BX
         CALL    CHARINIT
         PUSH    SI
         ADD     SI,SDEVNAME             ; Point to name
@@ -138,8 +140,10 @@ ASSUME  ES:DOSGROUP
         MOV     AX,DS
         STOSW
         OR      BYTE PTR [SI.SDEVATT],ISCIN OR ISCOUT
+        MOV     AX,DS
+        POP     DS
         MOV     WORD PTR [BCON],SI
-        MOV     WORD PTR [BCON+2],DS
+        MOV     WORD PTR [BCON+2],AX
 CHAR_INIT_LOOP:
         LDS     SI,DWORD PTR [SI]               ; AUX device
         CALL    CHARINIT
