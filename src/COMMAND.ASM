@@ -514,9 +514,6 @@ ALSO_BOGUS:
         CALL    WRONGCOM
         JMP     SHORT CHKSAME
 HAVCOM:
-        MOV     DX,OFFSET RESGROUP:BOOTDONE
-        MOV     AH,09H
-        INT     int_command
         MOV     AX,CHAR_OPER SHL 8
         INT     int_command
         MOV     [RSWITCHAR],DL
@@ -533,6 +530,9 @@ USESLASH:
         REP     MOVSW                   ; Transfer INFO to transient
         MOV     AX,[MEMSIZ]
         MOV     WORD PTR DS:[PDB_block_len],AX  ; Adjust my own header
+        MOV     DX,OFFSET RESGROUP:BOOTDONE
+        MOV     AH,09H
+        INT     int_command
         JMP     DWORD PTR [TRANS]
 
 ; Far call to REMCHECK for TRANSIENT
