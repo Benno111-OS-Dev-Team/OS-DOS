@@ -523,60 +523,14 @@ jobs:
               0x53,0x0D,0x0A,0x00,0x0D,0x0A,0x44,0x69,0x73,0x6B,0x20,0x72,0x65,0x61,0x64,0x20,
               0x65,0x72,0x72,0x6F,0x72,0x0D,0x0A,0x00
           ])
-          retry_handler = bytearray([
-              0xFE,0x0E,0x00,0x00,      # dec byte ptr [retry counter]
-              0x74,0x02,                # jz fail
-              0xEB,0xBE,                # jmp short back to the sector read loop
-          ])
-          boot_code[99:99] = retry_handler
-          boot_code[75] = 0x17
-          retry_counter_offset = len(boot_code)
-          retry_counter_addr = 0x7C00 + 62 + retry_counter_offset
-          boot_code.append(3)
-          boot_code[101:103] = retry_counter_addr.to_bytes(2, "little")
-          fail_handler_offset = len(boot_code)
-          boot_shift = len(retry_handler)
-          helper_offset = 144 + boot_shift
-          error_msg_addr = 0x7C00 + 62 + 196 + boot_shift
-          fail_handler = bytearray([
-              0x50,                         # push ax
-              0xBE,0x00,0x00,               # mov si,error_msg_addr ("Disk read error")
-              0xE8,0x00,0x00,               # call the existing string printer
-              0x58,                         # pop ax
-              0x8A,0xCC,                    # mov cl,ah
-              0xB4,0x0E,                    # mov ah,0Eh
-              0xB0,0x0D,0xCD,0x10,          # CR
-              0xB0,0x0A,0xCD,0x10,          # LF
-              0xB0,0x45,0xCD,0x10,          # 'E'
-              0xB0,0x52,0xCD,0x10,          # 'R'
-              0xB0,0x52,0xCD,0x10,          # 'R'
-              0xB0,0x3D,0xCD,0x10,          # '='
-              0xBB,0x00,0x00,               # mov bx,hex_table
-              0x8A,0xC1,                    # mov al,cl
-              0xC0,0xE8,0x04,               # shr al,4
-              0xD7,                         # xlat
-              0xCD,0x10,                    # int 10h
-              0x8A,0xC1,                    # mov al,cl
-              0x24,0x0F,                    # and al,0Fh
-              0xD7,                         # xlat
-              0xCD,0x10,                    # int 10h
-              0xFA,0xF4,0xEB,0xFC,          # cli / hlt / loop
-          ])
-          fail_handler.extend(b'0123456789ABCDEF')
-          fail_handler[2:4] = error_msg_addr.to_bytes(2, "little")
-          helper_call_rel = helper_offset - (fail_handler_offset + 7)
-          fail_handler[5:7] = int(helper_call_rel).to_bytes(2, "little", signed=True)
-          hex_table_offset = 0x7C00 + 62 + fail_handler_offset + len(fail_handler) - 16
-          fail_handler[37:39] = hex_table_offset.to_bytes(2, "little")
-          boot_code.extend(fail_handler)
           # Patch placeholders in boot code:
           #   0xAAAA -> start LBA (IO.SYS first sector)
           #   0xBBBB -> IO.SYS sector count
           if 62 + len(boot_code) > 510:
               log_error("Boot code is too large for sector payload area")
               raise RuntimeError("Boot code overflow: exceeds 510-byte limit")
-          boot_code[173:175] = io_start_lba.to_bytes(2, "little")
-          boot_code[175:177] = io_sector_count.to_bytes(2, "little")
+          boot_code[157:159] = io_start_lba.to_bytes(2, "little")
+          boot_code[159:161] = io_sector_count.to_bytes(2, "little")
           bs[62:62 + len(boot_code)] = boot_code
           bs[510:512] = b"\x55\xAA"
           image[0:512] = bs
