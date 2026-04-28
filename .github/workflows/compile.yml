@@ -351,6 +351,31 @@ jobs:
           Link-Group -OutputName 'SYS.EXE' -Modules @('SYS','SYSMES') -System 'dos'
           Link-Group -OutputName 'EXE2BIN.EXE' -Modules @('EXE2BIN','EXEMES') -System 'dos'
 
+      - name: Install mtools
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          choco install mtools -y --no-progress
+
+      - name: Build boot image
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $repoRoot = $env:GITHUB_WORKSPACE
+          $distRoot = Join-Path $repoRoot 'dist'
+          $bootImage = Join-Path $distRoot 'OSDOS-BOOT-1.44M.img'
+
+          Remove-Item -LiteralPath $bootImage -Force -ErrorAction SilentlyContinue
+          & mformat -i $bootImage -f 1440 ::
+          & mcopy -i $bootImage (Join-Path $distRoot 'IO.SYS') ::IO.SYS
+          & mcopy -i $bootImage (Join-Path $distRoot 'MSDOS.SYS') ::MSDOS.SYS
+          & mcopy -i $bootImage (Join-Path $distRoot 'COMMAND.COM') ::COMMAND.COM
+          & mcopy -i $bootImage (Join-Path $distRoot 'SYS.EXE') ::SYS.EXE
+          & mcopy -i $bootImage (Join-Path $distRoot 'EXE2BIN.EXE') ::EXE2BIN.EXE
+          & mattrib -i $bootImage +h +s ::IO.SYS
+          & mattrib -i $bootImage +h +s ::MSDOS.SYS
+          & mdir -i $bootImage ::
+
       - name: Upload object files
         uses: actions/upload-artifact@v4
         with:
