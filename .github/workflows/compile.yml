@@ -539,9 +539,8 @@ jobs:
               log_warn(f"Image size mismatch: expected {total_sectors * bps}, got {len(image)}")
           log_info("Included files: " + ", ".join(n for n, *_ in allocation))
           '@
-          # Remove YAML indentation from the embedded Python script before execution.
-          $py = (($py -split "`r?`n") | ForEach-Object { $_ -replace '^ {10}', '' }) -join "`n"
-          $py | python -
+          # Dedent embedded Python to avoid YAML indentation syntax errors.
+          $py | python -c "import sys,textwrap; exec(textwrap.dedent(sys.stdin.read()))"
 
       - name: Upload object files
         uses: actions/upload-artifact@v4
