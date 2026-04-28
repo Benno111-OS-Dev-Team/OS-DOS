@@ -1417,9 +1417,6 @@ ASSUME  DS:SEG SYSINIT
         MOV     AX,CS
         ADD     AX,((OFFSET WRKSTK - OFFSET INIT)+50) /16
         MOV     DS:[FINAL_DOS_LOCATION],AX
-        MOV     AX,CS
-        MOV     DS,AX
-        MOV     SI,OFFSET DEVSTART
         MOV     DX,OFFSET BOOTMSG_3
         CALL    BOOTMSG
         JMP     SYSINIT

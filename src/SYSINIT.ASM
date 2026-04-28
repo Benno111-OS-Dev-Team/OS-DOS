@@ -71,6 +71,8 @@ ASSUME  CS:SYSINITSEG,DS:NOTHING,ES:NOTHING,SS:NOTHING
         ENDIF
 
 SYSINIT:
+        MOV     DX,OFFSET SYSMSG_1
+        CALL    SYSMSG
         JMP     GOINIT
 
 DOSINFO                 LABEL   DWORD
@@ -117,6 +119,39 @@ PACKET                  DB      22
 UNITCOUNT               DB      0
 BREAK_ADDR              DD      0
 BPB_ADDR                DD      0
+
+SYSMSG_1                DB      "SYSINIT: entered",13,10,0
+SYSMSG_2                DB      "SYSINIT: relocating DOS",13,10,0
+
+SYSMSG:
+        PUSH    AX
+        PUSH    BX
+        PUSH    SI
+        PUSH    DS
+        PUSH    CS
+        POP     DS
+        MOV     SI,DX
+SYSMSG_LOOP:
+        LODSB
+        OR      AL,AL
+        JZ      SYSMSG_DONE
+        CMP     AL,0DH
+        JNE     SYSMSG_PRINT
+        MOV     AH,0EH
+        XOR     BX,BX
+        INT     10H
+        MOV     AL,0AH
+SYSMSG_PRINT:
+        MOV     AH,0EH
+        XOR     BX,BX
+        INT     10H
+        JMP     SHORT SYSMSG_LOOP
+SYSMSG_DONE:
+        POP     DS
+        POP     SI
+        POP     BX
+        POP     AX
+        RET
 
 GOINIT:
         CLD
@@ -211,6 +246,9 @@ SYSIN:
         STI                             ; Leave INTs disabled for ALTVECT
         ENDIF
 LOCSTACK LABEL BYTE
+
+        MOV     DX,OFFSET SYSMSG_2
+        CALL    SYSMSG
 
         CALL    MSDOS
         MOV     WORD PTR [DOSINFO+2],ES ; SAVE POINTER TO DOS INFO
