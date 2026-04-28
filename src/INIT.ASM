@@ -607,6 +607,17 @@ COPYCOMSP:
 
         IF      HIGHMEM
         MOV     DS,CS:[REALRES]
+        ELSE
+        PUSH    CS
+        POP     DS
+        ENDIF
+
+        CALL    LOADCOM                 ; Load COMMAND.COM as early as possible
+        CALL    CHKSUM                  ; Compute the checksum now
+        MOV     [SUM],DX                ; Save it
+
+        IF      HIGHMEM
+        MOV     DS,CS:[REALRES]
         PUSH    CS
         POP     ES
         MOV     AH,DEALLOC
@@ -641,9 +652,6 @@ COPYCOMSP:
         ENDIF
 
 GOTENVIR:
-        CALL    LOADCOM                 ; Load the transient in the right place
-        CALL    CHKSUM                  ; Compute the checksum
-        MOV     [SUM],DX                ; Save it
 IF IBM
         MOV     AX,[MEMSIZ]
         MOV     DX,OFFSET EGROUP:ZEXECDATAEND + 15
