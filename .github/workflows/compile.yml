@@ -312,9 +312,14 @@ jobs:
               $linkScript += 'end'
               $linkScript += 'system osdoscom'
             } else {
-              $linkScript += "system $System"
-              $linkScript += "libpath $watcomRoot\lib286"
-              $linkScript += "libpath $watcomRoot\lib286\dos"
+              $linkScript += 'system begin osdosdos'
+              $linkScript += "  option osname='DOS EXE'"
+              $linkScript += "  libpath $objRoot"
+              $linkScript += "  libpath $watcomRoot\lib286"
+              $linkScript += "  libpath $watcomRoot\lib286\dos"
+              $linkScript += '  format dos'
+              $linkScript += 'end'
+              $linkScript += 'system osdosdos'
             }
             $linkScript += "file $($fileArgs -join ', ')"
             Set-Content -Path $linkPath -Value $linkScript -Encoding ASCII
