@@ -388,27 +388,31 @@ jobs:
           total_clusters = data_sectors // sectors_per_cluster
 
           # Boot-critical files plus the helper utilities that ship with the
-          # bootable disk image.
+          # bootable disk image. The system files are flattened before being
+          # written so the boot loader jumps into code, not an EXE header.
           files = [
-              ("IO.SYS", 0x06),
-              ("OSDOS.SYS", 0x06),
-              ("COMMAND.COM", 0x20),
-              ("SYS.EXE", 0x20),
-              ("EXE2BIN.EXE", 0x20),
+              ("IO.SYS", 0x06, True),
+              ("OSDOS.SYS", 0x06, True),
+              ("COMMAND.COM", 0x20, False),
+              ("SYS.EXE", 0x20, False),
+              ("EXE2BIN.EXE", 0x20, False),
           ]
 
           file_data = []
-          for name, attr in files:
+          for name, attr, strip_header in files:
               p = dist / name
               if not p.exists():
                   log_error(f"Missing required file: {p}")
                   raise RuntimeError(f"Missing required file: {p}")
               data = p.read_bytes()
-              header_size = 0x20 if name.upper().endswith(".EXE") else 0
-              if header_size:
+              if strip_header:
+                  if len(data) < 0x1C or data[0:2] != b"MZ":
+                      raise RuntimeError(f"{name}: expected an MZ executable header to strip")
+                  header_paragraphs = int.from_bytes(data[8:10], "little")
+                  header_size = header_paragraphs * 16
                   if len(data) <= header_size:
-                      raise RuntimeError(f"{name}: file is too small to contain a valid EXE header")
-                  log_info(f"{name}: stripping {header_size} bytes of EXE header for flat boot image")
+                      raise RuntimeError(f"{name}: file is too small to contain a valid MZ header")
+                  log_info(f"{name}: stripping {header_size} bytes of MZ header for flat boot image")
                   data = data[header_size:]
               clusters = max(1, math.ceil(len(data) / (bps * sectors_per_cluster)))
               log_info(f"{name}: {len(data)} bytes -> {clusters} cluster(s)")
