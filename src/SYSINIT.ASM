@@ -122,6 +122,7 @@ BPB_ADDR                DD      0
 
 SYSMSG_1                DB      "SYSINIT: entered",13,10,0
 SYSMSG_2                DB      "SYSINIT: relocating DOS",13,10,0
+SYSMSG_3                DB      "BOOT COMPLETE",13,10,0
 
 SYSMSG:
         PUSH    AX
@@ -425,6 +426,9 @@ GOAUX2: MOV     DX,OFFSET AUXDEV
         MOV     DX,OFFSET PRNDEV
         MOV     AL,1                    ; WRITE ONLY
         CALL    OPEN_DEV
+
+        MOV     DX,OFFSET SYSMSG_3
+        CALL    SYSMSG
 ;
 ; SET UP THE PARAMETERS FOR COMMAND
 ;
