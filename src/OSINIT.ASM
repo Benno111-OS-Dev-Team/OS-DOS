@@ -98,10 +98,45 @@ LAST    SEGMENT BYTE PUBLIC 'LAST'
 SYSBUF  LABEL   WORD
 ASSUME  CS:DOSGROUP,DS:NOTHING,ES:NOTHING,SS:NOTHING
 
+DOSMSG_1                DB      "DOSINIT: entered",13,10,0
+DOSMSG_2                DB      "DOSINIT: calling MSDOS",13,10,0
+
+DOSMSG:
+        PUSH    AX
+        PUSH    BX
+        PUSH    SI
+        PUSH    DS
+        PUSH    CS
+        POP     DS
+        MOV     SI,DX
+DOSMSG_LOOP:
+        LODSB
+        OR      AL,AL
+        JZ      DOSMSG_DONE
+        CMP     AL,0DH
+        JNE     DOSMSG_PRINT
+        MOV     AH,0EH
+        XOR     BX,BX
+        INT     10H
+        MOV     AL,0AH
+DOSMSG_PRINT:
+        MOV     AH,0EH
+        XOR     BX,BX
+        INT     10H
+        JMP     SHORT DOSMSG_LOOP
+DOSMSG_DONE:
+        POP     DS
+        POP     SI
+        POP     BX
+        POP     AX
+        RET
+
 DOSINIT:
         CLI
         CLD
         MOV     [ENDMEM],DX
+        MOV     DX,OFFSET DOSMSG_1
+        CALL    DOSMSG
         MOV     [INITSP],SP
         MOV     [INITSS],SS
         MOV     SP,OFFSET DOSGROUP:INITSTACK

@@ -232,8 +232,8 @@ SYSIN:
         MOV     CX,DOSSIZE/2
         REP     MOVSW
 
-        LDS     SI,[DEVICE_LIST]
         MOV     DX,[MEMORY_SIZE]
+        LDS     SI,[DEVICE_LIST]
 
         CLI
         MOV     AX,CS
