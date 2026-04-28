@@ -402,7 +402,12 @@ jobs:
                   log_error(f"Missing required file: {p}")
                   raise RuntimeError(f"Missing required file: {p}")
               data = p.read_bytes()
-                      log_info(f"{name}: stripping {header_size} bytes of EXE header for flat boot image")
+              header_size = 0x20 if name.upper().endswith(".EXE") else 0
+              if header_size:
+                  if len(data) <= header_size:
+                      raise RuntimeError(f"{name}: file is too small to contain a valid EXE header")
+                  log_info(f"{name}: stripping {header_size} bytes of EXE header for flat boot image")
+                  data = data[header_size:]
               clusters = max(1, math.ceil(len(data) / (bps * sectors_per_cluster)))
               log_info(f"{name}: {len(data)} bytes -> {clusters} cluster(s)")
               file_data.append((name, attr, data, clusters))
