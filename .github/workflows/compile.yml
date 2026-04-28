@@ -439,6 +439,24 @@ jobs:
               log_info(f"{name}: {len(data)} bytes -> {clusters} cluster(s)")
               file_data.append((name, attr, data, clusters))
 
+          io_index = next((i for i, (name, _, _, _) in enumerate(file_data) if name.upper() == "IO.SYS"), None)
+          dos_index = next((i for i, (name, _, _, _) in enumerate(file_data) if name.upper() == "OSDOS.SYS"), None)
+          if io_index is None or dos_index is None:
+              raise RuntimeError("Boot image requires both IO.SYS and OSDOS.SYS")
+
+          io_name, io_attr, io_data, _ = file_data[io_index]
+          dos_name, dos_attr, dos_data, _ = file_data[dos_index]
+          if len(io_data) > 0x1000:
+              raise RuntimeError(f"IO.SYS is too large to fit the expected 4K boot handoff window: {len(io_data)} bytes")
+          if len(io_data) < 0x1000:
+              pad_len = 0x1000 - len(io_data)
+              log_info(f"IO.SYS: padding {pad_len} byte(s) to reach the 4K handoff boundary")
+              io_data = io_data + (b"\x00" * pad_len)
+          io_data = io_data + dos_data
+          io_clusters = max(1, math.ceil(len(io_data) / (bps * sectors_per_cluster)))
+          log_info(f"IO.SYS: combined boot payload is {len(io_data)} bytes -> {io_clusters} cluster(s)")
+          file_data[io_index] = (io_name, io_attr, io_data, io_clusters)
+
           # Allocate clusters contiguously
           next_cluster = 2
           allocation = []
