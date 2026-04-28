@@ -292,6 +292,7 @@ ASSUME  DS:NOTHING,ES:NOTHING
 
         MOV     WORD PTR DS:[addr_int_abort],OFFSET DOSGROUP:QUIT
         MOV     WORD PTR DS:[addr_int_command],OFFSET DOSGROUP:COMMAND
+        MOV     WORD PTR DS:[addr_int_command+2],BP
         MOV     WORD PTR DS:[addr_int_terminate],100H
         MOV     WORD PTR DS:[addr_int_terminate+2],DX
         MOV     WORD PTR DS:[addr_int_ctrl_c],OFFSET DOSGROUP:IRETRTN
