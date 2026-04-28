@@ -5,6 +5,14 @@
 ;This BIOS designed to be linked with the SYSINIT module provided by
 ;OS-DEV-TEAM
 
+IFNDEF  IBM
+IBM     EQU     0
+ENDIF
+
+IFNDEF  IBMJAPVER
+IBMJAPVER       EQU     0
+ENDIF
+
 BIOSIZ  EQU     4096            ;Size of BIOS in bytes.
 BIOSIZS EQU     100H            ;Size of BIOS in Paragraphs.
 ANSI    EQU     0               ;Ansi switch.
