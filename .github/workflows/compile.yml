@@ -476,10 +476,10 @@ jobs:
           if dos_name.upper() != "OSDOS.SYS":
               raise RuntimeError("OSDOS.SYS must be second in allocation for bootstrap loader")
           io_start_lba = first_data_sector + (io_chain[0] - 2) * sectors_per_cluster
-          # The boot sector hands control to IO.SYS only, but the boot image
-          # must preload the DOS kernel immediately after it in memory so
-          # SYSINIT can relocate it from CURRENT_DOS_LOCATION.
-          io_sector_count = (len(io_chain) + len(dos_chain)) * sectors_per_cluster
+          # The boot sector hands control to IO.SYS only. The IO.SYS payload
+          # already contains the DOS kernel image appended after the BIOS
+          # handoff area, so the loader only needs to fetch the IO.SYS chain.
+          io_sector_count = len(io_chain) * sectors_per_cluster
           if io_sector_count < 3:
               log_warn(f"IO.SYS load is only {io_sector_count} sector(s); boot compatibility may be reduced")
 
