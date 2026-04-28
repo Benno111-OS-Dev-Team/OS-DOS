@@ -68,7 +68,6 @@ DATARES SEGMENT PUBLIC BYTE
         EXTRN   PIPEFLAG:BYTE,SAVE_PDB:WORD,COMSPEC:BYTE,TRANS:WORD
         EXTRN   TRANVARS:BYTE,LTPA:WORD,RSWITCHAR:BYTE,RDIRCHAR:BYTE
         EXTRN   RETCODE:WORD,FORFLAG:BYTE
-BOOTDONE DB      "BOOT COMPLETE",13,10,"$"
 
         IF      IBMVER
         EXTRN   SYS_CALL:DWORD,ZEXEC:WORD,EXESEG:WORD,EXESUM:WORD
@@ -530,9 +529,6 @@ USESLASH:
         REP     MOVSW                   ; Transfer INFO to transient
         MOV     AX,[MEMSIZ]
         MOV     WORD PTR DS:[PDB_block_len],AX  ; Adjust my own header
-        MOV     DX,OFFSET RESGROUP:BOOTDONE
-        MOV     AH,09H
-        INT     int_command
         JMP     DWORD PTR [TRANS]
 
 ; Far call to REMCHECK for TRANSIENT

@@ -253,8 +253,6 @@ LOCSTACK LABEL BYTE
 
         PUSH    CS
         POP     DS
-        MOV     WORD PTR [MSDOS],0
-        MOV     WORD PTR [FINAL_DOS_LOCATION],ES
 
         CALL    MSDOS
         MOV     WORD PTR [DOSINFO+2],ES ; SAVE POINTER TO DOS INFO
