@@ -407,7 +407,7 @@ jobs:
 
           image = bytearray(total_sectors * bps)
 
-          # Boot sector (minimal FAT12 BPB, non-custom boot code)
+          # Boot sector (FAT12 BPB + tiny bootstrap that prints a message)
           bs = bytearray(512)
           bs[0:3] = b"\xEB\x3C\x90"
           bs[3:11] = b"MSDOS5.0"
@@ -429,6 +429,29 @@ jobs:
           bs[39:43] = (0x12345678).to_bytes(4, "little")
           bs[43:54] = b"OSDOSBOOT  "
           bs[54:62] = b"FAT12   "
+          boot_code = bytearray([
+              0xFA,                    # cli
+              0x31, 0xC0,              # xor ax,ax
+              0x8E, 0xD8,              # mov ds,ax
+              0x8E, 0xC0,              # mov es,ax
+              0xBC, 0x00, 0x7C,        # mov sp,7C00h
+              0xFB,                    # sti
+              0xBE, 0x00, 0x00,        # mov si,msg (patched below)
+              0xAC,                    # lodsb
+              0x08, 0xC0,              # or al,al
+              0x74, 0x06,              # jz done
+              0xB4, 0x0E,              # mov ah,0Eh
+              0xCD, 0x10,              # int 10h
+              0xEB, 0xF5,              # jmp short print_loop
+              0xF4,                    # done: hlt
+              0xEB, 0xFD               # jmp $
+          ])
+          boot_msg = b"OS-DOS boot image: run SYS on target machine.\r\n\x00"
+          msg_linear = 0x7C00 + 62 + len(boot_code)
+          boot_code[12] = msg_linear & 0xFF
+          boot_code[13] = (msg_linear >> 8) & 0xFF
+          payload = boot_code + boot_msg
+          bs[62:62 + len(payload)] = payload
           bs[510:512] = b"\x55\xAA"
           image[0:512] = bs
 
