@@ -156,8 +156,8 @@ jobs:
                 $content = $content -replace 'OFFSET\s+TRANGROUP:GOTO\b', 'OFFSET TRANGROUP:GOTO_CMD'
               }
               'SKELIO.ASM' {
-                if ($content -notmatch '(?im)^\s*PUBLIC\s+RE_INIT\b') {
-                  $content = $content -replace '(?im)^\s*END\s*$', "RE_INIT PROC FAR`r`n    RET`r`nRE_INIT ENDP`r`n`r`nEND"
+                if ($content -notmatch '(?im)^\s*RE_INIT\s+PROC\b') {
+                  $content = $content -replace '(?im)^\s*DOSSPOT\s+LABEL\s+WORD\s*$', "DOSSPOT LABEL WORD`r`n`r`n        PUBLIC  RE_INIT`r`nRE_INIT PROC FAR`r`n        RET`r`nRE_INIT ENDP"
                 }
               }
               'SYSIMES.ASM' {
