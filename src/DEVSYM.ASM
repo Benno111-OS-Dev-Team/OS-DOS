@@ -18,6 +18,7 @@ ISCOUT  EQU     0002H           ;Bit 1 - This device is the console output.
 ISNULL  EQU     0004H           ;Bit 2 - This device is the null device.
 ISCLOCK EQU     0008H           ;Bit 3 - This device is the clock device.
 ISIBM   EQU     0010H           ;Bit 4 - This device is special
+ISSPEC  EQU     ISIBM           ;Alias: device supports fast console output (INT 29H)
 
 ;Static Reguest Header
 SRHEAD  STRUC

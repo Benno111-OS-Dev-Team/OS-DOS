@@ -86,7 +86,6 @@ jobs:
           $dosmac = Get-Content -Path (Join-Path $workSrc 'DOSMAC.ASM') -Raw
           $dosmac = $dosmac -replace '(?m)^\s*JUMP\s+name\s*$', ' JMP name'
           [System.IO.File]::WriteAllText((Join-Path $workSrc 'DOSMAC.ASM'), $dosmac, [System.Text.Encoding]::ASCII)
-          Set-Content -Path (Join-Path $workSrc 'IO.ASM') -Value 'END' -Encoding ASCII
 
           $comswPath = Join-Path $workSrc 'COMSW.ASM'
           $comsw = Get-Content -Path $comswPath -Raw
@@ -163,6 +162,11 @@ jobs:
               }
               'BUF.ASM' {
                 $content = $content -replace '\bNRETIBM\b', 'NRET2'
+              }
+              'STRIN.ASM' {
+                # OUT_ROUTINE, TAB, $STD_CON_INPUT_NO_ECHO are defined locally in
+                # IO.ASM which includes STRIN.ASM -- remove the EXTRN to avoid error.
+                $content = $content -replace '(?m)^\s*EXTRN\s+OUT_ROUTINE:NEAR,TAB:NEAR,\$STD_CON_INPUT_NO_ECHO:NEAR\s*$', ''
               }
             }
 
