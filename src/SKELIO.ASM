@@ -1399,6 +1399,7 @@ HWINIT: XOR     BP,BP
 
         MOV     AX,0001H
         MOV     MCON,AX
+        MOV     DX,MAX_MEM
 
         MOV     AX,SEG SYSINIT
         MOV     DS,AX
