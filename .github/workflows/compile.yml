@@ -157,7 +157,7 @@ jobs:
               }
               'SKELIO.ASM' {
                 if ($content -notmatch '(?im)^\s*RE_INIT\s+PROC\b') {
-                  $content = $content -replace '(?im)^\s*DOSSPOT\s+LABEL\s+WORD\s*$', "DOSSPOT LABEL WORD`r`n`r`n        PUBLIC  RE_INIT`r`nRE_INIT PROC FAR`r`n        RET`r`nRE_INIT ENDP"
+                  $content = $content -replace '(?im)^\s*DOSSPOT\s+LABEL\s+WORD\s*$', "DOSSPOT LABEL WORD`r`n`r`n        PUBLIC  RE_INIT`r`nRE_INIT PROC FAR`r`n        RETF`r`nRE_INIT ENDP"
                 }
               }
               'SYSIMES.ASM' {
