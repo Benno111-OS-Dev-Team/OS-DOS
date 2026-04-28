@@ -155,6 +155,17 @@ jobs:
                 $content = $content -replace 'OFFSET\s+TRANGROUP:ECHO\b', 'OFFSET TRANGROUP:ECHO_CMD'
                 $content = $content -replace 'OFFSET\s+TRANGROUP:GOTO\b', 'OFFSET TRANGROUP:GOTO_CMD'
               }
+              'SKELIO.ASM' {
+                if ($content -notmatch '(?im)^\s*PUBLIC\s+RE_INIT\b') {
+                  $content = $content -replace '(?im)^\s*END\s*$', "RE_INIT PROC FAR`r`n    RET`r`nRE_INIT ENDP`r`n`r`nEND"
+                }
+              }
+              'SYSIMES.ASM' {
+                $content = $content -replace '(?im)^\s*PUBLIC\s+BADOPM,CRLFM,BADSIZ,BADLD,BADCOM,SYSSIZE\s*$', '        PUBLIC  BADOPM,CRLFM,BADSIZ,BADLD,BADCOM,SYSSIZE,BADSIZ_PRE,BADSIZ_POST,BADLD_PRE,BADLD_POST,BADCOUNTRY'
+                if ($content -notmatch '(?im)^\s*BADSIZ_PRE\s+EQU\s+') {
+                  $content = $content -replace '(?im)^\s*SYSSIZE\s+LABEL\s+BYTE\s*$', "BADSIZ_PRE EQU BADSIZ`r`nBADSIZ_POST EQU CRLFM`r`nBADLD_PRE EQU BADLD`r`nBADLD_POST EQU CRLFM`r`nBADCOUNTRY EQU BADOPM`r`n`r`nSYSSIZE LABEL BYTE"
+                }
+              }
               'DIR.ASM' {
                 $content = $content -replace '\bSHORT\s+RETF\b', 'SHORT RETFOUND'
                 $content = $content -replace '\bJZ\s+RETF\b', 'JZ      RETFOUND'
