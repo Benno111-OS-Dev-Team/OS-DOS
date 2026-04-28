@@ -200,6 +200,7 @@ jobs:
             'SYSINIT'
             'SYSIMES'
             'SYS'
+            'SYSMES'
             'EXE2BIN'
           ) | ForEach-Object { $_.ToUpperInvariant() } | Select-Object -Unique
 
@@ -346,7 +347,7 @@ jobs:
           Link-Group -OutputName 'COMMAND.COM' -Modules $commandModules -System 'com'
           Link-Group -OutputName 'MSDOS.SYS' -Modules $dosModules -System 'dos'
           Link-Group -OutputName 'IO.SYS' -Modules @('SKELIO','SYSINIT','SYSIMES') -System 'dos'
-          Link-Group -OutputName 'SYS.EXE' -Modules @('SYS') -System 'dos'
+          Link-Group -OutputName 'SYS.EXE' -Modules @('SYS','SYSMES') -System 'dos'
           Link-Group -OutputName 'EXE2BIN.EXE' -Modules @('EXE2BIN') -System 'dos'
 
       - name: Upload object files
