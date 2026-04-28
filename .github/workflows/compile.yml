@@ -452,7 +452,7 @@ jobs:
               log_info(f"IO.SYS: padding {pad_len} byte(s) to reach the 4K handoff boundary")
               io_data = io_data + (b"\x00" * pad_len)
           io_clusters = max(1, math.ceil(len(io_data) / (bps * sectors_per_cluster)))
-          log_info(f"IO.SYS: combined boot payload is {len(io_data)} bytes -> {io_clusters} cluster(s)")
+          log_info(f"IO.SYS: boot payload is {len(io_data)} bytes -> {io_clusters} cluster(s)")
           file_data[io_index] = (io_name, io_attr, io_data, io_clusters)
 
           # Allocate clusters contiguously
@@ -474,11 +474,11 @@ jobs:
           if dos_name.upper() != "OSDOS.SYS":
               raise RuntimeError("OSDOS.SYS must be second in allocation for bootstrap loader")
           io_start_lba = first_data_sector + (io_chain[0] - 2) * sectors_per_cluster
-          # Load the entire IO.SYS payload before handoff so the init path can
-          # continue all the way into DOS/COMMAND startup.
-          io_sector_count = (len(io_chain) + len(dos_chain)) * sectors_per_cluster
+          # The boot sector hands control to IO.SYS only; IO.SYS/SYSINIT is
+          # responsible for loading OSDOS.SYS from the disk image.
+          io_sector_count = len(io_chain) * sectors_per_cluster
           if io_sector_count < 3:
-              log_warn(f"IO.SYS preload is only {io_sector_count} sector(s); boot compatibility may be reduced")
+              log_warn(f"IO.SYS load is only {io_sector_count} sector(s); boot compatibility may be reduced")
 
           image = bytearray(total_sectors * bps)
 
