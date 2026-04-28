@@ -1335,6 +1335,29 @@ ROM_CALL:
         POP     DI
         RET
 
+;
+; Print a zero-terminated boot message through the ROM console.
+; DX must point to a string in CS.
+;
+BOOTMSG:
+        PUSH    AX
+        PUSH    SI
+        PUSH    DS
+        PUSH    CS
+        POP     DS
+        MOV     SI,DX
+BOOTMSG1:
+        LODSB
+        OR      AL,AL
+        JZ      BOOTMSG2
+        CALL    OUTCHR
+        JMP     SHORT BOOTMSG1
+BOOTMSG2:
+        POP     DS
+        POP     SI
+        POP     AX
+        RET
+
         PAGE
         SUBTTL  Initalization code and temporary work areas.
 
@@ -1344,6 +1367,10 @@ ROM_CALL:
 
 WRKSTK  LABEL   WORD
         DB      100 DUP (?)
+
+BOOTMSG_1       DB      13,10,"IO.SYS: hardware init",13,10,0
+BOOTMSG_2       DB      "IO.SYS: ROM console ready",13,10,0
+BOOTMSG_3       DB      "IO.SYS: starting SYSINIT",13,10,0
 
 
 HWINIT: XOR     BP,BP
@@ -1357,6 +1384,11 @@ HWINIT: XOR     BP,BP
         CALL    ROM_CALL
         MOV     AH,0
         MOV     MCON,AX
+
+        MOV     DX,OFFSET BOOTMSG_1
+        CALL    BOOTMSG
+        MOV     DX,OFFSET BOOTMSG_2
+        CALL    BOOTMSG
 
         MOV     AX,SEG SYSINIT
         MOV     DS,AX
@@ -1373,6 +1405,8 @@ ASSUME  DS:SEG SYSINIT
         MOV     AX,CS
         ADD     AX,((OFFSET WRKSTK - OFFSET INIT)+50) /16
         MOV     DS:[FINAL_DOS_LOCATION],AX
+        MOV     DX,OFFSET BOOTMSG_3
+        CALL    BOOTMSG
         JMP     SYSINIT
 
 DOSSPOT LABEL   WORD
