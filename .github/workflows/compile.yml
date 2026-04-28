@@ -304,7 +304,6 @@ jobs:
               $linkScript += "  libpath $objRoot"
               $linkScript += "  libpath $watcomRoot\lib286"
               $linkScript += "  libpath $watcomRoot\lib286\dos"
-              $linkScript += '  libfile cstart_t.obj'
               $linkScript += '  format dos com'
               $linkScript += 'end'
               $linkScript += 'system osdoscom'
