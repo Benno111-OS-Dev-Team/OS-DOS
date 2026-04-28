@@ -387,12 +387,14 @@ jobs:
           data_sectors = total_sectors - first_data_sector
           total_clusters = data_sectors // sectors_per_cluster
 
-          # Boot-critical files only. Extra utilities are linked separately
-          # and can stay in dist without being forced into the boot image.
+          # Boot-critical files plus the helper utilities that ship with the
+          # bootable disk image.
           files = [
               ("IO.SYS", 0x06),
               ("OSDOS.SYS", 0x06),
               ("COMMAND.COM", 0x20),
+              ("SYS.EXE", 0x20),
+              ("EXE2BIN.EXE", 0x20),
           ]
 
           file_data = []
