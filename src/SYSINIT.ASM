@@ -251,9 +251,6 @@ LOCSTACK LABEL BYTE
         MOV     DX,OFFSET SYSMSG_2
         CALL    SYSMSG
 
-        PUSH    CS
-        POP     DS
-
         CALL    MSDOS
         MOV     WORD PTR [DOSINFO+2],ES ; SAVE POINTER TO DOS INFO
         MOV     WORD PTR [DOSINFO],DI
