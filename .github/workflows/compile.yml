@@ -523,14 +523,25 @@ jobs:
               0x53,0x0D,0x0A,0x00,0x0D,0x0A,0x44,0x69,0x73,0x6B,0x20,0x72,0x65,0x61,0x64,0x20,
               0x65,0x72,0x72,0x6F,0x72,0x0D,0x0A,0x00
           ])
+          retry_handler = bytearray([
+              0xFE,0x0E,0x00,0x00,      # dec byte ptr [retry counter]
+              0x74,0x02,                # jz fail
+              0xEB,0xBE,                # jmp short back to the sector read loop
+          ])
+          boot_code[99:99] = retry_handler
+          boot_code[75] = 0x17
+          retry_counter_offset = len(boot_code)
+          retry_counter_addr = 0x7C00 + 62 + retry_counter_offset
+          boot_code.append(3)
+          boot_code[101:103] = retry_counter_addr.to_bytes(2, "little")
           # Patch placeholders in boot code:
           #   0xAAAA -> start LBA (IO.SYS first sector)
           #   0xBBBB -> IO.SYS sector count
           if 62 + len(boot_code) > 510:
               log_error("Boot code is too large for sector payload area")
               raise RuntimeError("Boot code overflow: exceeds 510-byte limit")
-          boot_code[157:159] = io_start_lba.to_bytes(2, "little")
-          boot_code[159:161] = io_sector_count.to_bytes(2, "little")
+          boot_code[165:167] = io_start_lba.to_bytes(2, "little")
+          boot_code[167:169] = io_sector_count.to_bytes(2, "little")
           bs[62:62 + len(boot_code)] = boot_code
           bs[510:512] = b"\x55\xAA"
           image[0:512] = bs

@@ -1336,11 +1336,12 @@ ROM_CALL:
         RET
 
 ;
-; Print a zero-terminated boot message through the ROM console.
+; Print a zero-terminated boot message through the BIOS teletype service.
 ; DX must point to a string in CS.
 ;
 BOOTMSG:
         PUSH    AX
+        PUSH    BX
         PUSH    SI
         PUSH    DS
         PUSH    CS
@@ -1350,11 +1351,21 @@ BOOTMSG1:
         LODSB
         OR      AL,AL
         JZ      BOOTMSG2
-        CALL    OUTCHR
+        CMP     AL,0DH
+        JNE     BOOTMSG3
+        MOV     AH,0EH
+        XOR     BX,BX
+        INT     10H
+        MOV     AL,0AH
+BOOTMSG3:
+        MOV     AH,0EH
+        XOR     BX,BX
+        INT     10H
         JMP     SHORT BOOTMSG1
 BOOTMSG2:
         POP     DS
         POP     SI
+        POP     BX
         POP     AX
         RET
 
@@ -1371,6 +1382,7 @@ WRKSTK  LABEL   WORD
 BOOTMSG_1       DB      13,10,"IO.SYS: hardware init",13,10,0
 BOOTMSG_2       DB      "IO.SYS: ROM console ready",13,10,0
 BOOTMSG_3       DB      "IO.SYS: starting SYSINIT",13,10,0
+BOOTMSG_4       DB      "IO.SYS: HWINIT entered",13,10,0
 
 
 HWINIT: XOR     BP,BP
@@ -1379,6 +1391,9 @@ HWINIT: XOR     BP,BP
 
         PUSH    CS
         POP     ES
+
+        MOV     DX,OFFSET BOOTMSG_4
+        CALL    BOOTMSG
 
         MOV     BX,ROM_INIT
         CALL    ROM_CALL
