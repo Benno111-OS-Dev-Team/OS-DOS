@@ -388,32 +388,53 @@ jobs:
           total_clusters = data_sectors // sectors_per_cluster
 
           # Boot-critical files plus the helper utilities that ship with the
-          # bootable disk image. The system files are flattened before being
-          # written so the boot loader jumps into code, not an EXE header.
+          # bootable disk image. The system files are converted to flat images
+          # by applying their relocation fixups at the expected load segments.
           files = [
-              ("IO.SYS", 0x06, True),
-              ("OSDOS.SYS", 0x06, True),
-              ("COMMAND.COM", 0x20, False),
-              ("SYS.EXE", 0x20, False),
-              ("EXE2BIN.EXE", 0x20, False),
+              ("IO.SYS", 0x06, 0x00C0),
+              ("OSDOS.SYS", 0x06, 0x01C0),
+              ("COMMAND.COM", 0x20, None),
+              ("SYS.EXE", 0x20, None),
+              ("EXE2BIN.EXE", 0x20, None),
           ]
 
+          def mz_to_flat_binary(data, load_segment, name):
+              if len(data) < 0x1C or data[0:2] != b"MZ":
+                  raise RuntimeError(f"{name}: expected an MZ executable header")
+
+              header_paragraphs = int.from_bytes(data[8:10], "little")
+              header_size = header_paragraphs * 16
+              relocation_count = int.from_bytes(data[6:8], "little")
+              relocation_table = int.from_bytes(data[0x18:0x1A], "little")
+
+              if header_size > len(data):
+                  raise RuntimeError(f"{name}: invalid MZ header size")
+              if relocation_table + relocation_count * 4 > header_size:
+                  raise RuntimeError(f"{name}: relocation table falls outside the header")
+
+              image = bytearray(data[header_size:])
+              for index in range(relocation_count):
+                  entry = relocation_table + index * 4
+                  rel_off = int.from_bytes(data[entry:entry + 2], "little")
+                  rel_seg = int.from_bytes(data[entry + 2:entry + 4], "little")
+                  fixup = rel_seg * 16 + rel_off
+                  if fixup + 2 > len(image):
+                      raise RuntimeError(f"{name}: relocation fixup {index} points past the image")
+                  word = int.from_bytes(image[fixup:fixup + 2], "little")
+                  image[fixup:fixup + 2] = ((word + load_segment) & 0xFFFF).to_bytes(2, "little")
+
+              log_info(f"{name}: applied {relocation_count} relocation fixup(s) for load segment {load_segment:04X}")
+              return bytes(image)
+
           file_data = []
-          for name, attr, strip_header in files:
+          for name, attr, load_segment in files:
               p = dist / name
               if not p.exists():
                   log_error(f"Missing required file: {p}")
                   raise RuntimeError(f"Missing required file: {p}")
               data = p.read_bytes()
-              if strip_header:
-                  if len(data) < 0x1C or data[0:2] != b"MZ":
-                      raise RuntimeError(f"{name}: expected an MZ executable header to strip")
-                  header_paragraphs = int.from_bytes(data[8:10], "little")
-                  header_size = header_paragraphs * 16
-                  if len(data) <= header_size:
-                      raise RuntimeError(f"{name}: file is too small to contain a valid MZ header")
-                  log_info(f"{name}: stripping {header_size} bytes of MZ header for flat boot image")
-                  data = data[header_size:]
+              if load_segment is not None:
+                  data = mz_to_flat_binary(data, load_segment, name)
               clusters = max(1, math.ceil(len(data) / (bps * sectors_per_cluster)))
               log_info(f"{name}: {len(data)} bytes -> {clusters} cluster(s)")
               file_data.append((name, attr, data, clusters))
