@@ -101,6 +101,8 @@ ASSUME  CS:DOSGROUP,DS:NOTHING,ES:NOTHING,SS:NOTHING
 DOSINIT:
         CLI
         CLD
+        MOV     AX,ES
+        MOV     DS,AX
         MOV     [ENDMEM],DX
         MOV     [INITSP],SP
         MOV     [INITSS],SS
