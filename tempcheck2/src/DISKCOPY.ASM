@@ -1,9 +1,9 @@
-        TITLE   DISKCOPY MSDOS Disk Copier
+        TITLE   DISKCOPY OSDOS Disk Copier
 ;----------------------------------------------------------
 ;
 ;       Diskcopy - Program to copy entire diskettes
 ;
-;       Copyright 1982 by Microsoft Corporation
+;       Copyright 1982 by OS-DEV-TEAM Corporation
 ;       Written by Chris Peters, August 1982
 ;
 ;-----------------------------------------------------------
@@ -275,7 +275,7 @@ CONST   SEGMENT PUBLIC BYTE
         EXTRN   keymsg:BYTE,drverr1:BYTE,drverr3:BYTE,crlf:BYTE
         EXTRN   anoprompt:BYTE
 
-        db      ' MICROSOFT - PETERS '
+        db      ' OS-DEV-TEAM - PETERS '
 CONST   ENDS
 
 DATA    SEGMENT BYTE

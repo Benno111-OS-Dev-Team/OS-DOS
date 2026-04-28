@@ -129,7 +129,7 @@ ALTBASE EQU     4 * ALTTAB
 ;
         IF      NOT ALTVECT
 int_abort           EQU     INTTAB          ; abort process
-int_command         EQU     int_abort+1     ; call MSDOS
+int_command         EQU     int_abort+1     ; call OSDOS
 int_terminate       EQU     int_abort+2     ; int to terminate address
 int_ctrl_c          EQU     int_abort+3     ; ^c trapper
 int_fatal_abort     EQU     int_abort+4     ; hard disk error
@@ -146,7 +146,7 @@ int_fastcon         EQU     int_abort+9     ; fast CON interrupt
 ;----+----+----+----+----+----+----+----+----+----+----+----+----+----+----;
         ELSE
 int_abort           EQU     INTTAB          ; abort process
-int_command         EQU     int_abort+1     ; call MSDOS
+int_command         EQU     int_abort+1     ; call OSDOS
 int_terminate       EQU     ALTTAB          ; int to terminate address
 int_ctrl_c          EQU     int_terminate+1 ; ^c trapper
 int_fatal_abort     EQU     int_terminate+2 ; hard disk error
@@ -181,7 +181,7 @@ addr_int_fastcon        EQU    4 * int_fastcon
 ;----+----+----+----+----+----+----+----+----+----+----+----+----+----+----;
 
 BREAK <Disk map>
-;  MSDOS partitions the disk into 4 sections:
+;  OSDOS partitions the disk into 4 sections:
 ;
 ;  phys sector 0:   +-------------------+
 ;       |           | boot/reserved     |

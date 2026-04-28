@@ -1,7 +1,7 @@
 TRUE    EQU     0FFFFH
 FALSE   EQU     NOT TRUE
 
-; Use the switches below to produce the standard Microsoft version or the IBM
+; Use the switches below to produce the standard OS-DEV-TEAM version or the IBM
 ; version of the operating system
 MSVER   EQU     TRUE
 IBM     EQU     FALSE

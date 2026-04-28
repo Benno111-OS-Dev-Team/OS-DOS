@@ -17,7 +17,7 @@
 ;            SKIPONE, SKIPSTR, REEDIT, EXITINS, ENTERINS, CTRLZ)
 ;           OEMFunctionKey
 
-SUBTTL  IO - standard device I/O for MSDOS
+SUBTTL  IO - standard device I/O for OSDOS
 PAGE
 
 ; Bring in all macro/structure/constant definitions.

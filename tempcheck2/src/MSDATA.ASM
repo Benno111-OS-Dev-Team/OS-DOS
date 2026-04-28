@@ -22,7 +22,7 @@ DEVSTRING DB    "DEV"          ; Dummy device directory
 ;
 ; Table of routines for assignable devices
 ;
-; MSDOS allows assignment if the following standard devices:
+; OSDOS allows assignment if the following standard devices:
 ;   stdin  (usually CON input)
 ;   stdout (usually CON output)
 ;   auxin  (usually AUX input)

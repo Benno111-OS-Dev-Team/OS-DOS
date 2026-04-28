@@ -1,5 +1,5 @@
 ;
-; xenix memory calls for MSDOS
+; xenix memory calls for OSDOS
 ;
 ; CAUTION: The following routines rely on the fact that arena_signature and
 ; arena_owner_system are all equal to zero and are contained in DI.

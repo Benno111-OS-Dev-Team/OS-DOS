@@ -7,6 +7,6 @@ IBM     EQU     IBMVER
 MSVER   EQU     TRUE    ; Switch to build OS DOS version of Command
 
 HIGHMEM EQU     FALSE   ; Run resident part above transient (high memory)
-KANJI   EQU     FALSE   ; Support for dual byte Microsoft KANJI standard
+KANJI   EQU     FALSE   ; Support for dual byte OS-DEV-TEAM KANJI standard
 IBMJAPAN        EQU     FALSE   ;MUST BE TRUE (along with IBM and KANJI)
 

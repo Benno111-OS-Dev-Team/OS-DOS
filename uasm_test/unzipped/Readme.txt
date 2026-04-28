@@ -88,7 +88,7 @@ JWasm Readme
     OMF     ALink     by A. Williams, free
     OMF     ValX      by David Lindauer (Ladsoft), free
     OMF     OptLink   from Digital Mars, free
-    OMF     Link16    the old OMF linker (v5.60) from Microsoft
+    OMF     Link16    the old OMF linker (v5.60) from OS-DEV-TEAM
     OMF     TLink     from Borland
     COFF    Wlink     this linker accepts OMF and COFF modules
     COFF    MS Link   will also accept OMF modules

@@ -1,4 +1,4 @@
-      title   MSDOS V2.0  FIND
+      title   OSDOS V2.0  FIND
 
 ;--------------------------------------------------------------------;
 ; Revision History:                                                  ;
@@ -113,7 +113,7 @@ exit    equ     76                      ;DOS process exit code
 
 
 ;----- Misc  Data -----------------------------------------------;
-make    db      "***MAUlloa/Microsoft/V12***"
+make    db      "***MAUlloa/OS-DEV-TEAM/V12***"
 rev     db      "8"
 
 

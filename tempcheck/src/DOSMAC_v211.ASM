@@ -1,5 +1,5 @@
 ;
-; Macro file for MSDOS.
+; Macro file for OSDOS.
 ;
 
 OPTION NOKEYWORD:<INVOKE>

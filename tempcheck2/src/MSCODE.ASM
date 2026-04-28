@@ -1,6 +1,6 @@
 OPTION CASEMAP:ALL
 ;
-; MSCODE.ASM -- MSDOS code
+; MSCODE.ASM -- OSDOS code
 ;
 
 INCLUDE DOSSEG.ASM
@@ -62,7 +62,7 @@ CODSTRT EQU     $
         IF      NOT IBM
         IF      NOT KANJI
         PUBLIC  HEADER
-HEADER  DB      13,10,"Microsoft OS DOS version "
+HEADER  DB      13,10,"OS-DEV-TEAM OS DOS version "
         DB      DOS_MAJOR_VERSION + "0"
         DB      "."
         DB      (DOS_MINOR_VERSION / 10) + "0"
@@ -84,7 +84,7 @@ HEADER  DB      13,10,82h,"M"+1fh,82h,"i"+20h,82h,"c"+20h,82h,"r"+20h,82h,"o"+20
         DB      94h,0c5h
         ENDIF
         DB      13,10
-        DB      "Copyright 1981,82,83 Microsoft Corp.",13,10,"$"
+        DB      "Copyright 1981,82,83 OS-DEV-TEAM Corp.",13,10,"$"
         ENDIF
 BREAK   <System call entry points and dispatcher>
 ASSUME  CS:DOSGROUP,DS:NOTHING,ES:NOTHING,SS:NOTHING

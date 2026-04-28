@@ -15,7 +15,7 @@ Command syntax:
     The OEM  must  supply  five (NEAR) routines to the program
 along with 6 data items.  The names of the routines are  INIT,
 DISKFORMAT, BADSECTOR,  WRTFAT  and  DONE,  and  their flow of
-control (by the Microsoft module) is like this:
+control (by the OS-DEV-TEAM module) is like this:
 
       |
  +---------+
@@ -59,7 +59,7 @@ provided by the OEM:
         normally "O", "V" and "S", have pre-defined meanings.
 
            The  "S"  switch  is  the  switch  which causes the
-        system files IO.SYS, MSDOS.SYS, and COMMAND.COM to  be
+        system files IO.SYS, OSDOS.SYS, and COMMAND.COM to  be
         transfered  to  the  disk  after  it is formatted thus
         making a "S"ystem disk.  The switch can be some letter
         other  than  "S",  but  the last switch in the list is
@@ -126,7 +126,7 @@ provided by the OEM:
 
     FREESPACE -  WORD  location  which  contains  the  address
         of the start of free  memory  space.   This  is  where
-        the system  will  be  loaded, by the Microsoft module,
+        the system  will  be  loaded, by the OS-DEV-TEAM module,
         for transferring to the newly formatted disk.   Memory
         should be  available  from  this  address  to  the end
         of memory, so it  is  typically  the  address  of  the
@@ -222,7 +222,7 @@ OEM-supplied module:
         and FORMAT will prompt for another disk.
 
 
-The following  data  is  declared PUBLIC in Microsoft's FORMAT
+The following  data  is  declared PUBLIC in OS-DEV-TEAM's FORMAT
 module:
 
     SWITCHMAP - A word  with  a  bit  vector  indicating  what
@@ -240,7 +240,7 @@ module:
         specified), and bit 0 will be 1 (S specified).
 
            Bits 0,1 and  2  are  the  only  switches  used  in
-        Microsoft's FORMAT module.  These switches are used 1)
+        OS-DEV-TEAM's FORMAT module.  These switches are used 1)
         after INIT has been called,  to  determine  if  it  is
         necessary  to  load  the  system;  2)  after  the last
         BADSECTOR call, to determine if the system  is  to  be
@@ -267,7 +267,7 @@ module:
         command line.  0=A, 1=B, etc.
 
 Once the OEM-supplied module has been prepared, it must linked
-with Microsoft's FORMAT.OBJ module and the FORMES.OBJ  module.
+with OS-DEV-TEAM's FORMAT.OBJ module and the FORMES.OBJ  module.
 If the  OEM-supplied  module  is  called  OEMFOR.OBJ, then the
 following linker command will do:
 
@@ -303,7 +303,7 @@ PUBLIC  FATID,STARTSECTOR,SWITCHLIST,FREESPACE
 PUBLIC  INIT,DISKFORMAT,BADSECTOR,DONE,WRTFAT
 PUBLIC  FATSPACE,HARDFLAG
 
-; This data defined in Microsoft-supplied module
+; This data defined in OS-DEV-TEAM-supplied module
 
         EXTRN   SWITCHMAP:WORD,DRIVE:BYTE
 

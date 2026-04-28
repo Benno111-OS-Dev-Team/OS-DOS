@@ -3,7 +3,7 @@ TITLE   RECOVER MS-DOS File/Disk Recovery Utility
 ;
 ;       Recover - Program to rebuild an ms.dos directory
 ;
-;       Copyright 1982 by Microsoft Corporation
+;       Copyright 1982 by OS-DEV-TEAM Corporation
 ;       Written by Chris Peters, April 1982
 ;
 ;-----------------------------------------------------------
@@ -297,7 +297,7 @@ drvok1:
         mov     dx,offset dg: egomes
         jmp     printerr
 egomes: db      "Chris Peters helped with the new dos!",cr,lf
-        db      "Microsoft rules ok$"
+        db      "OS-DEV-TEAM rules ok$"
 
 drvok2:
         IF      IBMVER

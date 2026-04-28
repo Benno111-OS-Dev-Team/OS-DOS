@@ -1,4 +1,4 @@
-        title   EDLIN for MSDOS 2.0
+        title   EDLIN for OSDOS 2.0
 
 ;-----------------------------------------------------------------------;
 ;               REVISION HISTORY:                                       ;
@@ -30,7 +30,7 @@
 ;                                                                       ;
 ;               10/4/82  Rev. 1         M.A. Ulloa                      ;
 ;                  The IBM version now does NOT have the U and V        ;
-;               commands. The MSDOS version HAS the U and V commands.   ;
+;               commands. The OSDOS version HAS the U and V commands.   ;
 ;                  Added the B switch, and modified the effect of       ;
 ;               the quote char.                                         ;
 ;                                                                       ;
@@ -139,7 +139,7 @@ CONST   SEGMENT PUBLIC WORD
 
 BAK     DB      "BAK"
 
-make    db      "***MAUlloa/Microsoft/V20***"
+make    db      "***MAUlloa/OS-DEV-TEAM/V20***"
 rev     db      "14"
 
         if      roprot                  ;***** R/O *****

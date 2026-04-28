@@ -1,4 +1,4 @@
-        title   File Compare Routine for MSDOS 2.0
+        title   File Compare Routine for OSDOS 2.0
 
 CR      equ     0dh
 LF      equ     0ah

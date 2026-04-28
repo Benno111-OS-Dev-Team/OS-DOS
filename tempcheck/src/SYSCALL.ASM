@@ -1,5 +1,5 @@
 ;
-; system call entry points MSDOS
+; system call entry points OSDOS
 ;
 
 INCLUDE DOSSEG.ASM

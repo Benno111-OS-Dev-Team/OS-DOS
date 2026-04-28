@@ -111,10 +111,10 @@ jobs:
             switch ($asm.Name.ToUpperInvariant()) {
               'COMMAND.ASM' {
               }
-              'MSDATA.ASM' {
+              'OSDATA.ASM' {
                 $content = $content -replace '(?m)^\s*short_addr\s+DEVIOBUF\s*$', '                short_addr  DSKCHRETBUF'
               }
-              'MSINIT.ASM' {
+              'OSINIT.ASM' {
                 $content = $content -replace '(?i)\bEXTRN\s+QUIT:NEAR,IRET:NEAR,ABSDRD:FAR,ABSDWRT:FAR\b', 'EXTRN   QUIT:NEAR,IRETRTN:NEAR,ABSDRD:FAR,ABSDWRT:FAR'
                 $content = $content -replace '(?i)\bOFFSET\s+DOSGROUP:IRET\b', 'OFFSET DOSGROUP:IRETRTN'
               }
@@ -346,7 +346,7 @@ jobs:
           $commandModules = Get-ModuleNames (Join-Path $repoRoot 'src\COMLINK') | ForEach-Object { $_.ToUpperInvariant() }
           $dosModules = Get-ModuleNames (Join-Path $repoRoot 'src\DOSLINK') | ForEach-Object { $_.ToUpperInvariant() }
           Link-Group -OutputName 'COMMAND.COM' -Modules $commandModules -System 'com'
-          Link-Group -OutputName 'MSDOS.SYS' -Modules $dosModules -System 'dos'
+          Link-Group -OutputName 'OSDOS.SYS' -Modules $dosModules -System 'dos'
           Link-Group -OutputName 'IO.SYS' -Modules @('SKELIO','SYSINIT','SYSIMES') -System 'dos'
           Link-Group -OutputName 'SYS.EXE' -Modules @('SYS','SYSMES') -System 'dos'
           Link-Group -OutputName 'EXE2BIN.EXE' -Modules @('EXE2BIN','EXEMES') -System 'dos'
@@ -387,12 +387,12 @@ jobs:
           data_sectors = total_sectors - first_data_sector
           total_clusters = data_sectors // sectors_per_cluster
 
+          # Boot-critical files only. Extra utilities are linked separately
+          # and can stay in dist without being forced into the boot image.
           files = [
               ("IO.SYS", 0x06),
-              ("MSDOS.SYS", 0x06),
+              ("OSDOS.SYS", 0x06),
               ("COMMAND.COM", 0x20),
-              ("SYS.EXE", 0x20),
-              ("EXE2BIN.EXE", 0x20),
           ]
 
           file_data = []
@@ -439,7 +439,7 @@ jobs:
           # Boot sector (FAT12 BPB + bootstrap that loads IO.SYS and jumps to it)
           bs = bytearray(512)
           bs[0:3] = b"\xEB\x3C\x90"
-          bs[3:11] = b"MSDOS5.0"
+          bs[3:11] = b"OSDOS5.0"
           bs[11:13] = (bps).to_bytes(2, "little")
           bs[13] = sectors_per_cluster
           bs[14:16] = (reserved_sectors).to_bytes(2, "little")

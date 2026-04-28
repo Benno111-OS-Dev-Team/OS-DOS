@@ -1,5 +1,5 @@
 OPTION CASEMAP:ALL`r`n;
-; Standard device IO for MSDOS (first 12 function calls)
+; Standard device IO for OSDOS (first 12 function calls)
 ;
 
 .xlist
@@ -9,7 +9,7 @@ INCLUDE DOSSEG.ASM
 .cref
 .list
 
-TITLE   STDIO - device IO for MSDOS
+TITLE   STDIO - device IO for OSDOS
 NAME    STDIO
 
 INCLUDE IO.ASM

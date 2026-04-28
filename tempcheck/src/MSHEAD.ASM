@@ -1,7 +1,7 @@
 ; TITLE   MSHEAD.ASM -- OS DOS DEFINITIONS
 PAGE
 ; OS DOS  High-performance operating system for the 8086  version 1.28
-;       by Microsoft MSDOS development group:
+;       by OS-DEV-TEAM OSDOS development group:
 ;           Tim Paterson (Ret.)
 ;           Aaron Reynolds
 ;           Nancy Panners (Parenting)
@@ -167,7 +167,7 @@ PAGE
 ; that they should be placed in the executable
 
 ;
-; segment ordering for MSDOS
+; segment ordering for OSDOS
 ;
 
 START           SEGMENT BYTE PUBLIC 'START'

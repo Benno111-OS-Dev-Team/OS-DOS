@@ -1,5 +1,5 @@
 OPTION CASEMAP:ALL`r`n;
-; FAT operations for MSDOS
+; FAT operations for OSDOS
 ;
 
 INCLUDE DOSSEG.ASM

@@ -1,5 +1,5 @@
 ;
-; process control system calls for MSDOS
+; process control system calls for OSDOS
 ;
 
 INCLUDE DOSSEG.ASM

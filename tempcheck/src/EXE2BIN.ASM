@@ -43,7 +43,7 @@ DATA    SEGMENT PUBLIC BYTE
         EXTRN   bad_vers_err:BYTE,NOTFND:BYTE,NOROOM:BYTE,DIRFULL:BYTE
         EXTRN   CANTFIX:BYTE,RDBAD:BYTE,FULL:BYTE,PROMPT:BYTE,CRLF:BYTE
 
-make    db      "MAUlloa/Microsoft/V20"
+make    db      "MAUlloa/OS-DEV-TEAM/V20"
 rev     db      "2"
 
 file1_ext db    ".EXE",00h

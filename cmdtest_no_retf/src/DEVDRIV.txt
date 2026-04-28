@@ -16,7 +16,7 @@ has suffered heavily  from  the  following  two  observations:
         hardware is installed  a  new  BIOS  must  be  written
         largely from scratch.
 
-    In MSDOS  2.0, the DOS-device driver interface has changed
+    In OSDOS  2.0, the DOS-device driver interface has changed
 from the old jump-table style  to  one  in  which  the  device
 drivers  are  linked  together  in  a  list.   This allows new
 drivers for  optional  hardware  to  be  installed  (and  even
@@ -269,7 +269,7 @@ INSTALLATION OF DEVICE DRIVERS
 
     Unlike past versions MS-DOS 2.0 allows new device  drivers
 to   be   installed   dynamically   at  boot  time.   This  is
-accomplished by the new SYSINIT module supplied by  Microsoft,
+accomplished by the new SYSINIT module supplied by  OS-DEV-TEAM,
 which reads  and  processes  the CONFIG.SYS file.  This module
 is linked together with the OEM  default  BIOS  in  a  similar
 manner to the way FORMAT is built.
@@ -592,7 +592,7 @@ return byte.
          1 Media has not been changed
 
     If the driver can return -1 or 1 (by  having  a  door-lock
-or other  interlock  mechanism)  the  performance of MSDOS 2.0
+or other  interlock  mechanism)  the  performance of OSDOS 2.0
 is enhanced as the DOS  need  not  reread  the  FAT  for  each
 directory access.
 

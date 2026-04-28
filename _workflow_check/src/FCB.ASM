@@ -1,5 +1,5 @@
 ;
-; FCB management routines for MSDOS
+; FCB management routines for OSDOS
 ;
 
 INCLUDE DOSSEG.ASM

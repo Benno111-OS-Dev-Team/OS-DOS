@@ -28,7 +28,7 @@ the DOS.
         In order for the  above  to  work,  and  in  order  to
         maintain  some  order  in  the  world of multi-surface
         disks, it is required that INT 25H  and  26H  use  the
-        MSDOS sector mapping rather than some rather arbitrary
+        OSDOS sector mapping rather than some rather arbitrary
         head-cylinder-sector mapping.
 
 The following subroutine will read the fat into  the  area  of

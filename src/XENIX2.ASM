@@ -1,5 +1,5 @@
 ;
-; xenix file calls for MSDOS
+; xenix file calls for OSDOS
 ;
 
 INCLUDE DOSSEG.ASM

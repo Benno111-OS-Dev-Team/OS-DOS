@@ -835,7 +835,7 @@ VOLRET:
         RET
 
 ;****************************************
-;Copy IO.SYS, MSDOS.SYS and COMMAND.COM into data area.
+;Copy IO.SYS, OSDOS.SYS and COMMAND.COM into data area.
 ; Carry set if problems
 
 READDOS:
@@ -1559,7 +1559,7 @@ DOSDRV  LABEL   BYTE
         DB      "IBMDOS.COM"
         ENDIF
         IF MSVER
-        DB      "MSDOS.SYS"
+        DB      "OSDOS.SYS"
         ENDIF
         DB      0
 

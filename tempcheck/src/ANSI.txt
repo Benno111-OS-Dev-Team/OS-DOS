@@ -147,7 +147,7 @@ Parameter     Parameter Function
   46            Cyan background         (ISO 6429 standard)
   47            White backgound         (ISO 6429 standard)
 
-SM  - Set Mode          (IBM/MICROSOFT Private)
+SM  - Set Mode          (IBM/OS-DEV-TEAM Private)
 
       ESC [ = Ps h
 or    ESC [ = h

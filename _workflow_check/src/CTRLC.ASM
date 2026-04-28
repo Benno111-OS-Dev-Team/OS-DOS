@@ -1,5 +1,5 @@
 ;
-; ^C status routines for MSDOS
+; ^C status routines for OSDOS
 ;
 
 INCLUDE DOSSEG.ASM

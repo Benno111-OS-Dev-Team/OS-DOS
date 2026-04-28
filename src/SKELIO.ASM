@@ -1,9 +1,9 @@
        TITLE   IO.SYS for the ALTOS ACS-86C.
 
-; I/O system for Version 2.x of MSDOS.
+; I/O system for Version 2.x of OSDOS.
 
 ;This BIOS designed to be linked with the SYSINIT module provided by
-;Microsoft
+;OS-DEV-TEAM
 
 BIOSIZ  EQU     4096            ;Size of BIOS in bytes.
 BIOSIZS EQU     100H            ;Size of BIOS in Paragraphs.
@@ -99,7 +99,7 @@ PRNDEV:                         ;Header for device PRN
         DB      "PRN     "
 
 TIMDEV:                         ;Header for device CLOCK
-        DW      DSKDEV,BIOSSEG
+        DW      COM1DEV,BIOSSEG
         DW      8008H
         DW      STRATEGY
         DW      TIM_INT
@@ -110,6 +110,12 @@ DSKDEV:                         ;Header for disk devices
         DW      2000H           ;Is a block device
         DW      STRATEGY
         DW      DSK_INT
+COM1DEV:                        ;Header for device COM1
+        DW      DSKDEV,BIOSSEG
+        DW      8000H
+        DW      STRATEGY
+        DW      AUX_INT
+        DB      "COM1    "
 DRVMAX  DB      1               ;Number of Units
         DB      7 DUP (?)
 
@@ -267,7 +273,7 @@ DSK_INT:
 
 ;
 ; Common program for handling the simplistic I/O packet
-;   processing scheme in MSDOS 2.0
+;   processing scheme in OSDOS 2.0
 ;
 
 ENTRY:  PUSH    AX              ;Save all nessacary registers.
@@ -335,7 +341,7 @@ ERR_EXIT:
 
 EXITP   PROC    FAR             ;Normal exit for device drivers.
 
-EXIT:   MOV     AH,00000001B    ;Set done bit for MSDOS.
+EXIT:   MOV     AH,00000001B    ;Set done bit for OSDOS.
 EXIT1:  LDS     BX,CS:[PTRSAV]
         MOV     [BX.STATUS],AX  ;Save operation compete and status.
 
@@ -881,7 +887,7 @@ IOPB    SIOPB   <,00H,0,0,0,0,0,0,000H,0,0,0,0,>
 
 
 ;
-; MSDOS drive initialization tables and other what not.
+; OSDOS drive initialization tables and other what not.
 ;
 ;  Drive 0 is:
 ;               Single sided, Single density, 77 track with 26
@@ -1166,7 +1172,7 @@ F_RECAL EQU     00AH            ;Floppy recal. command.
 F_DD    EQU     080H            ;Set Drive double density bit.
 
         PAGE
-        SUBTTL  MSDOS 2.x Disk I/O drivers.
+        SUBTTL  OSDOS 2.x Disk I/O drivers.
 
 ;
 ; Disk READ/WRITE functions.
@@ -1333,7 +1339,7 @@ ROM_CALL:
         SUBTTL  Initalization code and temporary work areas.
 
 ;
-; Overlayed by MSDOS by SYSINIT.
+; Overlayed by OSDOS by SYSINIT.
 ;
 
 WRKSTK  LABEL   WORD

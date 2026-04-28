@@ -1,6 +1,6 @@
 
 
-               Configuration files in MSDOS 2.0
+               Configuration files in OSDOS 2.0
 
 
 In many cases, there are installation-specific  configurations
@@ -23,7 +23,7 @@ follows:
     BIOS initializations are done.
 
     A  long  jump to the SYSINIT routine in the SYSINIT module
-    is  made.   This  module  (supplied  by  MICROSOFT)   will
+    is  made.   This  module  (supplied  by  OS-DEV-TEAM)   will
     initialize   the  DOS  and  read  the  configuration  file
     CONFIG.SYS, if it exists, to  perform  device  instalation
     and various other user settable things.  Its final task is

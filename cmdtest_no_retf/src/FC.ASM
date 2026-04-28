@@ -1,4 +1,4 @@
-        title   File Compare Routine for MSDOS 2.0
+        title   File Compare Routine for OSDOS 2.0
 
 ;-----------------------------------------------------------------------;
 ; Revision History:                                                     ;
@@ -178,7 +178,7 @@ dg      group   code,const,data
 
 const   segment public word
 
-make    db      "MAUlloa/Microsoft/V10"
+make    db      "MAUlloa/OS-DEV-TEAM/V10"
 rev     db      "2"
 
 ;----- CAREFULL WITH PRESERVING THE ORDER OF THE TABLE -----

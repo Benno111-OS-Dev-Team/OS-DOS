@@ -1,7 +1,7 @@
-                         MSDOS 2.0 RELEASE
+                         OSDOS 2.0 RELEASE
 
 
-The 2.0 Release of MSDOS includes five 5 1/4 double density single sided
+The 2.0 Release of OSDOS includes five 5 1/4 double density single sided
 diskettes or three 8 inch CP/M 80 format diskettes.
 
 The software/documentation on the five inch diskettes is arranged
@@ -12,7 +12,7 @@ as follows:
      bution diskette to meet the requirements of users of high level
      language compilers as well as users running only applications.
      Many compilers marketed independently through the retail channel
-     (including those of Microsoft) assume LINK comes with the DOS, as
+     (including those of OS-DEV-TEAM) assume LINK comes with the DOS, as
      in the case of IBM.  How you choose to distrubute BASIC (contracted
      for separately) is up to you.
 
@@ -34,7 +34,7 @@ as follows:
      sequence for linking is BIOS - SYSINIT - SYSIMES.
      A profiler utiliity is also included on the diskette, but this
      is not intended for end-users.  This is distributed for use by
-     your development staff only and is not supported by Microsoft
+     your development staff only and is not supported by OS-DEV-TEAM
      If you do decide to distribute it, it is at your own risk!
 
 
@@ -45,7 +45,7 @@ due to last minute changes to achieve a greater degree of compatibility
 with IBM's implementation of MS-DOS (PC DOS).  This includes the use
 of "\" instead of "/" as the path separator, and "/" instead of "-"
 as the switch character.  For transporting of batch files across
-machines, Microsoft encourages the use of "\" and "/" respectively
+machines, OS-DEV-TEAM encourages the use of "\" and "/" respectively
 in the U.S. market.  (See DOSPATCH.TXT for how you can overide this.
 The user guide explains how the end-user can override this in CONFIG.SYS).
 Both the printer echo keys and insert mode keys have now been made to
@@ -55,7 +55,7 @@ We apologize for any inconveniences these changes may have caused
 your technical publications staff.
 
 
-Here is what you need to do to MSDOS 2.0 to create a shipable product:
+Here is what you need to do to OSDOS 2.0 to create a shipable product:
 (see "Making a Bootable Diskette" below)
 
 1.  BIOS.  If you have developed a BIOS for the Beta Test 2.0 version
@@ -69,7 +69,7 @@ Here is what you need to do to MSDOS 2.0 to create a shipable product:
     that you adapt the standard boot sector format also described in
     device drivers.  Once again, please refer to the skeletal BIOS.
     If you have not yet implemented version 2.0 please read the device
-    drivers document.  Microsoft strongly recommends that machines
+    drivers document.  OS-DEV-TEAM strongly recommends that machines
     incorporating integrated display devices with memory mapped video
     RAM implement some sort of terminal emulations through the use of
     escape sequences.  The skeletal  BIOS includes a sample ANSI
@@ -119,7 +119,7 @@ The following problems are known to exist:
     binaries from the new version will not correspond exactly to the
     old version.
 
-5.  If you have any further questions regarding the MSDOS 2.0 distribution
+5.  If you have any further questions regarding the OSDOS 2.0 distribution
     please contact Don Immerwahr (OEM technical support (206) 828-8086).
 
 
@@ -132,45 +132,45 @@ The following problems are known to exist:
 
 
 
-            BUILDING A BOOTABLE (MSDOS FORMAT) DISKETTE
+            BUILDING A BOOTABLE (OSDOS FORMAT) DISKETTE
 
 
-1.  In implementing MSDOS on a new machine, it is highly recommended
-    that an MSDOS machine be available for the development.
-    Please note that utilities shipped with MSDOS 2.0 use MSDOS 2.0
-    system calls and WILL NOT not run under MSDOS 1.25.
+1.  In implementing OSDOS on a new machine, it is highly recommended
+    that an OSDOS machine be available for the development.
+    Please note that utilities shipped with OSDOS 2.0 use OSDOS 2.0
+    system calls and WILL NOT not run under OSDOS 1.25.
 
-2.  Use your MSDOS development machine and EDLIN or a word processor
+2.  Use your OSDOS development machine and EDLIN or a word processor
     package to write BOOT.ASM, your bootstrap loader BIOS.ASM and
     your Format module.
 
-3.  Use MASM, the Microsoft Macro-86 Assembler, to assemble these
+3.  Use MASM, the OS-DEV-TEAM Macro-86 Assembler, to assemble these
     modules.  LINK is then used to link together the .OBJ modules in
     the order specified.
 
 4.  Link creates .EXE format files which are not memory image files
     and contain relocation information in their headers.  Since your
     BIOS and BOOT routines will not be loaded by the EXE loader in
-    MSDOS, they must first be turned into memory image files by
+    OSDOS, they must first be turned into memory image files by
     using the EXE2BIN utility.
 
 5.  The easiest thing to do is to (using your development machine)
     FORMAT a single sided diskette without the system.  Use DEBUG
     to load and write your BOOT.COM bootstrap loader to the BOOT
     sector of that diskette.  You may decide to have your bootstrap
-    load BIOS and let the BIOS load MSDOS or it may load both.  Note that
+    load BIOS and let the BIOS load OSDOS or it may load both.  Note that
     the Bootstrap loader will have to know physically where to go on
     the disk to get the BIOS and the DOS.   COMMAND.COM is loaded
     by the SYSINIT module.
 
 6.  Use the COPY command to copy your IO.SYS file (what the
     BIOS-SYSINIT-SYSIMES module is usually called) onto the disk
-    followed by MSDOS.SYS and COMMAND.COM.   You may use DEBUG
+    followed by OSDOS.SYS and COMMAND.COM.   You may use DEBUG
     to change the directory attribute bytes to make these files hidden.
 
 CAUTION:
 
 At all times, the BIOS writer should be careful to preserve the state
 of the DOS - including the flags.  You should be also be cautioned that
-the MSDOS stack is not deep.  You should not count on more than one or
+the OSDOS stack is not deep.  You should not count on more than one or
 two pushes of the registers.

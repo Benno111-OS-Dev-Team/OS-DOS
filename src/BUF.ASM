@@ -1,5 +1,5 @@
 ;
-; buffer management for MSDOS
+; buffer management for OSDOS
 ;
 
 INCLUDE DOSSEG.ASM

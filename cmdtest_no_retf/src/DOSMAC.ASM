@@ -1,5 +1,5 @@
 ;
-; Macro file for MSDOS.
+; Macro file for OSDOS.
 ;
 
 SUBTTL BREAK a listing into pages and give new subtitles

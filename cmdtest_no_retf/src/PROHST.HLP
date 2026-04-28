@@ -1,5 +1,5 @@
 PROHST is a preliminary version of a utility to process the profile
-file produced by the PROFIL utility of MSDOS.
+file produced by the PROFIL utility of OSDOS.
 Those of you familiar with MS-Pascal or MS-Fortran will have little
 difficulty in understanding how the parameters work. There are three,
 the .PRF filename, an optional histogram file (default extension .HST,

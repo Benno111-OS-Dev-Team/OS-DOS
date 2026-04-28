@@ -1,5 +1,5 @@
 OPTION CASEMAP:ALL`r`n;
-; ^C and error handler for MSDOS
+; ^C and error handler for OSDOS
 ;
 
 .xlist
@@ -8,7 +8,7 @@ INCLUDE STDSW.ASM
 .cref
 .list
 
-TITLE   STDCTRLC - error handler for MSDOS
+TITLE   STDCTRLC - error handler for OSDOS
 NAME    STDCTRLC
 
 INCLUDE CTRLC.ASM

@@ -1,5 +1,5 @@
 ;
-; Directory routines for MSDOS
+; Directory routines for OSDOS
 ;
 
 INCLUDE DOSSEG.ASM

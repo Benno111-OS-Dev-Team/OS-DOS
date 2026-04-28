@@ -1,5 +1,5 @@
 ;
-; segment ordering for MSDOS
+; segment ordering for OSDOS
 ;
 
 CONSTANTS       SEGMENT BYTE PUBLIC 'CONST'

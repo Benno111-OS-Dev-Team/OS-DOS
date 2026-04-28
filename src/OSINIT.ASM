@@ -1,4 +1,4 @@
-; TITLE MSINIT.ASM -- OS DOS INITIALIZATION CODE
+; TITLE OSINIT.ASM -- OS DOS INITIALIZATION CODE
 
         ORG     0                       ; reset to beginning of data segment
 ; Init code below overlaps with data area

@@ -70,7 +70,7 @@ MSMAJOR DB      DOS_MAJOR_VERSION
 MSMINOR DB      DOS_MINOR_VERSION
 
 
-BREAK <$Get_Version -- Return MSDOS version number>
+BREAK <$Get_Version -- Return OSDOS version number>
         procedure   $GET_VERSION,NEAR
 ASSUME  DS:NOTHING,ES:NOTHING
 

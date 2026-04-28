@@ -1,6 +1,6 @@
 OPTION CASEMAP:ALL
 ;
-; Standard buffer management for MSDOS
+; Standard buffer management for OSDOS
 ;
 
 .xlist
@@ -9,7 +9,7 @@ INCLUDE STDSW.ASM
 .cref
 .list
 
-TITLE   STDBUF - MSDOS buffer management
+TITLE   STDBUF - OSDOS buffer management
 NAME    STDBUF
 
 INCLUDE BUF.ASM

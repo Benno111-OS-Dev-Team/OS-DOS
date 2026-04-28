@@ -1,6 +1,6 @@
 OPTION CASEMAP:ALL
 ;
-; Disk utilities of MSDOS
+; Disk utilities of OSDOS
 ;
 
 INCLUDE DOSSEG.ASM

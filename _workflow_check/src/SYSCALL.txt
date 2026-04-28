@@ -570,7 +570,7 @@
         ; ^C check
 
     Description:
-            MSDOS  ordinarily  checks  for   a   ^C   on   the
+            OSDOS  ordinarily  checks  for   a   ^C   on   the
         controlling  device  only  when  doing a function 1-12
         operation to that device.  SetCtrlCTrapping allows the
         user  to  expand  this  checking to include any system
@@ -652,10 +652,10 @@
 
 
 
-        Previous  to  version  2.0,  MSDOS had a simple single
+        Previous  to  version  2.0,  OSDOS had a simple single
     directory structure that sufficed for small (160k to 320K)
     diskettes.   As  the need for hard disk support grows, and
-    as MSDOS 2.0 will support a wide variety  of  hard  disks,
+    as OSDOS 2.0 will support a wide variety  of  hard  disks,
     the need  for better disk organization also grows.  Merely
     expanding the directory  is  not  an  effective  solution;
     doing  a  'DIR'  on  a  directory with 1000 files is not a
@@ -688,10 +688,10 @@
       report accts.     report   accts. report      report
              receiv.             receiv
 
-        In MSDOS  2.0 the user can arrange his files in such a
+        In OSDOS  2.0 the user can arrange his files in such a
     manner that files that are not part of his current task do
-    not  interfere  with that task.  Pre-2.0 versions of MSDOS
-    has a single directory that contains files.  MSDOS extends
+    not  interfere  with that task.  Pre-2.0 versions of OSDOS
+    has a single directory that contains files.  OSDOS extends
     this  concept  to  allow a directory to contain both files
     and  directories  and  to  introduce  the  notion  of  the
     'current' directory.
@@ -728,7 +728,7 @@
         ../../accounting/Sue/report
         /accounting/Sue/report
 
-        There is no restriction in MSDOS 2.0 on the depth of a
+        There is no restriction in OSDOS 2.0 on the depth of a
     tree (the length of the longest path from  root  to  leaf)
     except  in  the number of allocation units available.  The
     root directory will have a fixed number of entries, 64 for
@@ -737,7 +737,7 @@
     of   files  per  directory  excepting  in  the  number  of
     allocation units available.
 
-        Old (pre-2.0) disks will appear to MSDOS 2.0 as having
+        Old (pre-2.0) disks will appear to OSDOS 2.0 as having
     only   a   root   directory   with  files  in  it  and  no
     subdirectories whatever.
 

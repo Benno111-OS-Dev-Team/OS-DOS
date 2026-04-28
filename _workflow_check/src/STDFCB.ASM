@@ -1,5 +1,5 @@
 OPTION CASEMAP:ALL`r`n;
-; Standard FCB calls for MSDOS (first 12 function calls)
+; Standard FCB calls for OSDOS (first 12 function calls)
 ;
 
 .xlist
@@ -8,7 +8,7 @@ INCLUDE STDSW.ASM
 .cref
 .list
 
-TITLE   STDFCB - FCB calls for MSDOS
+TITLE   STDFCB - FCB calls for OSDOS
 NAME    STDFCB
 
 INCLUDE FCB.ASM

@@ -1,6 +1,6 @@
 OPTION CASEMAP:ALL
-TITLE   Standard MSDOS
-NAME    MSDOS_2
+TITLE   Standard OSDOS
+NAME    OSDOS_2
 
 ; Number of disk I/O buffers
 
