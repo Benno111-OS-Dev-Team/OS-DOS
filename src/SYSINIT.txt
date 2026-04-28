@@ -13,8 +13,9 @@ is relocated.  The OEM bios must set this value.
 
     FINAL_DOS_LOCATION      WORD
 
-This word contains the segment number of the DOS after SYSINIT
-moves it.  The OEM bios must set this value.
+This word contains the segment number where DOS will run after
+SYSINIT starts.  If DOS is already loaded in place, set this to
+match CURRENT_DOS_LOCATION.  The OEM bios must set this value.
 
     DEVICE_LIST             DWORD
 
@@ -71,8 +72,9 @@ NOTES:
 highest 10K of memory ("highest" is determined by the  value
 of the MEMORY_SIZE variable), DO NOT DO WRITES THERE.
      Since this is called AFTER DOS is initialized, you can
-make system calls.  This also implies that the code for this
-routine    CANNOT   be   thrown   away   by   use   of   the
-FINAL_DOS_LOCATION since the DOS has already been moved.
+make system calls.  If DOS is booted in place, the code for
+this routine must remain in memory separately from the DOS
+image, and FINAL_DOS_LOCATION should point at the in-place
+segment.
      If you don't want  anything done just set this to point
 at a FAR RET instruction.

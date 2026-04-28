@@ -1381,7 +1381,7 @@ WRKSTK  LABEL   WORD
 
 BOOTMSG_1       DB      13,10,"IO.SYS: hardware init",13,10,0
 BOOTMSG_2       DB      "IO.SYS: ROM console ready",13,10,0
-BOOTMSG_3       DB      "IO.SYS: starting SYSINIT",13,10,0
+BOOTMSG_3       DB      "IO.SYS: starting DOS",13,10,0
 BOOTMSG_4       DB      "IO.SYS: HWINIT entered",13,10,0
 
 
@@ -1414,8 +1414,7 @@ ASSUME  DS:SEG SYSINIT
         MOV     AX,CS
         MOV     WORD PTR DS:[DEVICE_LIST+2],AX
         MOV     WORD PTR DS:[DEVICE_LIST],OFFSET DEVSTART
-        MOV     AX,CS
-        ADD     AX,((OFFSET WRKSTK - OFFSET INIT)+50) /16
+        MOV     AX,DS:[CURRENT_DOS_LOCATION]
         MOV     DS:[FINAL_DOS_LOCATION],AX
         MOV     DX,OFFSET BOOTMSG_3
         CALL    BOOTMSG

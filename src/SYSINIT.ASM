@@ -215,7 +215,7 @@ SYSINIT_RETURN PROC FAR
         RET
 SYSINIT_RETURN ENDP
 ;
-;       MOVE THE DOS TO ITS PROPER LOCATION
+;       START DOS IN PLACE
 ;
 SYSIN:
 
@@ -227,11 +227,6 @@ SYSIN:
         MOV     ES,AX
 
         ASSUME  ES:NOTHING
-
-        XOR     SI,SI
-        MOV     DI,SI
-        MOV     CX,DOSSIZE/2
-        REP     MOVSW
 
         MOV     DX,[MEMORY_SIZE]
         MOV     BX,WORD PTR [DEVICE_LIST+2]
