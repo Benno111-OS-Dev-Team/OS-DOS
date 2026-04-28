@@ -202,6 +202,7 @@ jobs:
             'SYS'
             'SYSMES'
             'EXE2BIN'
+            'EXEMES'
           ) | ForEach-Object { $_.ToUpperInvariant() } | Select-Object -Unique
 
           $modules | Set-Content -Path (Join-Path $buildRoot 'modules.txt')
@@ -348,7 +349,7 @@ jobs:
           Link-Group -OutputName 'MSDOS.SYS' -Modules $dosModules -System 'dos'
           Link-Group -OutputName 'IO.SYS' -Modules @('SKELIO','SYSINIT','SYSIMES') -System 'dos'
           Link-Group -OutputName 'SYS.EXE' -Modules @('SYS','SYSMES') -System 'dos'
-          Link-Group -OutputName 'EXE2BIN.EXE' -Modules @('EXE2BIN') -System 'dos'
+          Link-Group -OutputName 'EXE2BIN.EXE' -Modules @('EXE2BIN','EXEMES') -System 'dos'
 
       - name: Upload object files
         uses: actions/upload-artifact@v4
