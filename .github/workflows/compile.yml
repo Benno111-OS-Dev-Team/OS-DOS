@@ -445,12 +445,14 @@ jobs:
               raise RuntimeError("Boot image requires both IO.SYS and OSDOS.SYS")
 
           io_name, io_attr, io_data, _ = file_data[io_index]
+          dos_name, dos_attr, dos_data, _ = file_data[dos_index]
           if len(io_data) > 0x1000:
               raise RuntimeError(f"IO.SYS is too large to fit the expected 4K boot handoff window: {len(io_data)} bytes")
           if len(io_data) < 0x1000:
               pad_len = 0x1000 - len(io_data)
               log_info(f"IO.SYS: padding {pad_len} byte(s) to reach the 4K handoff boundary")
               io_data = io_data + (b"\x00" * pad_len)
+          io_data = io_data + dos_data
           io_clusters = max(1, math.ceil(len(io_data) / (bps * sectors_per_cluster)))
           log_info(f"IO.SYS: boot payload is {len(io_data)} bytes -> {io_clusters} cluster(s)")
           file_data[io_index] = (io_name, io_attr, io_data, io_clusters)
@@ -474,9 +476,10 @@ jobs:
           if dos_name.upper() != "OSDOS.SYS":
               raise RuntimeError("OSDOS.SYS must be second in allocation for bootstrap loader")
           io_start_lba = first_data_sector + (io_chain[0] - 2) * sectors_per_cluster
-          # The boot sector hands control to IO.SYS only; IO.SYS/SYSINIT is
-          # responsible for loading OSDOS.SYS from the disk image.
-          io_sector_count = len(io_chain) * sectors_per_cluster
+          # The boot sector hands control to IO.SYS only, but the boot image
+          # must preload the DOS kernel immediately after it in memory so
+          # SYSINIT can relocate it from CURRENT_DOS_LOCATION.
+          io_sector_count = (len(io_chain) + len(dos_chain)) * sectors_per_cluster
           if io_sector_count < 3:
               log_warn(f"IO.SYS load is only {io_sector_count} sector(s); boot compatibility may be reduced")
 
