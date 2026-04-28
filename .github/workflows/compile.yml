@@ -351,30 +351,144 @@ jobs:
           Link-Group -OutputName 'SYS.EXE' -Modules @('SYS','SYSMES') -System 'dos'
           Link-Group -OutputName 'EXE2BIN.EXE' -Modules @('EXE2BIN','EXEMES') -System 'dos'
 
-      - name: Install mtools
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          choco install mtools -y --no-progress
-
       - name: Build boot image
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
           $repoRoot = $env:GITHUB_WORKSPACE
           $distRoot = Join-Path $repoRoot 'dist'
-          $bootImage = Join-Path $distRoot 'OSDOS-BOOT-1.44M.img'
+          $py = @'
+          import math
+          import os
+          from pathlib import Path
 
-          Remove-Item -LiteralPath $bootImage -Force -ErrorAction SilentlyContinue
-          & mformat -i $bootImage -f 1440 ::
-          & mcopy -i $bootImage (Join-Path $distRoot 'IO.SYS') ::IO.SYS
-          & mcopy -i $bootImage (Join-Path $distRoot 'MSDOS.SYS') ::MSDOS.SYS
-          & mcopy -i $bootImage (Join-Path $distRoot 'COMMAND.COM') ::COMMAND.COM
-          & mcopy -i $bootImage (Join-Path $distRoot 'SYS.EXE') ::SYS.EXE
-          & mcopy -i $bootImage (Join-Path $distRoot 'EXE2BIN.EXE') ::EXE2BIN.EXE
-          & mattrib -i $bootImage +h +s ::IO.SYS
-          & mattrib -i $bootImage +h +s ::MSDOS.SYS
-          & mdir -i $bootImage ::
+          dist = Path(os.environ["GITHUB_WORKSPACE"]) / "dist"
+          image_path = dist / "OSDOS-BOOT-1.44M.img"
+
+          # FAT12 1.44MB geometry
+          bps = 512
+          total_sectors = 2880
+          sectors_per_cluster = 1
+          reserved_sectors = 1
+          num_fats = 2
+          root_entries = 224
+          sectors_per_fat = 9
+          root_dir_sectors = (root_entries * 32 + (bps - 1)) // bps
+          first_data_sector = reserved_sectors + num_fats * sectors_per_fat + root_dir_sectors
+          data_sectors = total_sectors - first_data_sector
+          total_clusters = data_sectors // sectors_per_cluster
+
+          files = [
+              ("IO.SYS", 0x06),
+              ("MSDOS.SYS", 0x06),
+              ("COMMAND.COM", 0x20),
+              ("SYS.EXE", 0x20),
+              ("EXE2BIN.EXE", 0x20),
+          ]
+
+          file_data = []
+          for name, attr in files:
+              p = dist / name
+              data = p.read_bytes()
+              clusters = max(1, math.ceil(len(data) / (bps * sectors_per_cluster)))
+              file_data.append((name, attr, data, clusters))
+
+          # Allocate clusters contiguously
+          next_cluster = 2
+          allocation = []
+          for name, attr, data, clusters in file_data:
+              start = next_cluster
+              chain = list(range(start, start + clusters))
+              next_cluster += clusters
+              allocation.append((name, attr, data, chain))
+
+          if next_cluster - 2 > total_clusters:
+              raise RuntimeError("Not enough space for files in 1.44MB image")
+
+          image = bytearray(total_sectors * bps)
+
+          # Boot sector (minimal FAT12 BPB, non-custom boot code)
+          bs = bytearray(512)
+          bs[0:3] = b"\xEB\x3C\x90"
+          bs[3:11] = b"MSDOS5.0"
+          bs[11:13] = (bps).to_bytes(2, "little")
+          bs[13] = sectors_per_cluster
+          bs[14:16] = (reserved_sectors).to_bytes(2, "little")
+          bs[16] = num_fats
+          bs[17:19] = (root_entries).to_bytes(2, "little")
+          bs[19:21] = (total_sectors).to_bytes(2, "little")
+          bs[21] = 0xF0
+          bs[22:24] = (sectors_per_fat).to_bytes(2, "little")
+          bs[24:26] = (18).to_bytes(2, "little")   # sectors/track
+          bs[26:28] = (2).to_bytes(2, "little")    # heads
+          bs[28:32] = (0).to_bytes(4, "little")    # hidden sectors
+          bs[32:36] = (0).to_bytes(4, "little")    # big total sectors
+          bs[36] = 0x00
+          bs[37] = 0x00
+          bs[38] = 0x29
+          bs[39:43] = (0x12345678).to_bytes(4, "little")
+          bs[43:54] = b"OSDOSBOOT  "
+          bs[54:62] = b"FAT12   "
+          bs[510:512] = b"\x55\xAA"
+          image[0:512] = bs
+
+          # FAT12 table
+          fat = bytearray(sectors_per_fat * bps)
+          fat[0] = 0xF0
+          fat[1] = 0xFF
+          fat[2] = 0xFF
+
+          def set_fat12_entry(cluster, value):
+              offset = (cluster * 3) // 2
+              if cluster & 1:
+                  fat[offset] = (fat[offset] & 0x0F) | ((value << 4) & 0xF0)
+                  fat[offset + 1] = (value >> 4) & 0xFF
+              else:
+                  fat[offset] = value & 0xFF
+                  fat[offset + 1] = (fat[offset + 1] & 0xF0) | ((value >> 8) & 0x0F)
+
+          for _, _, _, chain in allocation:
+              for i, cluster in enumerate(chain):
+                  nxt = 0xFFF if i == len(chain) - 1 else chain[i + 1]
+                  set_fat12_entry(cluster, nxt)
+
+          fat1_start = reserved_sectors * bps
+          fat2_start = (reserved_sectors + sectors_per_fat) * bps
+          image[fat1_start:fat1_start + len(fat)] = fat
+          image[fat2_start:fat2_start + len(fat)] = fat
+
+          # Root directory
+          root_start = (reserved_sectors + num_fats * sectors_per_fat) * bps
+          root = bytearray(root_dir_sectors * bps)
+
+          def dos_name(name):
+              n, e = name.split(".")
+              return (n[:8].ljust(8) + e[:3].ljust(3)).encode("ascii")
+
+          for idx, (name, attr, data, chain) in enumerate(allocation):
+              e = bytearray(32)
+              e[0:11] = dos_name(name.upper())
+              e[11] = attr
+              # Leave timestamps zero for reproducibility
+              e[26:28] = chain[0].to_bytes(2, "little")
+              e[28:32] = len(data).to_bytes(4, "little")
+              root[idx * 32:(idx + 1) * 32] = e
+
+          image[root_start:root_start + len(root)] = root
+
+          # Data area
+          for _, _, data, chain in allocation:
+              for i, cluster in enumerate(chain):
+                  sector = first_data_sector + (cluster - 2) * sectors_per_cluster
+                  off = sector * bps
+                  chunk = data[i * bps:(i + 1) * bps]
+                  image[off:off + len(chunk)] = chunk
+
+          image_path.write_bytes(image)
+          print(f"Created {image_path} ({len(image)} bytes)")
+          print("Included files:", ", ".join(n for n, *_ in allocation))
+          '@
+          $py | python -
 
       - name: Upload object files
         uses: actions/upload-artifact@v4
