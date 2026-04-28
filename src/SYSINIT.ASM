@@ -234,7 +234,8 @@ SYSIN:
         REP     MOVSW
 
         MOV     DX,[MEMORY_SIZE]
-        LDS     SI,[DEVICE_LIST]
+        MOV     BX,[DEVICE_LIST+2]
+        MOV     SI,[DEVICE_LIST]
 
         CLI
         MOV     AX,CS
