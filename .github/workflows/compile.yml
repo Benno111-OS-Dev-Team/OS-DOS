@@ -409,7 +409,9 @@ jobs:
           if io_name.upper() != "IO.SYS":
               raise RuntimeError("IO.SYS must be first in allocation for bootstrap loader")
           io_start_lba = first_data_sector + (io_chain[0] - 2) * sectors_per_cluster
-          io_sector_count = len(io_chain) * sectors_per_cluster
+          # DOS-style bootstrap handoff: load only the initial IO.SYS bootstrap
+          # sectors and jump into it. The remainder is loaded by system init code.
+          io_sector_count = min(3, len(io_chain) * sectors_per_cluster)
 
           image = bytearray(total_sectors * bps)
 
