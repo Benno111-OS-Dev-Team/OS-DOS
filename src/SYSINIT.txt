@@ -8,14 +8,14 @@ transfered with a long jump to the external  variable  SYSINIT
 
     CURRENT_DOS_LOCATION    WORD
 
-This word  contains  the  segment  number of the DOS before it
-is relocated.  The OEM bios must set this value.
+This word contains the segment number where DOS starts in
+memory.  The OEM bios must set this value.
 
     FINAL_DOS_LOCATION      WORD
 
-This word contains the segment number where DOS will run after
-SYSINIT starts.  If DOS is already loaded in place, set this to
-match CURRENT_DOS_LOCATION.  The OEM bios must set this value.
+This word contains the segment number where DOS will run.
+If DOS is already loaded in place, set this to match
+CURRENT_DOS_LOCATION.  The OEM bios must set this value.
 
     DEVICE_LIST             DWORD
 
