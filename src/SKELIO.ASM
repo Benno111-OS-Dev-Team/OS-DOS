@@ -1386,7 +1386,8 @@ BOOTMSG_4       DB      "IO.SYS: HWINIT entered",13,10,0
 
 
 HWINIT: XOR     BP,BP
-        MOV     SS,BP
+        MOV     AX,CS
+        MOV     SS,AX
         MOV     SP,OFFSET WRKSTK+98     ;Some nice area for stack.
 
         PUSH    CS
