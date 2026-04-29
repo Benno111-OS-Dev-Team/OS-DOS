@@ -227,6 +227,7 @@ SYSIN:
 
         MOV     AX,[CURRENT_DOS_LOCATION]
         MOV     DS,AX
+        MOV     AX,[FINAL_DOS_LOCATION]
         MOV     ES,AX
 
         ASSUME  ES:NOTHING
