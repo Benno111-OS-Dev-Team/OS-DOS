@@ -1547,7 +1547,7 @@ BOOTMSG2:
 ;
 
 WRKSTK  LABEL   WORD
-        DB      100 DUP (?)
+        DB      256 DUP (?)
 
 BOOTMSG_1       DB      13,10,"IO.SYS: hardware init",13,10,0
 BOOTMSG_2       DB      "IO.SYS: ROM console ready",13,10,0
@@ -1556,12 +1556,31 @@ BOOTMSG_4       DB      "IO.SYS: HWINIT entered",13,10,0
 
 
 HWINIT: XOR     BP,BP
+        CLI
         MOV     AX,CS
         MOV     SS,AX
-        MOV     SP,OFFSET WRKSTK+98     ;Some nice area for stack.
+        MOV     SP,OFFSET WRKSTK+254    ;Use a bigger safe early stack.
+        STI
 
+        ; Keep all BIOS-local data references in the IO.SYS segment.  The
+        ; boot sector does not guarantee DS on entry, and using a stale DS here
+        ; can corrupt low memory and make boot appear to freeze in HWINIT.
+        PUSH    CS
+        POP     DS
         PUSH    CS
         POP     ES
+
+        ; The original Altos file hard-coded 00C0h into the device-driver link
+        ; chain.  In a normal PC boot image IO.SYS is not guaranteed to live at
+        ; 00C0h, so SYSINIT can follow the chain into the wrong segment.  Patch
+        ; the link segment words to the actual runtime CS before exposing the
+        ; device list.
+        MOV     AX,CS
+        MOV     WORD PTR [CONDEV+2],AX
+        MOV     WORD PTR [AUXDEV+2],AX
+        MOV     WORD PTR [PRNDEV+2],AX
+        MOV     WORD PTR [TIMDEV+2],AX
+        MOV     WORD PTR [COM1DEV+2],AX
 
         MOV     BX,ROM_INIT
         CALL    ROM_CALL
