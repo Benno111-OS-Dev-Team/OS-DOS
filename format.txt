@@ -1,0 +1,1 @@
+layout a plan to rebuild a project in c to be able to run on arm and x86 and x86_64

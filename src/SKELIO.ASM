@@ -939,7 +939,7 @@ LSDRIV1 DBP     <,,128,4,1,2,68,2002,0FEH,6,26>
 
 LSDRIV2 DBP     <,,128,4,4,2,68,2002,0FDH,6,26>
 
-LDDRIV1 DBP     <,,512,1,24,2,128,924,0F8H,3,12>
+LDDRIV1 DBP     <,,512,1,1,2,224,2880,0F0H,9,36>
 
 LDDRIV2	DBP	<,,1024,1,16,2,128,616,0F9H,1,8>
 
@@ -949,7 +949,7 @@ DSK_INIT:
         JMP     GET_BP5
 
 INITTAB:
-        DW      LDDRIV2.SECSIZE
+        DW      LDDRIV1.SECSIZE
 
 DSTAT   EQU     41H             ;1793 status port.
 DTRACK  EQU     43H             ;1793 track port.
@@ -1328,20 +1328,141 @@ DERRTAB DB      40H             ; 0. Write protect error
 ;
 ;  Save all registers except CX, BX and AX.
 
-ROMRTN  DD      0FE000000H      ;Main ROM entry point.
+ROMRTN  DD      0FE000000H      ;Original Altos ROM entry point.
 
+;
+; PC-compatible replacement for the original Altos ROM monitor calls.
+; The historical SKELIO code used CALL FAR FE00:0000, which crashes on
+; IBM PC/BIOS/QEMU-style machines. This dispatcher keeps the same small
+; ROM API used by the driver code, but maps it to standard BIOS services.
+;
 ROM_CALL:
-        PUSH    DI
+        CMP     BX,ROM_INIT
+        JE      PC_ROM_INIT
+        CMP     BX,ROM_CONSTA
+        JE      PC_ROM_CONSTA
+        CMP     BX,ROM_CONIN
+        JE      PC_ROM_CONIN
+        CMP     BX,ROM_CONOUT
+        JE      PC_ROM_CONOUT
+        CMP     BX,ROM_PMSG
+        JE      PC_ROM_PMSG
+        CMP     BX,ROM_DISKIO
+        JE      PC_ROM_DISKIO
+        XOR     AL,AL
+        RET
+
+PC_ROM_INIT:
+        XOR     AX,AX
+        XOR     DX,DX
+        RET
+
+PC_ROM_CONSTA:
+        MOV     AH,01H
+        INT     16H
+        JZ      PC_ROM_NOKEY
+        MOV     AL,0FFH
+        RET
+PC_ROM_NOKEY:
+        XOR     AL,AL
+        RET
+
+PC_ROM_CONIN:
+        XOR     AH,AH
+        INT     16H
+        RET
+
+PC_ROM_CONOUT:
+        PUSH    BX
+        MOV     AL,DL
+        MOV     AH,0EH
+        MOV     BH,0
+        MOV     BL,07H
+        INT     10H
+        POP     BX
+        RET
+
+PC_ROM_PMSG:
+        PUSH    AX
+        PUSH    BX
         PUSH    SI
-        PUSH    BP
-        PUSH    DX
+        PUSH    DS
         PUSH    ES
-        CALL    CS:DWORD PTR [ROMRTN]
+        PUSH    ES
+        POP     DS
+        MOV     SI,DX
+PC_ROM_PMSG_LOOP:
+        LODSB
+        OR      AL,AL
+        JZ      PC_ROM_PMSG_DONE
+        MOV     AH,0EH
+        MOV     BH,0
+        MOV     BL,07H
+        INT     10H
+        JMP     SHORT PC_ROM_PMSG_LOOP
+PC_ROM_PMSG_DONE:
         POP     ES
-        POP     DX
-        POP     BP
+        POP     DS
         POP     SI
+        POP     BX
+        POP     AX
+        RET
+
+PC_ROM_DISKIO:
+        PUSH    AX
+        PUSH    BX
+        PUSH    CX
+        PUSH    DX
+        PUSH    SI
+        PUSH    DI
+        PUSH    BP
+        PUSH    DS
+        PUSH    ES
+        PUSH    ES
+        POP     DS
+        MOV     SI,CX
+
+        MOV     AL,[SI.SCOUNT]
+        OR      AL,AL
+        JZ      PC_ROM_DISK_OK
+        MOV     AH,02H
+        TEST    BYTE PTR [SI.OPCODE],20H
+        JZ      PC_ROM_DISK_OP_READY
+        MOV     AH,03H
+PC_ROM_DISK_OP_READY:
+        MOV     DL,[SI.DRIVE]
+        AND     DL,7FH
+        MOV     CH,BYTE PTR [SI.TRACK]
+        MOV     BL,[SI.SECTOR]
+        DEC     BL
+        XOR     BH,BH
+        PUSH    AX
+        MOV     AX,BX
+        MOV     BL,18
+        DIV     BL
+        MOV     DH,AL
+        MOV     CL,AH
+        INC     CL
+        POP     AX
+        MOV     BX,[SI.DMAOFF]
+        MOV     ES,[SI.DMASEG]
+        INT     13H
+        JC      PC_ROM_DISK_ERR
+PC_ROM_DISK_OK:
+        MOV     BYTE PTR [SI.RETCODE],0
+        JMP     SHORT PC_ROM_DISK_DONE
+PC_ROM_DISK_ERR:
+        MOV     BYTE PTR [SI.RETCODE],AH
+PC_ROM_DISK_DONE:
+        POP     ES
+        POP     DS
+        POP     BP
         POP     DI
+        POP     SI
+        POP     DX
+        POP     CX
+        POP     BX
+        POP     AX
         RET
 
 ;
