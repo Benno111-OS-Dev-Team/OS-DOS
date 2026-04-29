@@ -121,23 +121,6 @@ BREAK_ADDR              DD      0
 BPB_ADDR                DD      0
 
 SYSMSG_1                DB      "SYSINIT: entered",13,10,0
-SYSMSG_2                DB      "SYSINIT: relocating DOS",13,10,0
-SYSMSG_3                DB      "BOOT COMPLETE",13,10,0
-SYSMSG_4                DB      "SYSINIT: DOS relocated",13,10,0
-SYSMSG_5                DB      "SYSINIT: processing CONFIG.SYS",13,10,0
-SYSMSG_6                DB      "SYSINIT: launching COMMAND.COM",13,10,0
-SYSMSG_7                DB      "SYSINIT: scanning memory",13,10,0
-SYSMSG_8                DB      "SYSINIT: memory scan complete",13,10,0
-SYSMSG_9                DB      "SYSINIT: setting up stack",13,10,0
-SYSMSG_10               DB      "SYSINIT: running BIOS re-init",13,10,0
-SYSMSG_11               DB      "SYSINIT: opening standard devices",13,10,0
-SYSMSG_12               DB      "SYSINIT: COMMAND returned, restarting",13,10,0
-SYSMSG_13               DB      "SYSINIT: relocating SYSINIT image",13,10,0
-SYSMSG_14               DB      "SYSINIT: entering relocated SYSINIT",13,10,0
-SYSMSG_15               DB      "SYSINIT: installing INT 24h handler",13,10,0
-SYSMSG_16               DB      "SYSINIT: default drive selected",13,10,0
-SYSMSG_17               DB      "SYSINIT: CONFIG.SYS complete",13,10,0
-SYSMSG_18               DB      "SYSINIT: BOOT ERROR, rebooting",13,10,0
 
 SYSMSG:
         PUSH    AX
@@ -173,8 +156,6 @@ GOINIT:
         CLD
         XOR     SI,SI
         MOV     DI,SI
-        MOV     DX,OFFSET SYSMSG_7
-        CALL    SYSMSG
 
         IF      MSVER
         MOV     CX,[MEMORY_SIZE]
@@ -195,8 +176,6 @@ MEMSCAN:INC     CX
         JZ      MEMSCAN
 SETEND:
         MOV     [MEMORY_SIZE],CX
-        MOV     DX,OFFSET SYSMSG_8
-        CALL    SYSMSG
         ENDIF
 
         IF      IBMVER OR IBMJAPVER
@@ -207,8 +186,6 @@ NOSCAN:
         MOV     AX,CS
         MOV     DS,AX
 ASSUME  DS:SYSINITSEG
-        MOV     DX,OFFSET SYSMSG_13
-        CALL    SYSMSG
 
         IF      HIGHMEM
         SUB     CX,(DOSSIZE / 16)       ; Leave room for DOS
@@ -245,8 +222,6 @@ SYSIN:
         MOV     AX,[CURRENT_DOS_LOCATION]
         MOV     DS,AX
         MOV     ES,AX
-        MOV     DX,OFFSET SYSMSG_14
-        CALL    SYSMSG
 
         ASSUME  ES:NOTHING
 
@@ -258,8 +233,6 @@ SYSIN:
         MOV     AX,CS
         MOV     SS,AX
         MOV     SP,OFFSET LOCSTACK
-        MOV     DX,OFFSET SYSMSG_9
-        CALL    SYSMSG
 
         ASSUME  SS:SYSINITSEG
 
@@ -268,8 +241,6 @@ SYSIN:
         ENDIF
 LOCSTACK LABEL BYTE
 
-        MOV     DX,OFFSET SYSMSG_2
-        CALL    SYSMSG
 
         MOV     AX,[FINAL_DOS_LOCATION]
         MOV     ES,AX
@@ -279,13 +250,9 @@ LOCSTACK LABEL BYTE
         POP     DS
         MOV     WORD PTR [DOSINFO+2],ES ; SAVE POINTER TO DOS INFO
         MOV     WORD PTR [DOSINFO],DI
-        MOV     DX,OFFSET SYSMSG_4
-        CALL    SYSMSG
 
         IF      NOT IBM
         IF      NOT IBMJAPVER
-        MOV     DX,OFFSET SYSMSG_10
-        CALL    SYSMSG
         CALL    RE_INIT                 ; Re-call the BIOS
         ENDIF
         ENDIF
@@ -334,8 +301,6 @@ SECONDRELOC:
         PUSH    DS
         PUSH    CS
         POP     DS
-        MOV     DX,OFFSET SYSMSG_15
-        CALL    SYSMSG
         MOV     DX,OFFSET INT24         ; SET UP INT 24 HANDLER
         MOV     AX,(SET_INTERRUPT_VECTOR SHL 8) OR 24H
         INT     21H
@@ -354,14 +319,7 @@ SECONDRELOC:
         MOV     AH,SET_DEFAULT_DRIVE
         INT     21H                     ; SELECT THE DISK
 NODRVSET:
-        MOV     DX,OFFSET SYSMSG_16
-        CALL    SYSMSG
-
-        MOV     DX,OFFSET SYSMSG_5
-        CALL    SYSMSG
         CALL    DOCONF                  ; DO THE CONFIG STUFF
-        MOV     DX,OFFSET SYSMSG_17
-        CALL    SYSMSG
 
         IF      HIGHMEM
         PUSH    DS
@@ -453,8 +411,6 @@ GOAUX:  PUSH    AX
 
 GOAUX2: MOV     DX,OFFSET AUXDEV
         MOV     AL,2                    ; READ/WRITE ACCESS
-        MOV     DX,OFFSET SYSMSG_11
-        CALL    SYSMSG
         MOV     DX,OFFSET AUXDEV
         CALL    OPEN_DEV
 
@@ -462,8 +418,6 @@ GOAUX2: MOV     DX,OFFSET AUXDEV
         MOV     AL,1                    ; WRITE ONLY
         CALL    OPEN_DEV
 
-        MOV     DX,OFFSET SYSMSG_3
-        CALL    SYSMSG
 ;
 ; SET UP THE PARAMETERS FOR COMMAND
 ;
@@ -502,8 +456,6 @@ COMTRANLP:                              ; FIND LENGTH OF COMMAND LINE
 
         ASSUME  ES:SYSINITSEG
 
-        MOV     DX,OFFSET SYSMSG_6
-        CALL    SYSMSG
         MOV     DX,OFFSET COMMND        ; NOW POINTING TO FILE DESCRIPTION
 
         IF      NOEXEC
@@ -540,16 +492,12 @@ CCC     ENDP
         STC                             ; IN CASE OF INT 24
         INT     21H                     ; GO START UP COMMAND
         JC      COMERR
-        MOV     DX,OFFSET SYSMSG_12
-        CALL    SYSMSG
         JMP     GOSET                   ; If COMMAND exits, restart it
         ENDIF
 
 COMERR:
         MOV     DX,OFFSET BADCOM        ; WANT TO PRINT COMMAND ERROR
         CALL    BADFIL
-        MOV     DX,OFFSET SYSMSG_18
-        CALL    SYSMSG
 REBOOT: INT     19H                     ; Retry bootstrap instead of hanging forever
         JMP     REBOOT
 
