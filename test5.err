@@ -1,6 +1,0 @@
-C:\Users\Benno111\AppData\Local\Temp\uasm-test\test5.asm(1) : Error A2084: Colon is expected
-C:\Users\Benno111\AppData\Local\Temp\uasm-test\test5.asm(2) : Error A2160: INVOKE requires prototype for procedure
-C:\Users\Benno111\AppData\Local\Temp\uasm-test\test5.asm(3) : Error A2082: Must be in segment block
-C:\Users\Benno111\AppData\Local\Temp\uasm-test\test5.asm(4) : Error A2163: Unmatched macro nesting
-C:\Users\Benno111\AppData\Local\Temp\uasm-test\test5.asm(7) : Error A2082: Must be in segment block
-C:\Users\Benno111\AppData\Local\Temp\uasm-test\test5.asm(8) : Error A2160: INVOKE requires prototype for procedure
