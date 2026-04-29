@@ -225,16 +225,19 @@ SYSIN:
 
         ASSUME  DS:NOTHING,ES:SYSINITSEG,SS:NOTHING
 
-        MOV     AX,[CURRENT_DOS_LOCATION]
+        ; SYSIN runs after SYSINIT has relocated itself with a far return.
+        ; DS is then changed to the DOS image segment for CALL MSDOS, so all
+        ; SYSINIT handoff variables must be read through CS: overrides.
+        MOV     AX,CS:[CURRENT_DOS_LOCATION]
         MOV     DS,AX
-        MOV     AX,[FINAL_DOS_LOCATION]
+        MOV     AX,CS:[FINAL_DOS_LOCATION]
         MOV     ES,AX
 
         ASSUME  ES:NOTHING
 
-        MOV     DX,[MEMORY_SIZE]
-        MOV     BX,WORD PTR [DEVICE_LIST+2]
-        MOV     SI,WORD PTR [DEVICE_LIST]
+        MOV     DX,CS:[MEMORY_SIZE]
+        MOV     BX,WORD PTR CS:[DEVICE_LIST+2]
+        MOV     SI,WORD PTR CS:[DEVICE_LIST]
 
         CLI
         MOV     AX,CS
@@ -251,10 +254,12 @@ LOCSTACK LABEL BYTE
         MOV     DX,OFFSET SYSMSG_2
         CALL    SYSMSG
 
-        MOV     AX,[FINAL_DOS_LOCATION]
+        MOV     AX,CS:[FINAL_DOS_LOCATION]
         MOV     ES,AX
 
         CALL    MSDOS
+        PUSH    CS
+        POP     DS
         MOV     WORD PTR [DOSINFO+2],ES ; SAVE POINTER TO DOS INFO
         MOV     WORD PTR [DOSINFO],DI
 
