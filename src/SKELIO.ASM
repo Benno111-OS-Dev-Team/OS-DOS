@@ -13,8 +13,8 @@ IFNDEF  IBMJAPVER
 IBMJAPVER       EQU     0
 ENDIF
 
-BIOSIZ  EQU     4096            ;Size of BIOS in bytes.
-BIOSIZS EQU     100H            ;Size of BIOS in Paragraphs.
+BIOSIZ  EQU     8192            ;Size of BIOS handoff area in bytes.
+BIOSIZS EQU     200H            ;Size of BIOS handoff area in paragraphs.
 ANSI    EQU     0               ;Ansi switch.
 
 ;Additional Information for the ALTOS machine.
