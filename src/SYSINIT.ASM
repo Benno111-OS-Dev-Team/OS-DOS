@@ -123,6 +123,9 @@ BPB_ADDR                DD      0
 SYSMSG_1                DB      "SYSINIT: entered",13,10,0
 SYSMSG_2                DB      "SYSINIT: relocating DOS",13,10,0
 SYSMSG_3                DB      "BOOT COMPLETE",13,10,0
+SYSMSG_4                DB      "SYSINIT: DOS relocated",13,10,0
+SYSMSG_5                DB      "SYSINIT: processing CONFIG.SYS",13,10,0
+SYSMSG_6                DB      "SYSINIT: launching COMMAND.COM",13,10,0
 
 SYSMSG:
         PUSH    AX
@@ -252,6 +255,8 @@ LOCSTACK LABEL BYTE
         CALL    MSDOS
         PUSH    CS
         POP     DS
+        MOV     DX,OFFSET SYSMSG_4
+        CALL    SYSMSG
         MOV     WORD PTR [DOSINFO+2],ES ; SAVE POINTER TO DOS INFO
         MOV     WORD PTR [DOSINFO],DI
 
@@ -324,6 +329,8 @@ SECONDRELOC:
         INT     21H                     ; SELECT THE DISK
 NODRVSET:
 
+        MOV     DX,OFFSET SYSMSG_5
+        CALL    SYSMSG
         CALL    DOCONF                  ; DO THE CONFIG STUFF
 
         IF      HIGHMEM
@@ -462,6 +469,8 @@ COMTRANLP:                              ; FIND LENGTH OF COMMAND LINE
 
         ASSUME  ES:SYSINITSEG
 
+        MOV     DX,OFFSET SYSMSG_6
+        CALL    SYSMSG
         MOV     DX,OFFSET COMMND        ; NOW POINTING TO FILE DESCRIPTION
 
         IF      NOEXEC
