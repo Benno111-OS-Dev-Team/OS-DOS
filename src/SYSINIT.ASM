@@ -132,6 +132,12 @@ SYSMSG_9                DB      "SYSINIT: setting up stack",13,10,0
 SYSMSG_10               DB      "SYSINIT: running BIOS re-init",13,10,0
 SYSMSG_11               DB      "SYSINIT: opening standard devices",13,10,0
 SYSMSG_12               DB      "SYSINIT: COMMAND returned, restarting",13,10,0
+SYSMSG_13               DB      "SYSINIT: relocating SYSINIT image",13,10,0
+SYSMSG_14               DB      "SYSINIT: entering relocated SYSINIT",13,10,0
+SYSMSG_15               DB      "SYSINIT: installing INT 24h handler",13,10,0
+SYSMSG_16               DB      "SYSINIT: default drive selected",13,10,0
+SYSMSG_17               DB      "SYSINIT: CONFIG.SYS complete",13,10,0
+SYSMSG_18               DB      "SYSINIT: BOOT ERROR, rebooting",13,10,0
 
 SYSMSG:
         PUSH    AX
@@ -201,6 +207,8 @@ NOSCAN:
         MOV     AX,CS
         MOV     DS,AX
 ASSUME  DS:SYSINITSEG
+        MOV     DX,OFFSET SYSMSG_13
+        CALL    SYSMSG
 
         IF      HIGHMEM
         SUB     CX,(DOSSIZE / 16)       ; Leave room for DOS
@@ -237,6 +245,8 @@ SYSIN:
         MOV     AX,[CURRENT_DOS_LOCATION]
         MOV     DS,AX
         MOV     ES,AX
+        MOV     DX,OFFSET SYSMSG_14
+        CALL    SYSMSG
 
         ASSUME  ES:NOTHING
 
@@ -324,6 +334,8 @@ SECONDRELOC:
         PUSH    DS
         PUSH    CS
         POP     DS
+        MOV     DX,OFFSET SYSMSG_15
+        CALL    SYSMSG
         MOV     DX,OFFSET INT24         ; SET UP INT 24 HANDLER
         MOV     AX,(SET_INTERRUPT_VECTOR SHL 8) OR 24H
         INT     21H
@@ -342,10 +354,14 @@ SECONDRELOC:
         MOV     AH,SET_DEFAULT_DRIVE
         INT     21H                     ; SELECT THE DISK
 NODRVSET:
+        MOV     DX,OFFSET SYSMSG_16
+        CALL    SYSMSG
 
         MOV     DX,OFFSET SYSMSG_5
         CALL    SYSMSG
         CALL    DOCONF                  ; DO THE CONFIG STUFF
+        MOV     DX,OFFSET SYSMSG_17
+        CALL    SYSMSG
 
         IF      HIGHMEM
         PUSH    DS
@@ -532,6 +548,8 @@ CCC     ENDP
 COMERR:
         MOV     DX,OFFSET BADCOM        ; WANT TO PRINT COMMAND ERROR
         CALL    BADFIL
+        MOV     DX,OFFSET SYSMSG_18
+        CALL    SYSMSG
 REBOOT: INT     19H                     ; Retry bootstrap instead of hanging forever
         JMP     REBOOT
 
