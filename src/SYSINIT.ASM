@@ -125,6 +125,15 @@ SYSMSG_1                DB      "SYSINIT: entered",13,10,0
 SYSMSG_2                DB      "SYSINIT: relocating DOS",13,10,0
 SYSMSG_3                DB      "BOOT COMPLETE",13,10,0
 
+; Safe temporary stack for the relocated SYSINIT code.  The old code used
+; SP=OFFSET LOCSTACK, where LOCSTACK is a label inside the executable code
+; stream immediately before CALL MSDOS.  That only works while no extra calls
+; are made on that stack.  Our PC boot diagnostics and DOS handoff code use
+; CALL/PUSH here, so using the code label as a stack can overwrite the return
+; path and restart IO.SYS, making "Starting DOS" print in a loop.
+SYSINIT_STACK           DB      128 DUP (?)
+SYSINIT_STACK_TOP       LABEL   BYTE
+
 SYSMSG:
         PUSH    AX
         PUSH    BX
@@ -248,7 +257,7 @@ SYSIN:
         CLI
         MOV     AX,CS
         MOV     SS,AX
-        MOV     SP,OFFSET LOCSTACK
+        MOV     SP,OFFSET SYSINIT_STACK_TOP
 
         ASSUME  SS:SYSINITSEG
 
@@ -302,7 +311,7 @@ SECONDRELOC:
         MOV     AX,CS
         CLI
         MOV     SS,AX
-        MOV     SP,OFFSET LOCSTACK
+        MOV     SP,OFFSET SYSINIT_STACK_TOP
         STI
       ELSE
         MOV     BX,CS
@@ -367,7 +376,7 @@ THIRDRELOC:
         MOV     AX,CS
         CLI
         MOV     SS,AX
-        MOV     SP,OFFSET LOCSTACK
+        MOV     SP,OFFSET SYSINIT_STACK_TOP
         STI
         ENDIF
 
