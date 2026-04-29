@@ -392,7 +392,11 @@ jobs:
           # by applying their relocation fixups at the expected load segments.
           files = [
               ("IO.SYS", 0x06, 0x00C0),
-              ("OSDOS.SYS", 0x06, 0x01C0),
+              # OSDOS.SYS is appended immediately after the 8 KiB IO.SYS handoff
+              # window.  IO.SYS boots at 00C0h, so OSDOS starts at 02C0h;
+              # mz_to_flat_binary must relocate it for 02C0h or SYSINIT will
+              # jump into a DOS image whose absolute references point 4 KiB low.
+              ("OSDOS.SYS", 0x06, 0x02C0),
               ("COMMAND.COM", 0x20, None),
               ("SYS.EXE", 0x20, None),
               ("EXE2BIN.EXE", 0x20, None),
