@@ -1350,6 +1350,7 @@ ROM_CALL:
 BOOTMSG:
         PUSH    AX
         PUSH    BX
+        PUSH    DX
         PUSH    SI
         PUSH    DS
         PUSH    CS
@@ -1373,6 +1374,7 @@ BOOTMSG3:
 BOOTMSG2:
         POP     DS
         POP     SI
+        POP     DX
         POP     BX
         POP     AX
         RET

@@ -127,6 +127,7 @@ SYSMSG_3                DB      "BOOT COMPLETE",13,10,0
 SYSMSG:
         PUSH    AX
         PUSH    BX
+        PUSH    DX
         PUSH    SI
         PUSH    DS
         PUSH    CS
@@ -150,6 +151,7 @@ SYSMSG_PRINT:
 SYSMSG_DONE:
         POP     DS
         POP     SI
+        POP     DX
         POP     BX
         POP     AX
         RET
