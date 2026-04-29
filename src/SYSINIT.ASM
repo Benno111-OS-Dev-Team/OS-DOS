@@ -126,6 +126,12 @@ SYSMSG_3                DB      "BOOT COMPLETE",13,10,0
 SYSMSG_4                DB      "SYSINIT: DOS relocated",13,10,0
 SYSMSG_5                DB      "SYSINIT: processing CONFIG.SYS",13,10,0
 SYSMSG_6                DB      "SYSINIT: launching COMMAND.COM",13,10,0
+SYSMSG_7                DB      "SYSINIT: scanning memory",13,10,0
+SYSMSG_8                DB      "SYSINIT: memory scan complete",13,10,0
+SYSMSG_9                DB      "SYSINIT: setting up stack",13,10,0
+SYSMSG_10               DB      "SYSINIT: running BIOS re-init",13,10,0
+SYSMSG_11               DB      "SYSINIT: opening standard devices",13,10,0
+SYSMSG_12               DB      "SYSINIT: COMMAND returned, restarting",13,10,0
 
 SYSMSG:
         PUSH    AX
@@ -161,6 +167,8 @@ GOINIT:
         CLD
         XOR     SI,SI
         MOV     DI,SI
+        MOV     DX,OFFSET SYSMSG_7
+        CALL    SYSMSG
 
         IF      MSVER
         MOV     CX,[MEMORY_SIZE]
@@ -181,6 +189,8 @@ MEMSCAN:INC     CX
         JZ      MEMSCAN
 SETEND:
         MOV     [MEMORY_SIZE],CX
+        MOV     DX,OFFSET SYSMSG_8
+        CALL    SYSMSG
         ENDIF
 
         IF      IBMVER OR IBMJAPVER
@@ -238,6 +248,8 @@ SYSIN:
         MOV     AX,CS
         MOV     SS,AX
         MOV     SP,OFFSET LOCSTACK
+        MOV     DX,OFFSET SYSMSG_9
+        CALL    SYSMSG
 
         ASSUME  SS:SYSINITSEG
 
@@ -262,6 +274,8 @@ LOCSTACK LABEL BYTE
 
         IF      NOT IBM
         IF      NOT IBMJAPVER
+        MOV     DX,OFFSET SYSMSG_10
+        CALL    SYSMSG
         CALL    RE_INIT                 ; Re-call the BIOS
         ENDIF
         ENDIF
@@ -423,6 +437,9 @@ GOAUX:  PUSH    AX
 
 GOAUX2: MOV     DX,OFFSET AUXDEV
         MOV     AL,2                    ; READ/WRITE ACCESS
+        MOV     DX,OFFSET SYSMSG_11
+        CALL    SYSMSG
+        MOV     DX,OFFSET AUXDEV
         CALL    OPEN_DEV
 
         MOV     DX,OFFSET PRNDEV
@@ -507,6 +524,8 @@ CCC     ENDP
         STC                             ; IN CASE OF INT 24
         INT     21H                     ; GO START UP COMMAND
         JC      COMERR
+        MOV     DX,OFFSET SYSMSG_12
+        CALL    SYSMSG
         JMP     GOSET                   ; If COMMAND exits, restart it
         ENDIF
 
