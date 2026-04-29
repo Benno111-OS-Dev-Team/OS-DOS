@@ -500,7 +500,8 @@ CCC     ENDP
 COMERR:
         MOV     DX,OFFSET BADCOM        ; WANT TO PRINT COMMAND ERROR
         CALL    BADFIL
-STALL:  JMP     STALL
+REBOOT: INT     19H                     ; Retry bootstrap instead of hanging forever
+        JMP     REBOOT
 
 DOCONF:
         PUSH    CS
