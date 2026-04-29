@@ -181,6 +181,12 @@ MEMSCAN:INC     CX
         MOV     [BX],AL
         JZ      MEMSCAN
 SETEND:
+        ; MEMSCAN probes memory by loading DS with each candidate segment.
+        ; When the loop stops, DS is still the last probed segment, not
+        ; SYSINITSEG. Store MEMORY_SIZE through SYSINIT before DOSINIT.
+        ; Otherwise DX is left as 0001h and DOS can hang during Starting DOS.
+        PUSH    CS
+        POP     DS
         MOV     [MEMORY_SIZE],CX
         ENDIF
 
