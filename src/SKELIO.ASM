@@ -118,14 +118,15 @@ DSKDEV:                         ;Header for disk devices
         DW      2000H           ;Is a block device
         DW      STRATEGY
         DW      DSK_INT
+DRVMAX  DB      1               ;Number of Units
+        DB      7 DUP (?)
+
 COM1DEV:                        ;Header for device COM1
         DW      DSKDEV,BIOSSEG
         DW      8000H
         DW      STRATEGY
         DW      AUX_INT
         DB      "COM1    "
-DRVMAX  DB      1               ;Number of Units
-        DB      7 DUP (?)
 
         PAGE
         SUBTTL  Dispatch tables for each device.
@@ -1441,14 +1442,17 @@ HWINIT: XOR     BP,BP
         PUSH    CS
         POP     ES
 
+        MOV     BX,ROM_INIT
+        CALL    ROM_CALL
+        MOV     AH,0
+        MOV     MCON,AX
+
         MOV     DX,OFFSET BOOTMSG_4
+        CALL    BOOTMSG
+        MOV     DX,OFFSET BOOTMSG_2
         CALL    BOOTMSG
         MOV     DX,OFFSET BOOTMSG_1
         CALL    BOOTMSG
-
-        MOV     AX,0001H
-        MOV     MCON,AX
-        MOV     DX,MAX_MEM
 
         MOV     AX,SEG SYSINIT
         MOV     DS,AX
