@@ -497,6 +497,8 @@ CCC     ENDP
         MOV     AH,EXEC
         STC                             ; IN CASE OF INT 24
         INT     21H                     ; GO START UP COMMAND
+        JC      COMERR
+        JMP     GOSET                   ; If COMMAND exits, restart it
         ENDIF
 
 COMERR:
