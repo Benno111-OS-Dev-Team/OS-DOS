@@ -250,6 +250,8 @@ LOCSTACK LABEL BYTE
         MOV     ES,AX
 
         CALL    MSDOS
+        PUSH    CS
+        POP     DS
         MOV     WORD PTR [DOSINFO+2],ES ; SAVE POINTER TO DOS INFO
         MOV     WORD PTR [DOSINFO],DI
 
