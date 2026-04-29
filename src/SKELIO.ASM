@@ -1422,32 +1422,58 @@ PC_ROM_DISKIO:
         POP     DS
         MOV     SI,CX
 
-        MOV     AL,[SI.SCOUNT]
-        OR      AL,AL
+        ; DOS may ask the block driver for a whole 36-sector logical
+        ; track.  PC BIOS INT 13h is not reliable when one request crosses
+        ; a physical 18-sector track/head boundary, which breaks the late
+        ; SYSINIT EXEC path while loading COMMAND.COM.  Translate the old
+        ; logical 36-sector track request into safe one-sector BIOS calls.
+        XOR     BP,BP
+        XOR     BX,BX
+        MOV     BL,[SI.SCOUNT]
+        MOV     BP,BX
+        OR      BP,BP
         JZ      PC_ROM_DISK_OK
+
+        MOV     BX,[SI.DMAOFF]
+        MOV     ES,[SI.DMASEG]
+
+PC_ROM_DISK_LOOP:
+        MOV     AL,[SI.SECTOR]
+        DEC     AL
+        XOR     AH,AH
+        MOV     CL,18
+        DIV     CL                      ; AL=head, AH=sector-1
+        MOV     DH,AL
+        MOV     CL,AH
+        INC     CL
+        MOV     CH,BYTE PTR [SI.TRACK]
+        MOV     DL,[SI.DRIVE]
+        AND     DL,7FH
+
         MOV     AH,02H
         TEST    BYTE PTR [SI.OPCODE],20H
         JZ      PC_ROM_DISK_OP_READY
         MOV     AH,03H
 PC_ROM_DISK_OP_READY:
-        MOV     DL,[SI.DRIVE]
-        AND     DL,7FH
-        MOV     CH,BYTE PTR [SI.TRACK]
-        MOV     BL,[SI.SECTOR]
-        DEC     BL
-        XOR     BH,BH
-        PUSH    AX
-        MOV     AX,BX
-        MOV     BL,18
-        DIV     BL
-        MOV     DH,AL
-        MOV     CL,AH
-        INC     CL
-        POP     AX
-        MOV     BX,[SI.DMAOFF]
-        MOV     ES,[SI.DMASEG]
+        MOV     AL,1
         INT     13H
         JC      PC_ROM_DISK_ERR
+
+        ADD     BX,[SI.SECLENG]
+        JNC     PC_ROM_DISK_NOWRAP
+        MOV     AX,ES
+        ADD     AX,1000H
+        MOV     ES,AX
+PC_ROM_DISK_NOWRAP:
+        INC     BYTE PTR [SI.SECTOR]
+        CMP     BYTE PTR [SI.SECTOR],37
+        JB      PC_ROM_DISK_NEXT
+        MOV     BYTE PTR [SI.SECTOR],1
+        INC     WORD PTR [SI.TRACK]
+PC_ROM_DISK_NEXT:
+        DEC     BP
+        JNZ     PC_ROM_DISK_LOOP
+
 PC_ROM_DISK_OK:
         MOV     BYTE PTR [SI.RETCODE],0
         JMP     SHORT PC_ROM_DISK_DONE
