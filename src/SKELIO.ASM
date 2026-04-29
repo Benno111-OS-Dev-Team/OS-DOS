@@ -1632,8 +1632,13 @@ ASSUME  DS:SEG SYSINIT
         MOV     AX,CS
         MOV     WORD PTR DS:[DEVICE_LIST+2],AX
         MOV     WORD PTR DS:[DEVICE_LIST],OFFSET DEVSTART
-        MOV     AX,CS
-        ADD     AX,((OFFSET WRKSTK - OFFSET INIT)+50) /16
+        ; The boot image builder pads IO.SYS to BIOSIZ bytes and appends
+        ; OSDOS.SYS immediately after that boundary.  Therefore the DOS
+        ; image is already resident at CS+BIOSIZS and must also be entered
+        ; there.  The old Altos formula used the live end of the BIOS code
+        ; (near WRKSTK), which became lower than the padded 8 KiB handoff
+        ; area and made SYSINIT call into empty memory at Starting DOS.
+        MOV     AX,DS:[CURRENT_DOS_LOCATION]
         MOV     DS:[FINAL_DOS_LOCATION],AX
         MOV     DX,OFFSET BOOTMSG_3
         CALL    BOOTMSG
