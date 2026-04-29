@@ -255,10 +255,10 @@ LOCSTACK LABEL BYTE
         CALL    MSDOS
         PUSH    CS
         POP     DS
-        MOV     DX,OFFSET SYSMSG_4
-        CALL    SYSMSG
         MOV     WORD PTR [DOSINFO+2],ES ; SAVE POINTER TO DOS INFO
         MOV     WORD PTR [DOSINFO],DI
+        MOV     DX,OFFSET SYSMSG_4
+        CALL    SYSMSG
 
         IF      NOT IBM
         IF      NOT IBMJAPVER
