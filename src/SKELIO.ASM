@@ -774,7 +774,7 @@ AIN:    CALL    AISTAT          ;Get status and/or char.
 ; Write routine for Auxilary port.
 ;
 
-AOUT:   MOV     CX,[ACON]
+AOUT:   MOV     CX,CS:[ACON]
         MOV     BX,ROM_CONOUT
         MOV     DL,AL
         CALL    ROM_CALL
@@ -1344,6 +1344,43 @@ ROM_CALL:
         RET
 
 ;
+; Mirror a zero-terminated message to the auxiliary debug port.
+; DS:DX must point to the string.
+;
+PUBLIC  DBGMSG
+DBGMSG  PROC    FAR
+        PUSH    AX
+        PUSH    BX
+        PUSH    CX
+        PUSH    DX
+        PUSH    SI
+        PUSH    DS
+        MOV     SI,DX
+DBGMSG1:
+        LODSB
+        OR      AL,AL
+        JZ      DBGMSG2
+        CMP     AL,0DH
+        JNE     DBGMSG3
+        PUSH    AX
+        MOV     AL,0DH
+        CALL    AOUT
+        POP     AX
+        MOV     AL,0AH
+DBGMSG3:
+        CALL    AOUT
+        JMP     SHORT DBGMSG1
+DBGMSG2:
+        POP     DS
+        POP     SI
+        POP     DX
+        POP     CX
+        POP     BX
+        POP     AX
+        RET
+DBGMSG  ENDP
+
+;
 ; Print a zero-terminated boot message through the BIOS teletype service.
 ; DX must point to a string in CS.
 ;
@@ -1356,6 +1393,7 @@ BOOTMSG:
         PUSH    CS
         POP     DS
         MOV     SI,DX
+        CALL    DBGMSG
 BOOTMSG1:
         LODSB
         OR      AL,AL
