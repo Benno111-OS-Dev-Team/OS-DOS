@@ -36,6 +36,7 @@ ROM_INIT        EQU     10      ;Returns boot console and top memory ES:DX.
 
 EXTRN   SYSINIT:FAR                   ;The entry point of SYSINIT
 EXTRN   CURRENT_DOS_LOCATION:WORD     ;Where the DOS is when SYSINIT called
+EXTRN   FINAL_DOS_LOCATION:WORD       ;Where I want SYSINIT to put the DOS
 EXTRN   DEVICE_LIST:DWORD             ;Pointer to the DEVICE list.
 EXTRN   MEMORY_SIZE:WORD              ;Size in paragraphs of Physical memory.
 EXTRN   DEFAULT_DRIVE:BYTE            ;Default Drive to use when system booted
@@ -1421,6 +1422,9 @@ ASSUME  DS:SEG SYSINIT
         MOV     AX,CS
         MOV     WORD PTR DS:[DEVICE_LIST+2],AX
         MOV     WORD PTR DS:[DEVICE_LIST],OFFSET DEVSTART
+        MOV     AX,CS
+        ADD     AX,((OFFSET WRKSTK - OFFSET INIT)+50) /16
+        MOV     DS:[FINAL_DOS_LOCATION],AX
         MOV     DX,OFFSET BOOTMSG_3
         CALL    BOOTMSG
         JMP     SYSINIT

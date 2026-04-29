@@ -11,6 +11,11 @@ transfered with a long jump to the external  variable  SYSINIT
 This word contains the segment number where DOS starts in
 memory.  The OEM bios must set this value.
 
+    FINAL_DOS_LOCATION      WORD
+
+This word contains the segment number of the DOS after SYSINIT
+moves it.  The OEM bios must set this value.
+
     DEVICE_LIST             DWORD
 
 This  double  word  pointer  points  to  the  linked  list  of
