@@ -106,9 +106,15 @@ DOSINIT:
         MOV     [ENDMEM],DX
         MOV     [INITSP],SP
         MOV     [INITSS],SS
-        MOV     SP,OFFSET DOSGROUP:INITSTACK
+        ; On PC BIOS/QEMU hardware the device initialization path may call
+        ; BIOS services (notably INT 13h through the compatibility disk shim).
+        ; Keep interrupts masked only while changing SS:SP, then re-enable
+        ; them before CHARINIT/DSK_INIT can touch BIOS.  The old sequence also
+        ; loaded SP before SS, which left a small window using the caller stack.
         MOV     AX,CS
         MOV     SS,AX
+        MOV     SP,OFFSET DOSGROUP:INITSTACK
+        STI
 ASSUME  SS:DOSGROUP
         PUSH    CS
         POP     ES
