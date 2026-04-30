@@ -245,23 +245,20 @@ ASSUME  DS:NOTHING,ES:NOTHING
 
        entry   DEVIOCALL2
 ; As above only DS:SI points to device header on entry, and DS:SI is preserved
-        ; DS:SI points at the device header, while ES:BX points at the
-        ; request packet in DOSGROUP.  CALLDEVAD is DOS-owned scratch
-        ; storage, so it must be addressed through ES, not DS.  Using
-        ; plain [CALLDEVAD] here writes the far-call pointer into the
-        ; IO.SYS/device segment, then calls through garbage.  Also do not
-        ; assume the driver strategy routine preserves DS, SI, or ES:
-        ; some PC BIOS compatibility handlers touch segment registers.
-        ; Restore DS:SI and ES before building the interrupt-entry call,
-        ; or DOSINIT can lock at "SYSINIT: relocating DOS" after the
-        ; first character-device init request.
+        ; Build the device far calls on the stack instead of using CALLDEVAD.
+        ; During SYSINIT the caller has DS = device segment and ES = request
+        ; packet segment; CALLDEVAD scratch addressing can hit the wrong segment
+        ; and lock up just after "SYSINIT: relocating DOS".
         PUSH    ES
         PUSH    DS
         PUSH    SI
         MOV     AX,[SI.SDEVSTRAT]
-        MOV     WORD PTR ES:[CALLDEVAD],AX
-        MOV     WORD PTR ES:[CALLDEVAD+2],DS
-        CALL    DWORD PTR ES:[CALLDEVAD]
+        PUSH    CS
+        PUSH    OFFSET DEV_STRAT_RET
+        PUSH    DS
+        PUSH    AX
+        RETF
+DEV_STRAT_RET:
         POP     SI
         POP     DS
         POP     ES
@@ -270,9 +267,12 @@ ASSUME  DS:NOTHING,ES:NOTHING
         PUSH    DS
         PUSH    SI
         MOV     AX,[SI.SDEVINT]
-        MOV     WORD PTR ES:[CALLDEVAD],AX
-        MOV     WORD PTR ES:[CALLDEVAD+2],DS
-        CALL    DWORD PTR ES:[CALLDEVAD]
+        PUSH    CS
+        PUSH    OFFSET DEV_INT_RET
+        PUSH    DS
+        PUSH    AX
+        RETF
+DEV_INT_RET:
         POP     SI
         POP     DS
         POP     ES
