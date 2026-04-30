@@ -249,16 +249,33 @@ ASSUME  DS:NOTHING,ES:NOTHING
         ; request packet in DOSGROUP.  CALLDEVAD is DOS-owned scratch
         ; storage, so it must be addressed through ES, not DS.  Using
         ; plain [CALLDEVAD] here writes the far-call pointer into the
-        ; IO.SYS/device segment, then calls through garbage.  That is
-        ; what made boot stop immediately after SYSINIT printed
-        ; "relocating DOS" when DOSINIT tried to initialize CON/AUX/DSK.
+        ; IO.SYS/device segment, then calls through garbage.  Also do not
+        ; assume the driver strategy routine preserves DS, SI, or ES:
+        ; some PC BIOS compatibility handlers touch segment registers.
+        ; Restore DS:SI and ES before building the interrupt-entry call,
+        ; or DOSINIT can lock at "SYSINIT: relocating DOS" after the
+        ; first character-device init request.
+        PUSH    ES
+        PUSH    DS
+        PUSH    SI
         MOV     AX,[SI.SDEVSTRAT]
         MOV     WORD PTR ES:[CALLDEVAD],AX
         MOV     WORD PTR ES:[CALLDEVAD+2],DS
         CALL    DWORD PTR ES:[CALLDEVAD]
+        POP     SI
+        POP     DS
+        POP     ES
+
+        PUSH    ES
+        PUSH    DS
+        PUSH    SI
         MOV     AX,[SI.SDEVINT]
         MOV     WORD PTR ES:[CALLDEVAD],AX
+        MOV     WORD PTR ES:[CALLDEVAD+2],DS
         CALL    DWORD PTR ES:[CALLDEVAD]
+        POP     SI
+        POP     DS
+        POP     ES
         return
 DEVIOCALL   ENDP
 
