@@ -245,13 +245,20 @@ ASSUME  DS:NOTHING,ES:NOTHING
 
        entry   DEVIOCALL2
 ; As above only DS:SI points to device header on entry, and DS:SI is preserved
+        ; DS:SI points at the device header, while ES:BX points at the
+        ; request packet in DOSGROUP.  CALLDEVAD is DOS-owned scratch
+        ; storage, so it must be addressed through ES, not DS.  Using
+        ; plain [CALLDEVAD] here writes the far-call pointer into the
+        ; IO.SYS/device segment, then calls through garbage.  That is
+        ; what made boot stop immediately after SYSINIT printed
+        ; "relocating DOS" when DOSINIT tried to initialize CON/AUX/DSK.
         MOV     AX,[SI.SDEVSTRAT]
-        MOV     WORD PTR [CALLDEVAD],AX
-        MOV     WORD PTR [CALLDEVAD+2],DS
-        CALL    DWORD PTR [CALLDEVAD]
+        MOV     WORD PTR ES:[CALLDEVAD],AX
+        MOV     WORD PTR ES:[CALLDEVAD+2],DS
+        CALL    DWORD PTR ES:[CALLDEVAD]
         MOV     AX,[SI.SDEVINT]
-        MOV     WORD PTR [CALLDEVAD],AX
-        CALL    DWORD PTR [CALLDEVAD]
+        MOV     WORD PTR ES:[CALLDEVAD],AX
+        CALL    DWORD PTR ES:[CALLDEVAD]
         return
 DEVIOCALL   ENDP
 
