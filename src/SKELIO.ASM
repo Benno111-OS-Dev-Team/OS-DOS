@@ -1353,8 +1353,17 @@ ROM_CALL:
         RET
 
 PC_ROM_INIT:
-        XOR     AX,AX
-        XOR     DX,DX
+        MOV     AX,0001H                ; Default boot console.
+        PUSH    AX
+        INT     12H                     ; Conventional memory in KB.
+        SHL     AX,1
+        SHL     AX,1
+        SHL     AX,1
+        SHL     AX,1
+        SHL     AX,1
+        SHL     AX,1                    ; Convert KB to paragraphs.
+        MOV     DX,AX                   ; Return top memory segment.
+        POP     AX
         RET
 
 PC_ROM_CONSTA:
@@ -1612,6 +1621,11 @@ HWINIT: XOR     BP,BP
         CALL    ROM_CALL
         MOV     AH,0
         MOV     MCON,AX
+        OR      DX,DX
+        JNZ     HAVE_MEM_SIZE
+        MOV     DX,MAX_MEM
+HAVE_MEM_SIZE:
+        PUSH    DX                      ; Save memory size across boot output.
 
         MOV     DX,OFFSET BOOTMSG_4
         CALL    BOOTMSG
@@ -1628,7 +1642,8 @@ ASSUME  DS:SEG SYSINIT
         MOV     AX,CS
         ADD     AX,BIOSIZS
         MOV     DS:[CURRENT_DOS_LOCATION],AX
-        MOV     DS:[MEMORY_SIZE],MAX_MEM
+        POP     DX
+        MOV     DS:[MEMORY_SIZE],DX
         MOV     AX,CS
         MOV     WORD PTR DS:[DEVICE_LIST+2],AX
         MOV     WORD PTR DS:[DEVICE_LIST],OFFSET DEVSTART
