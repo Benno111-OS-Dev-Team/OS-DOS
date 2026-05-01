@@ -99,6 +99,35 @@ SYSBUF  LABEL   WORD
 ASSUME  CS:DOSGROUP,DS:NOTHING,ES:NOTHING,SS:NOTHING
 
 DOSINIT:
+        PUSH    AX
+        PUSH    BX
+        PUSH    DX
+        PUSH    SI
+        PUSH    DS
+        PUSH    CS
+        POP     DS
+        MOV     SI,OFFSET DOSINIT_MSG_1
+DOSINIT_MSG_LOOP:
+        LODSB
+        OR      AL,AL
+        JZ      DOSINIT_MSG_DONE
+        CMP     AL,0DH
+        JNE     DOSINIT_MSG_PRINT
+        MOV     AH,0EH
+        XOR     BX,BX
+        INT     10H
+        MOV     AL,0AH
+DOSINIT_MSG_PRINT:
+        MOV     AH,0EH
+        XOR     BX,BX
+        INT     10H
+        JMP     SHORT DOSINIT_MSG_LOOP
+DOSINIT_MSG_DONE:
+        POP     DS
+        POP     SI
+        POP     DX
+        POP     BX
+        POP     AX
         CLI
         CLD
         MOV     AX,ES
@@ -120,6 +149,35 @@ ASSUME  SS:DOSGROUP
         POP     ES
         MOV     WORD PTR ES:[DEVHEAD+2],BX
         MOV     WORD PTR ES:[DEVHEAD],SI   ; DS:SI Points to CONSOLE Device
+        PUSH    AX
+        PUSH    BX
+        PUSH    DX
+        PUSH    SI
+        PUSH    DS
+        PUSH    CS
+        POP     DS
+        MOV     SI,OFFSET DOSINIT_MSG_2
+DOSINIT_MSG2_LOOP:
+        LODSB
+        OR      AL,AL
+        JZ      DOSINIT_MSG2_DONE
+        CMP     AL,0DH
+        JNE     DOSINIT_MSG2_PRINT
+        MOV     AH,0EH
+        XOR     BX,BX
+        INT     10H
+        MOV     AL,0AH
+DOSINIT_MSG2_PRINT:
+        MOV     AH,0EH
+        XOR     BX,BX
+        INT     10H
+        JMP     SHORT DOSINIT_MSG2_LOOP
+DOSINIT_MSG2_DONE:
+        POP     DS
+        POP     SI
+        POP     DX
+        POP     BX
+        POP     AX
         MOV     DS,BX
         CALL    CHARINIT
         PUSH    SI
@@ -417,6 +475,9 @@ ASSUME  DS:NOTHING,ES:NOTHING
         POP     BX
         POP     ES
         RET
+
+DOSINIT_MSG_1   DB      "DOSINIT: entered",13,10,0
+DOSINIT_MSG_2   DB      "DOSINIT: device list ready",13,10,0
 
         DB      80H DUP(?)
 INITSTACK LABEL BYTE
