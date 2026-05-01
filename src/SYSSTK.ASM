@@ -10,7 +10,7 @@ SYSSTKSEG SEGMENT PARA PUBLIC 'SYSTEM_INIT'
 ; Use explicit zero-init so this storage is emitted into the flat boot image.
 ; A '?' stack/BSS-style segment is not guaranteed to exist with our raw MZ->flat
 ; conversion path.
-SYSINIT_STACK           DB      3584 DUP (0)
+SYSINIT_STACK           DB      3520 DUP (0)
 SYSINIT_STACK_TOP       LABEL   BYTE
 
 SYSSTKSEG ENDS
