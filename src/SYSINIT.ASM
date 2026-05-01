@@ -131,7 +131,9 @@ SYSMSG_3                DB      "BOOT COMPLETE",13,10,0
 ; are made on that stack.  Our PC boot diagnostics and DOS handoff code use
 ; CALL/PUSH here, so using the code label as a stack can overwrite the return
 ; path and restart IO.SYS, making "Starting DOS" print in a loop.
-SYSINIT_STACK           DB      1024 DUP (?)
+; Keep this comfortably large: SYSINIT runs parsing/loading code and can
+; nest several calls and INT 21h transitions before COMMAND comes up.
+SYSINIT_STACK           DB      4096 DUP (?)
 SYSINIT_STACK_TOP       LABEL   BYTE
 
 SYSMSG:
