@@ -252,9 +252,11 @@ ASSUME  DS:NOTHING,ES:NOTHING
         PUSH    ES
         PUSH    DS
         PUSH    SI
+        PUSH    BX
         MOV     AX,[SI.SDEVSTRAT]
         PUSH    CS
-        PUSH    OFFSET DEV_STRAT_RET
+        MOV     BX,OFFSET DEV_STRAT_RET
+        PUSH    BX
         PUSH    DS
         PUSH    AX
         RETF
@@ -268,7 +270,8 @@ DEV_STRAT_RET:
         PUSH    SI
         MOV     AX,[SI.SDEVINT]
         PUSH    CS
-        PUSH    OFFSET DEV_INT_RET
+        MOV     BX,OFFSET DEV_INT_RET
+        PUSH    BX
         PUSH    DS
         PUSH    AX
         RETF
@@ -276,6 +279,7 @@ DEV_INT_RET:
         POP     SI
         POP     DS
         POP     ES
+        POP     BX
         return
 DEVIOCALL   ENDP
 
