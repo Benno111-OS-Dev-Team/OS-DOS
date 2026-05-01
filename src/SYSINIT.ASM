@@ -125,6 +125,17 @@ BPB_ADDR                DD      0
 SYSMSG_1                DB      "SYSINIT: entered",13,10,0
 SYSMSG_2                DB      "SYSINIT: relocating DOS",13,10,0
 SYSMSG_3                DB      "BOOT COMPLETE",13,10,0
+SYSMSG_4                DB      "SYSINIT: memory scan/setup",13,10,0
+SYSMSG_5                DB      "SYSINIT: self-relocation copy",13,10,0
+SYSMSG_6                DB      "SYSINIT: entering SYSIN",13,10,0
+SYSMSG_7                DB      "SYSINIT: stack switched",13,10,0
+SYSMSG_8                DB      "SYSINIT: calling MSDOS",13,10,0
+SYSMSG_9                DB      "SYSINIT: returned from MSDOS",13,10,0
+SYSMSG_10               DB      "SYSINIT: running RE_INIT",13,10,0
+SYSMSG_11               DB      "SYSINIT: setting INT 24",13,10,0
+SYSMSG_12               DB      "SYSINIT: running DOCONF",13,10,0
+SYSMSG_13               DB      "SYSINIT: opening console devices",13,10,0
+SYSMSG_14               DB      "SYSINIT: preparing COMMAND",13,10,0
 
 SYSMSG:
         PUSH    AX
@@ -160,6 +171,8 @@ SYSMSG_DONE:
         RET
 
 GOINIT:
+        MOV     DX,OFFSET SYSMSG_4
+        CALL    SYSMSG
         CLD
         XOR     SI,SI
         MOV     DI,SI
@@ -214,6 +227,8 @@ ASSUME  DS:SYSINITSEG
         MOV     ES,CX
         MOV     CX,OFFSET SYSSIZE + 1
         SHR     CX,1                    ; Divide by 2 to get words
+        MOV     DX,OFFSET SYSMSG_5
+        CALL    SYSMSG
         REP     MOVSW                   ; RELOCATE SYSINIT
 
         ASSUME  ES:SYSINITSEG
@@ -229,6 +244,8 @@ SYSINIT_RETURN ENDP
 ;       START DOS IN PLACE
 ;
 SYSIN:
+        MOV     DX,OFFSET SYSMSG_6
+        CALL    SYSMSG
 
         ASSUME  DS:NOTHING,ES:SYSINITSEG,SS:NOTHING
 
@@ -252,6 +269,8 @@ SYSIN:
         MOV     SP,OFFSET SYSINIT_STACK_TOP
 
         ASSUME  SS:NOTHING
+        MOV     DX,OFFSET SYSMSG_7
+        CALL    SYSMSG
 
         IF      NOT ALTVECT
         STI                             ; Leave INTs disabled for ALTVECT
@@ -264,14 +283,20 @@ LOCSTACK LABEL BYTE
         MOV     AX,CS:[FINAL_DOS_LOCATION]
         MOV     ES,AX
 
+        MOV     DX,OFFSET SYSMSG_8
+        CALL    SYSMSG
         CALL    DWORD PTR CS:[MSDOS]
         PUSH    CS
         POP     DS
+        MOV     DX,OFFSET SYSMSG_9
+        CALL    SYSMSG
         MOV     WORD PTR [DOSINFO+2],ES ; SAVE POINTER TO DOS INFO
         MOV     WORD PTR [DOSINFO],DI
 
         IF      NOT IBM
         IF      NOT IBMJAPVER
+        MOV     DX,OFFSET SYSMSG_10
+        CALL    SYSMSG
         CALL    RE_INIT                 ; Re-call the BIOS
         ENDIF
         ENDIF
@@ -320,6 +345,8 @@ SECONDRELOC:
         PUSH    DS
         PUSH    CS
         POP     DS
+        MOV     DX,OFFSET SYSMSG_11
+        CALL    SYSMSG
         MOV     DX,OFFSET INT24         ; SET UP INT 24 HANDLER
         MOV     AX,(SET_INTERRUPT_VECTOR SHL 8) OR 24H
         INT     21H
@@ -339,6 +366,8 @@ SECONDRELOC:
         INT     21H                     ; SELECT THE DISK
 NODRVSET:
 
+        MOV     DX,OFFSET SYSMSG_12
+        CALL    SYSMSG
         CALL    DOCONF                  ; DO THE CONFIG STUFF
 
         IF      HIGHMEM
@@ -398,6 +427,8 @@ ASSUME  DS:SYSINITSEG
         MOV     AL,[FILES]
         CBW
         MOV     CX,AX
+        MOV     DX,OFFSET SYSMSG_13
+        CALL    SYSMSG
         XOR     BX,BX                   ; Close standard input
         MOV     AH,CLOSE
         INT     21H
@@ -443,6 +474,8 @@ GOAUX2: MOV     DX,OFFSET AUXDEV
 ; SET UP THE PARAMETERS FOR COMMAND
 ;
 GOSET:
+        MOV     DX,OFFSET SYSMSG_14
+        CALL    SYSMSG
         MOV     SI,OFFSET COMMAND_LINE+1
 
         IF      NOEXEC
