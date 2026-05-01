@@ -57,6 +57,7 @@ ASSUME  CS:SYSINITSEG,DS:NOTHING,ES:NOTHING,SS:NOTHING
         EXTRN   BADSIZ_POST:BYTE,BADLD_POST:BYTE
         EXTRN   SYSSIZE:BYTE,BADCOUNTRY:BYTE
         EXTRN   DBGMSG:FAR
+        EXTRN   SYSINIT_STACK_TOP:BYTE
 
         PUBLIC  CURRENT_DOS_LOCATION
         PUBLIC  FINAL_DOS_LOCATION
@@ -124,17 +125,6 @@ BPB_ADDR                DD      0
 SYSMSG_1                DB      "SYSINIT: entered",13,10,0
 SYSMSG_2                DB      "SYSINIT: relocating DOS",13,10,0
 SYSMSG_3                DB      "BOOT COMPLETE",13,10,0
-
-; Safe temporary stack for the relocated SYSINIT code.  The old code used
-; SP=OFFSET LOCSTACK, where LOCSTACK is a label inside the executable code
-; stream immediately before CALL MSDOS.  That only works while no extra calls
-; are made on that stack.  Our PC boot diagnostics and DOS handoff code use
-; CALL/PUSH here, so using the code label as a stack can overwrite the return
-; path and restart IO.SYS, making "Starting DOS" print in a loop.
-; Keep this larger than the historical tiny stack but still within the
-; strict 8 KiB IO.SYS boot handoff image size.
-SYSINIT_STACK           DB      3584 DUP (?)
-SYSINIT_STACK_TOP       LABEL   BYTE
 
 SYSMSG:
         PUSH    AX
@@ -257,11 +247,11 @@ SYSIN:
         MOV     SI,WORD PTR CS:[DEVICE_LIST]
 
         CLI
-        MOV     AX,CS
+        MOV     AX,SEG SYSINIT_STACK_TOP
         MOV     SS,AX
         MOV     SP,OFFSET SYSINIT_STACK_TOP
 
-        ASSUME  SS:SYSINITSEG
+        ASSUME  SS:NOTHING
 
         IF      NOT ALTVECT
         STI                             ; Leave INTs disabled for ALTVECT
@@ -310,7 +300,7 @@ BBB     PROC    FAR
 BBB     ENDP
 
 SECONDRELOC:
-        MOV     AX,CS
+        MOV     AX,SEG SYSINIT_STACK_TOP
         CLI
         MOV     SS,AX
         MOV     SP,OFFSET SYSINIT_STACK_TOP
@@ -375,7 +365,7 @@ CCC     PROC    FAR
 CCC     ENDP
 
 THIRDRELOC:
-        MOV     AX,CS
+        MOV     AX,SEG SYSINIT_STACK_TOP
         CLI
         MOV     SS,AX
         MOV     SP,OFFSET SYSINIT_STACK_TOP
