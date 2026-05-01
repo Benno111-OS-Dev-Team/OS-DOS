@@ -131,7 +131,7 @@ SYSMSG_3                DB      "BOOT COMPLETE",13,10,0
 ; are made on that stack.  Our PC boot diagnostics and DOS handoff code use
 ; CALL/PUSH here, so using the code label as a stack can overwrite the return
 ; path and restart IO.SYS, making "Starting DOS" print in a loop.
-SYSINIT_STACK           DB      512 DUP (?)
+SYSINIT_STACK           DB      1024 DUP (?)
 SYSINIT_STACK_TOP       LABEL   BYTE
 
 SYSMSG:
