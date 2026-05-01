@@ -198,7 +198,6 @@ jobs:
             (Get-ModuleNames (Join-Path $srcRoot 'DOSLINK'))
             'SKELIO'
             'SYSINIT'
-            'SYSSTK'
             'SYSIMES'
             'SYS'
             'SYSMES'
@@ -348,7 +347,7 @@ jobs:
           $dosModules = Get-ModuleNames (Join-Path $repoRoot 'src\DOSLINK') | ForEach-Object { $_.ToUpperInvariant() }
           Link-Group -OutputName 'COMMAND.COM' -Modules $commandModules -System 'com'
           Link-Group -OutputName 'OSDOS.SYS' -Modules $dosModules -System 'dos'
-          Link-Group -OutputName 'IO.SYS' -Modules @('SKELIO','SYSINIT','SYSSTK','SYSIMES') -System 'dos'
+          Link-Group -OutputName 'IO.SYS' -Modules @('SKELIO','SYSINIT','SYSIMES') -System 'dos'
           Link-Group -OutputName 'SYS.EXE' -Modules @('SYS','SYSMES') -System 'dos'
           Link-Group -OutputName 'EXE2BIN.EXE' -Modules @('EXE2BIN','EXEMES') -System 'dos'
 

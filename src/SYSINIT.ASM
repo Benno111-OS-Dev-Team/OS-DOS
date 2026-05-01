@@ -57,7 +57,6 @@ ASSUME  CS:SYSINITSEG,DS:NOTHING,ES:NOTHING,SS:NOTHING
         EXTRN   BADSIZ_POST:BYTE,BADLD_POST:BYTE
         EXTRN   SYSSIZE:BYTE,BADCOUNTRY:BYTE
         EXTRN   DBGMSG:FAR
-        EXTRN   SYSINIT_STACK_TOP:BYTE
 
         PUBLIC  CURRENT_DOS_LOCATION
         PUBLIC  FINAL_DOS_LOCATION
@@ -136,6 +135,8 @@ SYSMSG_11               DB      "SYSINIT: setting INT 24",13,10,0
 SYSMSG_12               DB      "SYSINIT: running DOCONF",13,10,0
 SYSMSG_13               DB      "SYSINIT: opening console devices",13,10,0
 SYSMSG_14               DB      "SYSINIT: preparing COMMAND",13,10,0
+SYSINIT_STACK           DB      1024 DUP (?)
+SYSINIT_STACK_TOP       LABEL   BYTE
 
 SYSMSG:
         PUSH    AX
@@ -270,11 +271,11 @@ SYSIN:
         MOV     SI,WORD PTR CS:[DEVICE_LIST]
 
         CLI
-        MOV     AX,SEG SYSINIT_STACK_TOP
+        MOV     AX,CS
         MOV     SS,AX
         MOV     SP,OFFSET SYSINIT_STACK_TOP
 
-        ASSUME  SS:NOTHING
+        ASSUME  SS:SYSINITSEG
         MOV     DX,OFFSET SYSMSG_7
         CALL    SYSMSG
 
@@ -331,7 +332,7 @@ BBB     PROC    FAR
 BBB     ENDP
 
 SECONDRELOC:
-        MOV     AX,SEG SYSINIT_STACK_TOP
+        MOV     AX,CS
         CLI
         MOV     SS,AX
         MOV     SP,OFFSET SYSINIT_STACK_TOP
@@ -400,7 +401,7 @@ CCC     PROC    FAR
 CCC     ENDP
 
 THIRDRELOC:
-        MOV     AX,SEG SYSINIT_STACK_TOP
+        MOV     AX,CS
         CLI
         MOV     SS,AX
         MOV     SP,OFFSET SYSINIT_STACK_TOP
