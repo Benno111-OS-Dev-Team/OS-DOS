@@ -140,9 +140,12 @@ SYSMSG_14               DB      "SYSINIT: preparing COMMAND",13,10,0
 SYSMSG:
         PUSH    AX
         PUSH    BX
+        PUSH    CX
         PUSH    DX
+        PUSH    DI
         PUSH    SI
         PUSH    DS
+        PUSH    ES
         PUSH    CS
         POP     DS
         MOV     SI,DX
@@ -163,9 +166,12 @@ SYSMSG_PRINT:
         INT     10H
         JMP     SHORT SYSMSG_LOOP
 SYSMSG_DONE:
+        POP     ES
         POP     DS
         POP     SI
+        POP     DI
         POP     DX
+        POP     CX
         POP     BX
         POP     AX
         RET
