@@ -1625,7 +1625,9 @@ HWINIT: XOR     BP,BP
         JNZ     HAVE_MEM_SIZE
         MOV     DX,MAX_MEM
 HAVE_MEM_SIZE:
-        PUSH    DX                      ; Save memory size across boot output.
+        MOV     AX,SEG SYSINIT
+        MOV     ES,AX
+        MOV     ES:[MEMORY_SIZE],DX     ; Save the BIOS size before any output.
 
         MOV     DX,OFFSET BOOTMSG_4
         CALL    BOOTMSG
@@ -1642,8 +1644,6 @@ ASSUME  DS:SEG SYSINIT
         MOV     AX,CS
         ADD     AX,BIOSIZS
         MOV     DS:[CURRENT_DOS_LOCATION],AX
-        POP     DX
-        MOV     DS:[MEMORY_SIZE],DX
         MOV     AX,CS
         MOV     WORD PTR DS:[DEVICE_LIST+2],AX
         MOV     WORD PTR DS:[DEVICE_LIST],OFFSET DEVSTART
