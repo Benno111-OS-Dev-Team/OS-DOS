@@ -137,10 +137,6 @@ SYSMSG_13               DB      "SYSINIT: opening console devices",13,10,0
 SYSMSG_14               DB      "SYSINIT: preparing COMMAND",13,10,0
 SYSERR_1                DB      "SYSINIT FATAL: invalid DOS handoff segment",13,10,0
 SYSERR_2                DB      "SYSINIT FATAL: DOS returned bad info pointer",13,10,0
-MSDOS_CALL_OLD_SS       DW      0
-MSDOS_CALL_OLD_SP       DW      0
-MSDOS_CALL_STACK        DB      256 DUP (?)
-MSDOS_CALL_STACK_TOP    LABEL   BYTE
 SYSINIT_STACK           DB      1024 DUP (?)
 SYSINIT_STACK_TOP       LABEL   BYTE
 
@@ -318,24 +314,7 @@ MSDOS_SEG_OK:
 
         MOV     DX,OFFSET SYSMSG_8
         CALL    SYSMSG
-
-        ; Run the DOS handoff on a dedicated call stack so this transition
-        ; has an isolated memory space independent of SYSINIT's work stack.
-        CLI
-        MOV     CS:[MSDOS_CALL_OLD_SS],SS
-        MOV     CS:[MSDOS_CALL_OLD_SP],SP
-        MOV     AX,CS
-        MOV     SS,AX
-        MOV     SP,OFFSET MSDOS_CALL_STACK_TOP
-        STI
-
         CALL    DWORD PTR CS:[MSDOS]
-
-        CLI
-        MOV     AX,CS:[MSDOS_CALL_OLD_SS]
-        MOV     SS,AX
-        MOV     SP,CS:[MSDOS_CALL_OLD_SP]
-        STI
 
         PUSH    CS
         POP     DS
