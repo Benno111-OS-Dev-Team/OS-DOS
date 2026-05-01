@@ -28,7 +28,7 @@ jobs:
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $srcDir = Join-Path $env:GITHUB_WORKSPACE 'src'
+          $srcDir = Join-Path $env:GITHUB_WORKSPACE 'src-asm'
           $problems = New-Object System.Collections.Generic.List[string]
           $externalIncludes = @('IO.ASM')
 

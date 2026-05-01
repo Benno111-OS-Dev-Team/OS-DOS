@@ -73,7 +73,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           $repoRoot = $env:GITHUB_WORKSPACE
-          $srcRoot = Join-Path $repoRoot 'src'
+          $srcRoot = Join-Path $repoRoot 'src-asm'
           $buildRoot = Join-Path $repoRoot 'build'
           $workSrc = Join-Path $buildRoot 'src'
           $objRoot = Join-Path $buildRoot 'obj'
@@ -343,8 +343,8 @@ jobs:
             }
           }
 
-          $commandModules = Get-ModuleNames (Join-Path $repoRoot 'src\COMLINK') | ForEach-Object { $_.ToUpperInvariant() }
-          $dosModules = Get-ModuleNames (Join-Path $repoRoot 'src\DOSLINK') | ForEach-Object { $_.ToUpperInvariant() }
+          $commandModules = Get-ModuleNames (Join-Path $repoRoot 'src-asm\COMLINK') | ForEach-Object { $_.ToUpperInvariant() }
+          $dosModules = Get-ModuleNames (Join-Path $repoRoot 'src-asm\DOSLINK') | ForEach-Object { $_.ToUpperInvariant() }
           Link-Group -OutputName 'COMMAND.COM' -Modules $commandModules -System 'com'
           Link-Group -OutputName 'OSDOS.SYS' -Modules $dosModules -System 'dos'
           Link-Group -OutputName 'IO.SYS' -Modules @('SKELIO','SYSINIT','SYSIMES') -System 'dos'

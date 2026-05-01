@@ -1,0 +1,96 @@
+name: Build Bootable Kernel
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-bootable-kernel-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build bootable kernel image
+    runs-on: windows-2022
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Open Watcom
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $owExe = Join-Path $env:GITHUB_WORKSPACE 'open-watcom-c-win32-1.9.exe'
+          Invoke-WebRequest -Uri 'https://github.com/open-watcom/open-watcom-1.9/releases/download/ow1.9/open-watcom-c-win32-1.9.exe' -OutFile $owExe
+          Start-Process -FilePath $owExe -ArgumentList '-s' -Wait -WindowStyle Hidden
+          "WATCOM=C:\WATCOM" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding ascii
+          "C:\WATCOM\binnt" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding ascii
+
+      - name: Verify toolchain
+        shell: cmd
+        run: |
+          where wcc || exit /b 1
+          where wlink || exit /b 1
+
+      - name: Prepare build tree
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $repoRoot = $env:GITHUB_WORKSPACE
+          $buildRoot = Join-Path $repoRoot 'build'
+          $workSrc = Join-Path $buildRoot 'src'
+          $logRoot = Join-Path $buildRoot 'logs'
+          $distRoot = Join-Path $repoRoot 'dist'
+          New-Item -ItemType Directory -Force -Path $workSrc, $logRoot, $distRoot | Out-Null
+          Copy-Item -LiteralPath (Join-Path $repoRoot 'src\kernel.c') -Destination $workSrc -Force
+
+      - name: Build kernel executable
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $repoRoot = $env:GITHUB_WORKSPACE
+          $workSrc = Join-Path $repoRoot 'build\src'
+          $logRoot = Join-Path $repoRoot 'build\logs'
+          $compiler = (Get-Command wcc.exe).Source
+          $linker = (Get-Command wlink.exe).Source
+
+          Push-Location $workSrc
+          try {
+            Write-Host 'Compiling kernel.c'
+            & $compiler -0 kernel.c 2>&1 | Tee-Object -FilePath (Join-Path $logRoot 'kernel.compile.log')
+            if ($LASTEXITCODE -ne 0) {
+              throw 'Kernel compilation failed.'
+            }
+
+            Write-Host 'Linking kernel.exe'
+            & $linker system dos file kernel.obj name kernel.exe 2>&1 | Tee-Object -FilePath (Join-Path $logRoot 'kernel.link.log')
+            if ($LASTEXITCODE -ne 0) {
+              throw 'Kernel link failed.'
+            }
+          } finally {
+            Pop-Location
+          }
+
+      - name: Build boot image
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $repoRoot = $env:GITHUB_WORKSPACE
+          $kernelExe = Join-Path $repoRoot 'build\src\kernel.exe'
+          $imageOut = Join-Path $repoRoot 'dist\OSDOS-BOOT-1.44M.img'
+          python (Join-Path $repoRoot 'scripts\build_boot_image.py') --kernel $kernelExe --output $imageOut
+
+      - name: Upload boot image
+        uses: actions/upload-artifact@v4
+        with:
+          name: bootable-kernel-${{ github.run_number }}
+          path: dist
+          if-no-files-found: error
