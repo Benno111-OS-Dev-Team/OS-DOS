@@ -4,10 +4,13 @@ TITLE   SYSINIT temporary stack segment
 ; Keeping this in its own segment avoids growing the tightly size-limited
 ; SYSINIT code/data image in IO.SYS.
 
-SYSSTKSEG SEGMENT PARA STACK 'STACK'
+SYSSTKSEG SEGMENT PARA PUBLIC 'SYSTEM_INIT'
         PUBLIC  SYSINIT_STACK_TOP
 
-SYSINIT_STACK           DB      3584 DUP (?)
+; Use explicit zero-init so this storage is emitted into the flat boot image.
+; A '?' stack/BSS-style segment is not guaranteed to exist with our raw MZ->flat
+; conversion path.
+SYSINIT_STACK           DB      3584 DUP (0)
 SYSINIT_STACK_TOP       LABEL   BYTE
 
 SYSSTKSEG ENDS
