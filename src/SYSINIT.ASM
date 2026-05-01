@@ -135,6 +135,8 @@ SYSMSG_11               DB      "SYSINIT: setting INT 24",13,10,0
 SYSMSG_12               DB      "SYSINIT: running DOCONF",13,10,0
 SYSMSG_13               DB      "SYSINIT: opening console devices",13,10,0
 SYSMSG_14               DB      "SYSINIT: preparing COMMAND",13,10,0
+SYSERR_1                DB      "SYSINIT FATAL: invalid DOS handoff segment",13,10,0
+SYSERR_2                DB      "SYSINIT FATAL: DOS returned bad info pointer",13,10,0
 MSDOS_CALL_OLD_SS       DW      0
 MSDOS_CALL_OLD_SP       DW      0
 MSDOS_CALL_STACK        DB      256 DUP (?)
@@ -180,6 +182,14 @@ SYSMSG_DONE:
         POP     BX
         POP     AX
         RET
+
+SYSFATAL:
+        ; DX must point to a zero-terminated fatal string in CS.
+        CALL    SYSMSG
+SYSFATAL_HALT:
+        CLI
+        HLT
+        JMP     SHORT SYSFATAL_HALT
 
 GOINIT:
         MOV     DX,OFFSET SYSMSG_4
@@ -297,6 +307,11 @@ LOCSTACK LABEL BYTE
         ; Refresh the far pointer used for DOS handoff right before the call.
         ; MSDOS and FINAL_DOS_LOCATION share storage by design, but forcing
         ; both words here avoids stale state from earlier initialization paths.
+        OR      AX,AX
+        JNZ     MSDOS_SEG_OK
+        MOV     DX,OFFSET SYSERR_1
+        JMP     SYSFATAL
+MSDOS_SEG_OK:
         MOV     WORD PTR CS:[MSDOS],0
         MOV     AX,CS:[FINAL_DOS_LOCATION]
         MOV     WORD PTR CS:[MSDOS+2],AX
@@ -326,6 +341,12 @@ LOCSTACK LABEL BYTE
         POP     DS
         MOV     DX,OFFSET SYSMSG_9
         CALL    SYSMSG
+        MOV     AX,ES
+        OR      AX,DI
+        JNZ     MSDOS_INFO_OK
+        MOV     DX,OFFSET SYSERR_2
+        JMP     SYSFATAL
+MSDOS_INFO_OK:
         MOV     WORD PTR [DOSINFO+2],ES ; SAVE POINTER TO DOS INFO
         MOV     WORD PTR [DOSINFO],DI
 
