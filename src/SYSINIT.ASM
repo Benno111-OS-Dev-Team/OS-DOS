@@ -290,6 +290,13 @@ LOCSTACK LABEL BYTE
         MOV     AX,CS:[FINAL_DOS_LOCATION]
         MOV     ES,AX
 
+        ; Refresh the far pointer used for DOS handoff right before the call.
+        ; MSDOS and FINAL_DOS_LOCATION share storage by design, but forcing
+        ; both words here avoids stale state from earlier initialization paths.
+        MOV     WORD PTR CS:[MSDOS],0
+        MOV     AX,CS:[FINAL_DOS_LOCATION]
+        MOV     WORD PTR CS:[MSDOS+2],AX
+
         MOV     DX,OFFSET SYSMSG_8
         CALL    SYSMSG
         CALL    DWORD PTR CS:[MSDOS]
