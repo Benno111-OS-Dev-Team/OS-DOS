@@ -261,6 +261,9 @@ TRUEDPBAD:
 ; DX has program segment (whether after DOS or overlaying DOS)
 ; CX has size of memory in paragraphs (reduced by DOS size if HIGHMEM)
         MOV     [ENDMEM],CX
+        IF      HIGHMEM
+        MOV     WORD PTR ES:[ENDMEM],CX
+        ENDIF
         MOV     ES,BP
 ASSUME  ES:DOSGROUP
 
@@ -335,6 +338,12 @@ ASSUME  DS:DOSGROUP,ES:DOSGROUP
         ADD     DI,AX
         INC     DI
         MOV     [CurrentPDB],DI
+        IF      HIGHMEM
+        PUSH    ES
+        MOV     ES,BP
+        MOV     WORD PTR ES:[CurrentPDB],DI
+        POP     ES
+        ENDIF
         PUSH    BP
         PUSH    DX              ; Save COMMAND address
         MOV     AX,[ENDMEM]
