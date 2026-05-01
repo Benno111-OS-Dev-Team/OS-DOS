@@ -260,10 +260,9 @@ TRUEDPBAD:
 ; BP has segment of DOS (whether to load high or run in place)
 ; DX has program segment (whether after DOS or overlaying DOS)
 ; CX has size of memory in paragraphs (reduced by DOS size if HIGHMEM)
+; ENDMEM lives inside the DOS image, so the updated value is carried into the
+; relocated copy by the block move below.
         MOV     [ENDMEM],CX
-        IF      HIGHMEM
-        MOV     WORD PTR ES:[ENDMEM],CX
-        ENDIF
         MOV     ES,BP
 ASSUME  ES:DOSGROUP
 
